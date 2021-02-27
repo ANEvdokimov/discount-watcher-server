@@ -5,10 +5,9 @@ USE `discount-watcher-schema`;
 CREATE TABLE user
 (
     id            BIGINT PRIMARY KEY AUTO_INCREMENT,
-    login         VARCHAR(255)        NOT NULL UNIQUE,
+    login         VARCHAR(255)        NOT NULL,
     name          VARCHAR(255) BINARY NOT NULL,
     password_hash VARCHAR(255) BINARY NOT NULL,
-    register_date DATETIME            NOT NULL,
     is_deleted    BOOLEAN             NOT NULL DEFAULT FALSE
 )
     ENGINE = InnoDB
