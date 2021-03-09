@@ -1,4 +1,4 @@
-package an.evdokimov.discount.watcher.server.api.session.dto.response;
+package an.evdokimov.discount.watcher.server.api.user.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class LogInDtoResponse {
+public class LogInResponse {
     private String token;
 }

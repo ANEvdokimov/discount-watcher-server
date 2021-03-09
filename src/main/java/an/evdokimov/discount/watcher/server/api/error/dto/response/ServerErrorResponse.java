@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ServerErrorDtoResponse {
+public class ServerErrorResponse {
     private String message;
 }

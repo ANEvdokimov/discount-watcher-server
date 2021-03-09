@@ -1,14 +1,12 @@
 package an.evdokimov.discount.watcher.server.api.user.controller;
 
 import an.evdokimov.discount.watcher.server.api.error.ServerException;
-import an.evdokimov.discount.watcher.server.api.session.dto.response.LogInDtoResponse;
-import an.evdokimov.discount.watcher.server.api.user.dto.request.RegisterDtoRequest;
-import an.evdokimov.discount.watcher.server.api.user.service.UserService;
+import an.evdokimov.discount.watcher.server.api.user.dto.request.RegisterRequest;
+import an.evdokimov.discount.watcher.server.api.user.dto.response.LogInResponse;
+import an.evdokimov.discount.watcher.server.service.user.UserService;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -17,12 +15,17 @@ import javax.validation.Valid;
 public class UserController {
     private final UserService userService;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, PasswordEncoder encoder) {
         this.userService = userService;
     }
 
-    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public LogInDtoResponse register(@RequestBody @Valid RegisterDtoRequest request) throws ServerException {
+    @PostMapping(path = "/registration", produces = MediaType.APPLICATION_JSON_VALUE)
+    public LogInResponse register(@RequestBody @Valid RegisterRequest request) throws ServerException {
         return userService.register(request);
+    }
+
+    @GetMapping(path = "hello", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String temp() {
+        return "{\"hello\": \"hello!\"}";
     }
 }

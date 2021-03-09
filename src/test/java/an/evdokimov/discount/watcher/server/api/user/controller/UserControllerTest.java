@@ -1,8 +1,9 @@
 package an.evdokimov.discount.watcher.server.api.user.controller;
 
-import an.evdokimov.discount.watcher.server.api.session.dto.response.LogInDtoResponse;
-import an.evdokimov.discount.watcher.server.api.user.dto.request.RegisterDtoRequest;
-import an.evdokimov.discount.watcher.server.api.user.service.UserService;
+import an.evdokimov.discount.watcher.server.api.user.dto.request.RegisterRequest;
+import an.evdokimov.discount.watcher.server.api.user.dto.response.LogInResponse;
+import an.evdokimov.discount.watcher.server.security.JwtUtils;
+import an.evdokimov.discount.watcher.server.service.user.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -31,27 +33,33 @@ class UserControllerTest {
     @MockBean
     private UserService userService;
 
+    @MockBean
+    private JwtUtils jwtUtils;
+
+    @MockBean
+    private PasswordEncoder passwordEncoder;
+
     @Test
     void register_validDto_logInDtoResponse() throws Exception {
-        RegisterDtoRequest newUser = RegisterDtoRequest.builder()
+        RegisterRequest newUser = RegisterRequest.builder()
                 .login("new user")
                 .password("pass")
                 .name("name")
                 .build();
 
-        LogInDtoResponse response = LogInDtoResponse.builder()
+        LogInResponse response = LogInResponse.builder()
                 .token("token")
                 .build();
         when(userService.register(newUser)).thenReturn(response);
 
-        MvcResult result = mvc.perform(post("/api/users")
+        MvcResult result = mvc.perform(post("/api/users/registration")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(newUser))).andReturn();
 
         assertAll(
-                () -> assertEquals(result.getResponse().getStatus(), 200),
+                () -> assertEquals(200, result.getResponse().getStatus()),
                 () -> assertEquals(
-                        mapper.readValue(result.getResponse().getContentAsString(), LogInDtoResponse.class),
+                        mapper.readValue(result.getResponse().getContentAsString(), LogInResponse.class),
                         response),
                 () -> verify(userService, times(1)).register(newUser)
         );
@@ -59,105 +67,105 @@ class UserControllerTest {
 
     @Test
     void register_nullLogin_http400() throws Exception {
-        RegisterDtoRequest newUser = RegisterDtoRequest.builder()
+        RegisterRequest newUser = RegisterRequest.builder()
                 .password("pass")
                 .name("name")
                 .build();
 
-        MvcResult result = mvc.perform(post("/api/users")
+        MvcResult result = mvc.perform(post("/api/users/registration")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(newUser))).andReturn();
 
         assertAll(
-                () -> assertEquals(result.getResponse().getStatus(), 400),
+                () -> assertEquals(400, result.getResponse().getStatus()),
                 () -> verify(userService, times(0)).register(newUser)
         );
     }
 
     @Test
     void register_emptyLogin_http400() throws Exception {
-        RegisterDtoRequest newUser = RegisterDtoRequest.builder()
+        RegisterRequest newUser = RegisterRequest.builder()
                 .login("")
                 .password("pass")
                 .name("name")
                 .build();
 
-        MvcResult result = mvc.perform(post("/api/users")
+        MvcResult result = mvc.perform(post("/api/users/registration")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(newUser))).andReturn();
 
         assertAll(
-                () -> assertEquals(result.getResponse().getStatus(), 400),
+                () -> assertEquals(400, result.getResponse().getStatus()),
                 () -> verify(userService, times(0)).register(newUser)
         );
     }
 
     @Test
     void register_nullName_http400() throws Exception {
-        RegisterDtoRequest newUser = RegisterDtoRequest.builder()
+        RegisterRequest newUser = RegisterRequest.builder()
                 .login("login")
                 .password("pass")
                 .build();
 
-        MvcResult result = mvc.perform(post("/api/users")
+        MvcResult result = mvc.perform(post("/api/users/registration")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(newUser))).andReturn();
 
         assertAll(
-                () -> assertEquals(result.getResponse().getStatus(), 400),
+                () -> assertEquals(400, result.getResponse().getStatus()),
                 () -> verify(userService, times(0)).register(newUser)
         );
     }
 
     @Test
     void register_emptyName_http400() throws Exception {
-        RegisterDtoRequest newUser = RegisterDtoRequest.builder()
+        RegisterRequest newUser = RegisterRequest.builder()
                 .login("login")
                 .password("pass")
                 .name("")
                 .build();
 
-        MvcResult result = mvc.perform(post("/api/users")
+        MvcResult result = mvc.perform(post("/api/users/registration")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(newUser))).andReturn();
 
         assertAll(
-                () -> assertEquals(result.getResponse().getStatus(), 400),
+                () -> assertEquals(400, result.getResponse().getStatus()),
                 () -> verify(userService, times(0)).register(newUser)
         );
     }
 
     @Test
     void register_nullPassword_http400() throws Exception {
-        RegisterDtoRequest newUser = RegisterDtoRequest.builder()
+        RegisterRequest newUser = RegisterRequest.builder()
                 .login("login")
                 .name("name")
                 .build();
 
-        MvcResult result = mvc.perform(post("/api/users")
+        MvcResult result = mvc.perform(post("/api/users/registration")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(newUser))).andReturn();
 
         assertAll(
-                () -> assertEquals(result.getResponse().getStatus(), 400),
+                () -> assertEquals(400, result.getResponse().getStatus()),
                 () -> verify(userService, times(0)).register(newUser)
         );
     }
 
     @Test
     void register_emptyPassword_http400() throws Exception {
-        RegisterDtoRequest newUser = RegisterDtoRequest.builder()
+        RegisterRequest newUser = RegisterRequest.builder()
                 .login("login")
                 .password("")
                 .name("name")
                 .build();
 
-        MvcResult result = mvc.perform(post("/api/users")
+        MvcResult result = mvc.perform(post("/api/users/registration")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(newUser))).andReturn();
 
         assertAll(
-                () -> assertEquals(result.getResponse().getStatus(), 400),
+                () -> assertEquals(400, result.getResponse().getStatus()),
                 () -> verify(userService, times(0)).register(newUser)
         );
     }
