@@ -1,7 +1,7 @@
 package an.evdokimov.discount.watcher.server.api.error;
 
-import an.evdokimov.discount.watcher.server.api.error.dto.response.ServerErrorDtoResponse;
-import an.evdokimov.discount.watcher.server.api.error.dto.response.ValidationErrorDtoResponse;
+import an.evdokimov.discount.watcher.server.api.error.dto.response.ServerErrorResponse;
+import an.evdokimov.discount.watcher.server.api.error.dto.response.ValidationErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -17,10 +17,10 @@ public class GlobalErrorHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public List<ValidationErrorDtoResponse> handleValidation(MethodArgumentNotValidException exception) {
-        List<ValidationErrorDtoResponse> errors = new ArrayList<>();
+    public List<ValidationErrorResponse> handleValidation(MethodArgumentNotValidException exception) {
+        List<ValidationErrorResponse> errors = new ArrayList<>();
         exception.getBindingResult().getFieldErrors().forEach(fieldError ->
-                errors.add(new ValidationErrorDtoResponse(fieldError.getDefaultMessage(), fieldError.getField()))
+                errors.add(new ValidationErrorResponse(fieldError.getDefaultMessage(), fieldError.getField()))
         );
         return errors;
     }
@@ -28,8 +28,8 @@ public class GlobalErrorHandler {
     @ExceptionHandler(ServerException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public ServerErrorDtoResponse handleValidation(ServerException exception) {
-        return ServerErrorDtoResponse.builder()
+    public ServerErrorResponse handleValidation(ServerException exception) {
+        return ServerErrorResponse.builder()
                 .message(exception.getMessage())
                 .build();
     }

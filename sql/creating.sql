@@ -5,28 +5,12 @@ USE `discount-watcher-schema`;
 CREATE TABLE user
 (
     id            BIGINT PRIMARY KEY AUTO_INCREMENT,
-<<<<<<< HEAD
     login         VARCHAR(255)        NOT NULL UNIQUE,
     name          VARCHAR(255) BINARY NOT NULL,
-    password_hash VARCHAR(255) BINARY NOT NULL,
+    password      VARCHAR(255) BINARY NOT NULL,
     register_date DATETIME            NOT NULL,
-=======
-    login         VARCHAR(255)        NOT NULL,
-    name          VARCHAR(255) BINARY NOT NULL,
-    password_hash VARCHAR(255) BINARY NOT NULL,
->>>>>>> origin/develop
-    is_deleted    BOOLEAN             NOT NULL DEFAULT FALSE
-)
-    ENGINE = InnoDB
-    CHARSET = UTF8;
-
-CREATE TABLE session
-(
-    id             BIGINT PRIMARY KEY AUTO_INCREMENT,
-    user_id        BIGINT              NOT NULL,
-    token          VARCHAR(255) BINARY NOT NULL,
-    last_call_time DATETIME            NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES user (id) ON UPDATE CASCADE ON DELETE CASCADE
+    role          ENUM ('ROLE_USER')  NOT NULL DEFAULT 'ROLE_USER',
+    enabled       BOOLEAN             NOT NULL DEFAULT TRUE
 )
     ENGINE = InnoDB
     CHARSET = UTF8;
@@ -62,12 +46,12 @@ CREATE TABLE shop
 
 CREATE TABLE product
 (
-    id         BIGINT PRIMARY KEY AUTO_INCREMENT,
-    name       VARCHAR(255) NOT NULL,
-    shop_id    BIGINT       NOT NULL,
-    url        VARCHAR(512) NOT NULL UNIQUE,
-    is_deleted BOOLEAN      NOT NULL DEFAULT FALSE,
-    FOREIGN KEY (shop_id) REFERENCES shop (id) ON UPDATE CASCADE ON DELETE RESTRICT
+    id      BIGINT PRIMARY KEY AUTO_INCREMENT,
+    name    VARCHAR(255) NOT NULL,
+    shop_id BIGINT       NOT NULL,
+    url     VARCHAR(512) NOT NULL UNIQUE,
+    FOREIGN KEY (shop_id) REFERENCES shop (id) ON UPDATE CASCADE ON DELETE RESTRICT,
+    UNIQUE (shop_id, url)
 )
     ENGINE = InnoDB
     CHARSET = UTF8;
