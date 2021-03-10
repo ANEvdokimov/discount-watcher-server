@@ -31,7 +31,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .antMatchers("/api/users/registration").permitAll()
-                .antMatchers("/api/auth/login").permitAll()
+                .antMatchers("/api/users/login").permitAll()
                 .anyRequest()
                 .authenticated()
                 .and()
@@ -40,7 +40,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Bean
     public JwtAuthenticationFilter tokenFilter() {
-        return new JwtAuthenticationFilter("/**", List.of("/api/users/registration"), jwtUtils);
+        return new JwtAuthenticationFilter(
+                "/**",
+                List.of("/api/users/registration", "/api/users/login"),
+                jwtUtils);
     }
 
     @Bean
@@ -51,6 +54,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        return new BCryptPasswordEncoder(12);
     }
 }

@@ -2,8 +2,9 @@ package an.evdokimov.discount.watcher.server.service.user;
 
 import an.evdokimov.discount.watcher.server.api.error.ServerErrorCode;
 import an.evdokimov.discount.watcher.server.api.error.ServerException;
+import an.evdokimov.discount.watcher.server.api.user.dto.request.LoginRequest;
 import an.evdokimov.discount.watcher.server.api.user.dto.request.RegisterRequest;
-import an.evdokimov.discount.watcher.server.api.user.dto.response.LogInResponse;
+import an.evdokimov.discount.watcher.server.api.user.dto.response.LoginResponse;
 import an.evdokimov.discount.watcher.server.database.user.model.User;
 import an.evdokimov.discount.watcher.server.database.user.model.UserRole;
 import an.evdokimov.discount.watcher.server.database.user.repository.UserRepository;
@@ -33,7 +34,7 @@ public class UserService implements UserDetailsService {
         this.encoder = encoder;
     }
 
-    public LogInResponse register(RegisterRequest request) throws ServerException {
+    public LoginResponse register(RegisterRequest request) throws ServerException {
         Optional<User> userFromDB = userRepository.findByLogin(request.getLogin());
         if (userFromDB.isPresent()) {
             throw new ServerException(ServerErrorCode.USER_ALREADY_EXISTS);
@@ -45,7 +46,18 @@ public class UserService implements UserDetailsService {
         newUser.setRegisterDate(LocalDateTime.now());
         userRepository.save(newUser);
 
-        return new LogInResponse(jwtUtils.generateToken(newUser.getLogin()));
+        return new LoginResponse(jwtUtils.generateToken(newUser.getLogin()));
+    }
+
+    public LoginResponse login(LoginRequest request) throws ServerException {
+        User userFromDb = userRepository.findByLogin(request.getLogin())
+                .orElseThrow(() -> new ServerException(ServerErrorCode.WRONG_LOGIN_OR_PASSWORD));
+
+        if (!encoder.matches(request.getPassword(), userFromDb.getPassword())) {
+            throw new ServerException(ServerErrorCode.WRONG_LOGIN_OR_PASSWORD);
+        }
+
+        return new LoginResponse(jwtUtils.generateToken(userFromDb.getLogin()));
     }
 
     @Override
