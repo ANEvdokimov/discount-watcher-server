@@ -9,6 +9,7 @@ import an.evdokimov.discount.watcher.server.database.user.model.User;
 import an.evdokimov.discount.watcher.server.database.user.model.UserRole;
 import an.evdokimov.discount.watcher.server.database.user.repository.UserRepository;
 import an.evdokimov.discount.watcher.server.security.JwtUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+@Slf4j
 @Service
 public class UserService implements UserDetailsService {
     private final ModelMapper mapper;
@@ -35,8 +37,11 @@ public class UserService implements UserDetailsService {
     }
 
     public LoginResponse register(RegisterRequest request) throws ServerException {
+        log.debug("registration user {}", request.getLogin());
+
         Optional<User> userFromDB = userRepository.findByLogin(request.getLogin());
         if (userFromDB.isPresent()) {
+            log.warn(ServerErrorCode.USER_ALREADY_EXISTS + ". login: {}", request.getLogin());
             throw new ServerException(ServerErrorCode.USER_ALREADY_EXISTS);
         }
 
@@ -50,6 +55,8 @@ public class UserService implements UserDetailsService {
     }
 
     public LoginResponse login(LoginRequest request) throws ServerException {
+        log.debug("login user {}", request.getLogin());
+
         User userFromDb = userRepository.findByLogin(request.getLogin())
                 .orElseThrow(() -> new ServerException(ServerErrorCode.WRONG_LOGIN_OR_PASSWORD));
 
@@ -62,12 +69,8 @@ public class UserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<User> user = userRepository.findByLogin(username);
+        log.debug("getting user by login {}", username);
 
-        if (user.isEmpty()) {
-            throw new UsernameNotFoundException("User not found");
-        }
-
-        return user.get();
+        return userRepository.findByLogin(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 }

@@ -16,7 +16,7 @@ public class JwtAuthenticationProvider extends AbstractUserDetailsAuthentication
 
     @Override
     public boolean supports(Class<?> authentication) {
-        return (JwtAuthenticationToken.class.isAssignableFrom(authentication));
+        return JwtAuthenticationToken.class.isAssignableFrom(authentication);
     }
 
     @Override
@@ -28,9 +28,6 @@ public class JwtAuthenticationProvider extends AbstractUserDetailsAuthentication
     @Override
     protected UserDetails retrieveUser(String username, UsernamePasswordAuthenticationToken authentication)
             throws AuthenticationException {
-        JwtAuthenticationToken jwtAuthenticationToken = (JwtAuthenticationToken) authentication;
-        String token = jwtAuthenticationToken.getToken();
-
-        return jwtUtil.getUserByToken(token);
+        return jwtUtil.getUserByToken(((JwtAuthenticationToken) authentication).getToken());
     }
 }

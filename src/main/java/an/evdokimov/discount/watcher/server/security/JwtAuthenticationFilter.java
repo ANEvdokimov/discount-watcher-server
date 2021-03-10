@@ -72,12 +72,15 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
             throws AuthenticationException, IOException, ServletException {
+        log.debug("attempt authentication");
+
         String authorizationHeader = request.getHeader(authorisationHeaderName);
         if (authorizationHeader == null) {
             authorizationHeader = request.getParameter(authorisationHeaderName);
         }
 
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+            log.warn(AuthenticationErrorMessage.BAD_TOKEN.getMessage() + ". token: {}", authorizationHeader);
             throw new AuthenticationCredentialsNotFoundException(AuthenticationErrorMessage.BAD_TOKEN.getMessage());
         }
 
@@ -85,6 +88,7 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
 
         try {
             jwtUtils.validateToken(token);
+            log.info("token {} is valid", token);
         } catch (ExpiredJwtException e) {
             log.warn(e.getMessage());
             throw new CredentialsExpiredException(e.getMessage(), e);

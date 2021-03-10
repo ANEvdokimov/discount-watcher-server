@@ -23,16 +23,22 @@ public class UserController {
 
     @PostMapping(path = "/registration", produces = MediaType.APPLICATION_JSON_VALUE)
     public LoginResponse register(@RequestBody @Valid RegisterRequest request) throws ServerException {
+        log.debug("registration user {}", request.getLogin());
+
         return userService.register(request);
     }
 
     @PostMapping(path = "/login", produces = MediaType.APPLICATION_JSON_VALUE)
     public LoginResponse login(@RequestBody @Valid LoginRequest request) throws ServerException {
+        log.debug("login user {}", request.getLogin());
+
         return userService.login(request);
     }
 
     @GetMapping(path = "/hello", produces = MediaType.APPLICATION_JSON_VALUE)
     public String hello() {
+        log.info("hello!");
+
         return "{\"hello\": \"hello!\"}";
     }
 }

@@ -28,6 +28,8 @@ public class JwtUtils {
     }
 
     public String generateToken(String login) {
+        log.debug("generate JWT for {}", login);
+
         return Jwts.builder()
                 .setSubject(login)
                 .setExpiration(Date.from(LocalDateTime.now().plusSeconds(expirationTime).toInstant(ZoneOffset.UTC)))
@@ -36,14 +38,20 @@ public class JwtUtils {
     }
 
     public void validateToken(String token) throws JwtException {
+        log.debug("validate token {}", token);
+
         Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token);
     }
 
     public String getLoginFromToken(String token) {
+        log.debug("getting login from token: {}", token);
+
         return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().getSubject();
     }
 
     public User getUserByToken(String token) {
+        log.debug("getting user by token: {}", token);
+
         return userRepository.findByLogin(getLoginFromToken(token)).orElseThrow(
                 () -> new UsernameNotFoundException("User not found"));
     }
