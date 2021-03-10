@@ -44,36 +44,44 @@ CREATE TABLE shop
     ENGINE = InnoDB
     CHARSET = UTF8;
 
-CREATE TABLE product
+CREATE TABLE product_information_lenta
 (
-    id      BIGINT PRIMARY KEY AUTO_INCREMENT,
-    name    VARCHAR(255) NOT NULL,
-    shop_id BIGINT       NOT NULL,
-    url     VARCHAR(512) NOT NULL UNIQUE,
-    FOREIGN KEY (shop_id) REFERENCES shop (id) ON UPDATE CASCADE ON DELETE RESTRICT,
-    UNIQUE (shop_id, url)
-)
-    ENGINE = InnoDB
-    CHARSET = UTF8;
-
-CREATE TABLE product_price
-(
-    id                  BIGINT PRIMARY KEY AUTO_INCREMENT,
-    product_id          BIGINT   NOT NULL,
-    price               FLOAT    NOT NULL,
-    discount            FLOAT,
-    price_with_discount FLOAT,
-    date                DATETIME NOT NULL,
-    FOREIGN KEY (product_id) REFERENCES product (id) ON UPDATE CASCADE ON DELETE RESTRICT
+    id   BIGINT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL,
+    url  VARCHAR(512) NOT NULL UNIQUE
 )
     ENGINE = InnoDB
     CHARSET = UTF8;
 
 CREATE TABLE product_price_lenta
 (
-    id              BIGINT PRIMARY KEY,
-    price_with_card FLOAT NOT NULL,
-    FOREIGN KEY (id) REFERENCES product_price (id) ON UPDATE CASCADE ON DELETE CASCADE
+    id                       BIGINT PRIMARY KEY AUTO_INCREMENT,
+    product_id               BIGINT   NOT NULL,
+    price                    FLOAT    NOT NULL,
+    price_with_card          FLOAT    NOT NULL,
+    discount                 FLOAT,
+    price_with_discount      FLOAT,
+    is_in_stock              BOOLEAN  NOT NULL,
+    availability_information VARCHAR(255),
+    date                     DATETIME NOT NULL,
+    FOREIGN KEY (product_id) REFERENCES product_information_lenta (id) ON UPDATE CASCADE ON DELETE RESTRICT
+)
+    ENGINE = InnoDB
+    CHARSET = UTF8;
+
+CREATE TABLE user_product_lenta
+(
+    id                     BIGINT PRIMARY KEY AUTO_INCREMENT,
+    user_id                BIGINT  NOT NULL,
+    product_information_id BIGINT  NOT NULL,
+    shop_id                BIGINT  NOT NULL,
+    monitor_discount       BOOLEAN NOT NULL,
+    monitor_availability   BOOLEAN NOT NULL,
+    monitor_price_changes  BOOLEAN NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES user (id) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (product_information_id) REFERENCES product_information_lenta (id) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (shop_id) REFERENCES shop (id) ON UPDATE CASCADE ON DELETE CASCADE,
+    UNIQUE (user_id, product_information_id, shop_id)
 )
     ENGINE = InnoDB
     CHARSET = UTF8;
