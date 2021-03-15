@@ -17,16 +17,18 @@ CREATE TABLE user
 
 CREATE TABLE city
 (
-    id   BIGINT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(255) NOT NULL
+    id            BIGINT PRIMARY KEY AUTO_INCREMENT,
+    name          VARCHAR(255) NOT NULL,
+    cyrillic_name VARCHAR(255) NOT NULL
 )
     ENGINE = InnoDB
     CHARSET = UTF8;
 
 CREATE TABLE commercial_network
 (
-    id   BIGINT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(255) NOT NULL
+    id            BIGINT PRIMARY KEY AUTO_INCREMENT,
+    name          VARCHAR(255) NOT NULL,
+    cyrillic_name VARCHAR(255) NOT NULL
 )
     ENGINE = InnoDB
     CHARSET = UTF8;
@@ -46,9 +48,10 @@ CREATE TABLE shop
 
 CREATE TABLE product_information_lenta
 (
-    id   BIGINT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(255) NOT NULL,
-    url  VARCHAR(512) NOT NULL UNIQUE
+    id          BIGINT PRIMARY KEY AUTO_INCREMENT,
+    name        VARCHAR(255) NOT NULL,
+    url         VARCHAR(512) NOT NULL UNIQUE,
+    vendor_code VARCHAR(64)
 )
     ENGINE = InnoDB
     CHARSET = UTF8;
