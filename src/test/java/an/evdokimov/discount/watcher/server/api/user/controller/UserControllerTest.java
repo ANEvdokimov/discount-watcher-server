@@ -1,5 +1,6 @@
 package an.evdokimov.discount.watcher.server.api.user.controller;
 
+import an.evdokimov.discount.watcher.server.api.TestConfig;
 import an.evdokimov.discount.watcher.server.api.user.dto.request.LoginRequest;
 import an.evdokimov.discount.watcher.server.api.user.dto.request.RegisterRequest;
 import an.evdokimov.discount.watcher.server.api.user.dto.response.LoginResponse;
@@ -11,6 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -23,7 +25,8 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 @ExtendWith(SpringExtension.class)
-@WebMvcTest
+@WebMvcTest(UserController.class)
+@Import(TestConfig.class)
 class UserControllerTest {
     @Autowired
     private MockMvc mvc;

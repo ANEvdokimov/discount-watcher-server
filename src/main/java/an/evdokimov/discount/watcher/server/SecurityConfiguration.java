@@ -1,10 +1,12 @@
 package an.evdokimov.discount.watcher.server;
 
 import an.evdokimov.discount.watcher.server.security.JwtAuthenticationFilter;
+import an.evdokimov.discount.watcher.server.security.JwtAuthenticationProvider;
 import an.evdokimov.discount.watcher.server.security.JwtUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -17,9 +19,11 @@ import java.util.List;
 @Configuration
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private final JwtUtils jwtUtils;
+    private final JwtAuthenticationProvider jwtAuthenticationProvider;
 
-    public SecurityConfiguration(JwtUtils jwtUtils) {
+    public SecurityConfiguration(JwtUtils jwtUtils, JwtAuthenticationProvider jwtAuthenticationProvider) {
         this.jwtUtils = jwtUtils;
+        this.jwtAuthenticationProvider = jwtAuthenticationProvider;
     }
 
     @Override
@@ -36,6 +40,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .authenticated()
                 .and()
                 .addFilterBefore(tokenFilter(), UsernamePasswordAuthenticationFilter.class);
+    }
+
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.authenticationProvider(jwtAuthenticationProvider);
     }
 
     @Bean
