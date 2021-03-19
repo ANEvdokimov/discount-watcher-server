@@ -1,6 +1,6 @@
 package an.evdokimov.discount.watcher.server.api.city.controller;
 
-import an.evdokimov.discount.watcher.server.database.city.model.City;
+import an.evdokimov.discount.watcher.server.api.city.dto.response.CityResponse;
 import an.evdokimov.discount.watcher.server.service.city.CityService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -21,7 +21,7 @@ public class CityController {
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public Collection<City> getAllCities() {
+    public Collection<CityResponse> getAllCities() {
         log.debug("getting all cities");
 
         return cityService.getAll();

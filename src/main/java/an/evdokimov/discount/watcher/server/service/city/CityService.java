@@ -1,7 +1,6 @@
 package an.evdokimov.discount.watcher.server.service.city;
 
 import an.evdokimov.discount.watcher.server.api.city.dto.response.CityResponse;
-import an.evdokimov.discount.watcher.server.database.city.model.City;
 import an.evdokimov.discount.watcher.server.database.city.repository.CityRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -22,7 +21,7 @@ public class CityService {
         this.modelMapper = modelMapper;
     }
 
-    public Collection<City> getAll() {
+    public Collection<CityResponse> getAll() {
         log.debug("getting all cities");
 
         return modelMapper.map(repository.findAll(), new TypeToken<ArrayList<CityResponse>>() {

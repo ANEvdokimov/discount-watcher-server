@@ -42,7 +42,7 @@ class CityServiceTest {
                 mapper.map(cities, new TypeToken<ArrayList<CityResponse>>() {
                 }.getType());
 
-        Collection<City> result = cityService.getAll();
+        Collection<CityResponse> result = cityService.getAll();
 
         assertThat(result, containsInAnyOrder(expectedCityResponses.toArray()));
     }
@@ -51,7 +51,7 @@ class CityServiceTest {
     void getAll_noCities_emptyList() {
         when(repository.findAll()).thenReturn(new ArrayList<>());
 
-        Collection<City> result = cityService.getAll();
+        Collection<CityResponse> result = cityService.getAll();
 
         assertEquals(0, result.size());
     }

@@ -2,14 +2,12 @@ package an.evdokimov.discount.watcher.server.api.city.controller;
 
 import an.evdokimov.discount.watcher.server.api.TestConfig;
 import an.evdokimov.discount.watcher.server.api.city.dto.response.CityResponse;
-import an.evdokimov.discount.watcher.server.database.city.model.City;
 import an.evdokimov.discount.watcher.server.security.JwtUtils;
 import an.evdokimov.discount.watcher.server.service.city.CityService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -53,10 +51,10 @@ class CityControllerTest {
 
     @Test
     void getAllCities_validJwt_http200() throws Exception {
-        List<City> cities = List.of(
-                City.builder().name("city 1").build(),
-                City.builder().name("city 2").build(),
-                City.builder().name("city 17").build());
+        List<CityResponse> cities = List.of(
+                CityResponse.builder().name("city 1").build(),
+                CityResponse.builder().name("city 2").build(),
+                CityResponse.builder().name("city 17").build());
         when(cityService.getAll()).thenReturn(cities);
 
         MvcResult result = mvc.perform(get("/api/cities")
@@ -68,14 +66,10 @@ class CityControllerTest {
                 objectMapper.getTypeFactory().constructCollectionType(ArrayList.class, CityResponse.class)
         );
 
-        ArrayList<CityResponse> expectedCityResponses =
-                modelMapper.map(cities, new TypeToken<ArrayList<CityResponse>>() {
-                }.getType());
-
         assertAll(
                 () -> assertEquals(200, result.getResponse().getStatus()),
                 () -> verify(cityService, times(1)).getAll(),
-                () -> assertThat(cityResponses, containsInAnyOrder(expectedCityResponses.toArray()))
+                () -> assertThat(cityResponses, containsInAnyOrder(cities.toArray()))
         );
     }
 
