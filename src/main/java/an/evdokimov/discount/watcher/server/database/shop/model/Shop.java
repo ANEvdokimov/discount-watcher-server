@@ -26,4 +26,5 @@ public class Shop {
     @JoinColumn(name = "city_id")
     private City city;
     private String address;
+    private String cookie;
 }

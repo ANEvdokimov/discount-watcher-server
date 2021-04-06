@@ -5,5 +5,5 @@ INSERT INTO city (name, cyrillic_name) VALUE ('Orenburg', 'Оренбург');
 
 INSERT INTO commercial_network (name, cyrillic_name) VALUE ('Lenta', 'Лента');
 
-INSERT INTO shop (commercial_network_id, name, city_id, address)
-VALUES (1, 'Лента на Лукашевича', 1, 'ул. Лукашевича, д. 33')
+INSERT INTO shop (commercial_network_id, name, city_id, address, cookie)
+VALUES (1, 'Лента на Лукашевича', 1, 'ул. Лукашевича, д. 33', 'Store:0079')
