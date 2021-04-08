@@ -8,6 +8,8 @@ import an.evdokimov.discount.watcher.server.parser.downloader.PageDownloaderExce
 import java.net.URL;
 
 public interface Parser {
+    String getSupportedUrl();
+
     Product parse(URL url, Shop shop) throws PageDownloaderException, ParserException;
 
     Product parse(ProductInformation productInformation, Shop shop) throws PageDownloaderException, ParserException;

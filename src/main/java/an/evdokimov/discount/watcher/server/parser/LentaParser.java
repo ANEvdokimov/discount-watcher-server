@@ -56,6 +56,11 @@ public class LentaParser implements Parser {
     }
 
     @Override
+    public String getSupportedUrl() {
+        return HOST_NAME;
+    }
+
+    @Override
     public Product parse(@NotNull URL url, @NotNull Shop shop) throws PageDownloaderException, ParserException {
         validateUrl(url);
 
