@@ -9,7 +9,8 @@ public enum ParserErrorCode {
     WRONG_SHOP_URL("Unsupported shop."),
     AMBIGUOUS_SEARCH_RESULT("More than one element found."),
     ELEMENT_NOT_FOUND("The element not found."),
-    WRONG_NUMBER_FORMAT("Wrong number format.");
+    WRONG_NUMBER_FORMAT("Wrong number format."),
+    UNKNOWN_DATA_FORMAT("Unknown data format.");
 
     private final String message;
 }
