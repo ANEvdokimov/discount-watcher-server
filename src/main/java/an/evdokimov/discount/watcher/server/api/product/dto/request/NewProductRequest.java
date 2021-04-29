@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import java.net.URL;
 
 @Data
 @Builder
@@ -13,5 +15,7 @@ import javax.validation.constraints.NotBlank;
 @AllArgsConstructor
 public class NewProductRequest {
     @NotBlank
-    private String url;
+    private URL url;
+    @NotNull
+    private Long shopId;
 }

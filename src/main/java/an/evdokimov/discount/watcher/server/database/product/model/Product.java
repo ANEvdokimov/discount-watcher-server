@@ -1,5 +1,6 @@
 package an.evdokimov.discount.watcher.server.database.product.model;
 
+import an.evdokimov.discount.watcher.server.api.product.dto.response.ProductResponse;
 import an.evdokimov.discount.watcher.server.database.shop.model.Shop;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -33,4 +34,8 @@ public class Product {
     private boolean isInStock;
     private String availabilityInformation;
     private LocalDateTime date;
+
+    public Class<? extends ProductResponse> getDtoClass() {
+        return ProductResponse.class;
+    }
 }
