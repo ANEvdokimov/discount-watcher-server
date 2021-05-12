@@ -33,7 +33,7 @@ public class ProductService {
         this.mapper = mapper;
     }
 
-    ProductResponse addProduct(NewProductRequest newProduct) throws ServerException {
+    public ProductResponse addProduct(NewProductRequest newProduct) throws ServerException {
         Shop shop = shopRepository.findById(newProduct.getShopId())
                 .orElseThrow(() -> new ServerException(ServerErrorCode.SHOP_NOT_FOUND));
 

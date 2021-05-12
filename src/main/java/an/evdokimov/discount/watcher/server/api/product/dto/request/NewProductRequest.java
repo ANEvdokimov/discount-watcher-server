@@ -14,7 +14,7 @@ import java.net.URL;
 @NoArgsConstructor
 @AllArgsConstructor
 public class NewProductRequest {
-    @NotBlank
+    @NotNull
     private URL url;
     @NotNull
     private Long shopId;
