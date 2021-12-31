@@ -67,7 +67,7 @@ class LentaParserTest {
     @Test
     void parse_byProductUnsupportedShop_exception() throws MalformedURLException {
         ProductInformation productInformation = ProductInformation.builder()
-                .urlLenta(new URL("https://unsupported_shop"))
+                .url(new URL("https://unsupported_shop"))
                 .build();
 
         Shop shop = Shop.builder()
@@ -100,7 +100,7 @@ class LentaParserTest {
         when(pageDownloader.downloadPage(any(), any())).thenReturn(page);
 
         ProductInformation productInformation = ProductInformation.builder()
-                .urlLenta(new URL("https://test_shop.com"))
+                .url(new URL("https://test_shop.com"))
                 .build();
 
         assertThrows(
@@ -117,7 +117,7 @@ class LentaParserTest {
 
         ProductInformation productInformation = ProductInformation.builder()
                 .name("product_name, subtitle")
-                .urlLenta(new URL("https://lenta.com/product"))
+                .url(new URL("https://lenta.com/product"))
                 .build();
 
         Shop shop = new Shop();
@@ -134,7 +134,7 @@ class LentaParserTest {
                 .date(LocalDateTime.now(clock))
                 .build();
 
-        Product result = parser.parse(productInformation.getUrlLenta(), shop);
+        Product result = parser.parse(productInformation.getUrl(), shop);
 
         assertEquals(expected_product, result);
     }
@@ -147,7 +147,7 @@ class LentaParserTest {
 
         ProductInformation productInformation = ProductInformation.builder()
                 .name("product_name, subtitle")
-                .urlLenta(new URL("https://lenta.com/product"))
+                .url(new URL("https://lenta.com/product"))
                 .build();
 
         Shop shop = new Shop();
@@ -177,7 +177,7 @@ class LentaParserTest {
 
         ProductInformation productInformation = ProductInformation.builder()
                 .name("product_name, subtitle")
-                .urlLenta(new URL("https://lenta.com/product"))
+                .url(new URL("https://lenta.com/product"))
                 .build();
 
         Shop shop = new Shop();
@@ -194,7 +194,7 @@ class LentaParserTest {
                 .date(LocalDateTime.now(clock))
                 .build();
 
-        Product result = parser.parse(productInformation.getUrlLenta(), shop);
+        Product result = parser.parse(productInformation.getUrl(), shop);
 
         assertEquals(expected_product, result);
     }
@@ -207,7 +207,7 @@ class LentaParserTest {
 
         ProductInformation productInformation = ProductInformation.builder()
                 .name("product_name, subtitle")
-                .urlLenta(new URL("https://lenta.com/product"))
+                .url(new URL("https://lenta.com/product"))
                 .build();
 
         Shop shop = new Shop();
@@ -224,7 +224,7 @@ class LentaParserTest {
                 .date(LocalDateTime.now(clock))
                 .build();
 
-        Product result = parser.parse(productInformation.getUrlLenta(), shop);
+        Product result = parser.parse(productInformation.getUrl(), shop);
 
         assertEquals(expected_product, result);
     }
@@ -237,7 +237,7 @@ class LentaParserTest {
 
         ProductInformation productInformation = ProductInformation.builder()
                 .name("product_name, subtitle")
-                .urlLenta(new URL("https://lenta.com/product"))
+                .url(new URL("https://lenta.com/product"))
                 .build();
 
         Shop shop = new Shop();
@@ -254,7 +254,7 @@ class LentaParserTest {
                 .date(LocalDateTime.now(clock))
                 .build();
 
-        Product result = parser.parse(productInformation.getUrlLenta(), shop);
+        Product result = parser.parse(productInformation.getUrl(), shop);
 
         assertEquals(expected_product, result);
     }
@@ -267,7 +267,7 @@ class LentaParserTest {
 
         ProductInformation productInformation = ProductInformation.builder()
                 .name("product_name, subtitle")
-                .urlLenta(new URL("https://lenta.com/product"))
+                .url(new URL("https://lenta.com/product"))
                 .build();
 
         Shop shop = new Shop();
@@ -284,7 +284,7 @@ class LentaParserTest {
                 .date(LocalDateTime.now(clock))
                 .build();
 
-        Product result = parser.parse(productInformation.getUrlLenta(), shop);
+        Product result = parser.parse(productInformation.getUrl(), shop);
 
         assertEquals(expected_product, result);
     }

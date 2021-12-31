@@ -58,7 +58,7 @@ class CityControllerTest {
         when(cityService.getAll()).thenReturn(cities);
 
         MvcResult result = mvc.perform(get("/api/cities")
-                .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user")))
+                        .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user")))
                 .andReturn();
 
         ArrayList<CityResponse> cityResponses = objectMapper.readValue(
@@ -76,7 +76,7 @@ class CityControllerTest {
     @Test
     void getAllCities_invalidJwt_http200() throws Exception {
         mvc.perform(get("/api/cities")
-                .header(authHeaderName, "Bearer wrong_token"))
+                        .header(authHeaderName, "Bearer wrong_token"))
                 .andExpect(status().isUnauthorized());
     }
 }

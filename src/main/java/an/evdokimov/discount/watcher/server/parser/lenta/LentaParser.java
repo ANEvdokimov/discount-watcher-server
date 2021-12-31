@@ -53,7 +53,7 @@ public class LentaParser implements Parser {
         LentaProductFromPage productFromPage = downloadProduct(url, shop);
 
         ProductInformation productInformation = ProductInformation.builder()
-                .urlLenta(url)
+                .url(url)
                 .name(productFromPage.getTitle() + ", " + productFromPage.getSubTitle())
                 .build();
 
@@ -63,7 +63,7 @@ public class LentaParser implements Parser {
     @Override
     public Product parse(@NotNull ProductInformation productInformation, @NotNull Shop shop)
             throws PageDownloaderException, ParserException {
-        LentaProductFromPage productFromPage = downloadProduct(productInformation.getUrlLenta(), shop);
+        LentaProductFromPage productFromPage = downloadProduct(productInformation.getUrl(), shop);
 
         return createProduct(productFromPage, productInformation, shop);
     }

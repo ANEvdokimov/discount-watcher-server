@@ -5,6 +5,7 @@ import an.evdokimov.discount.watcher.server.database.user.model.UserRole;
 import an.evdokimov.discount.watcher.server.database.user.repository.UserRepository;
 import an.evdokimov.discount.watcher.server.security.JwtAuthenticationProvider;
 import an.evdokimov.discount.watcher.server.security.JwtUtils;
+import lombok.Getter;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 
@@ -16,11 +17,13 @@ import static org.mockito.Mockito.when;
 @TestConfiguration
 public class TestConfig {
     private final UserRepository userRepository;
+    @Getter
+    private final User testUser;
 
     public TestConfig() {
         userRepository = mock(UserRepository.class);
 
-        User testUser = User.builder()
+        testUser = User.builder()
                 .login("test_user")
                 .password("pass")
                 .name("test_user")

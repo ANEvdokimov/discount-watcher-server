@@ -186,8 +186,8 @@ class UserControllerTest {
         when(userService.login(request)).thenReturn(response);
 
         MvcResult result = mvc.perform(post("/api/users/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(request)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(request)))
                 .andReturn();
 
         assertAll(
@@ -207,8 +207,8 @@ class UserControllerTest {
                 .build();
 
         MvcResult result = mvc.perform(post("/api/users/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(request)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(request)))
                 .andReturn();
 
         assertAll(
@@ -225,8 +225,8 @@ class UserControllerTest {
                 .build();
 
         MvcResult result = mvc.perform(post("/api/users/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(request)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(request)))
                 .andReturn();
 
         assertAll(
@@ -242,8 +242,8 @@ class UserControllerTest {
                 .build();
 
         MvcResult result = mvc.perform(post("/api/users/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(request)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(request)))
                 .andReturn();
 
         assertAll(
@@ -260,8 +260,8 @@ class UserControllerTest {
                 .build();
 
         MvcResult result = mvc.perform(post("/api/users/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(request)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(request)))
                 .andReturn();
 
         assertAll(

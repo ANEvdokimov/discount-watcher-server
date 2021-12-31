@@ -3,6 +3,7 @@ package an.evdokimov.discount.watcher.server.api.product.controller;
 import an.evdokimov.discount.watcher.server.api.TestConfig;
 import an.evdokimov.discount.watcher.server.api.product.dto.request.NewProductRequest;
 import an.evdokimov.discount.watcher.server.api.product.dto.response.LentaProductResponse;
+import an.evdokimov.discount.watcher.server.api.product.dto.response.ProductResponse;
 import an.evdokimov.discount.watcher.server.security.JwtUtils;
 import an.evdokimov.discount.watcher.server.service.product.ProductService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,11 +21,17 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import java.math.BigDecimal;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
 
@@ -34,6 +41,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 class ProductControllerTest {
     @Value("${header.authentication}")
     private String authHeaderName;
+
+    @Autowired
+    private TestConfig testConfig;
 
     @Autowired
     private JwtUtils jwtUtils;
@@ -62,9 +72,9 @@ class ProductControllerTest {
                 .build();
 
         MvcResult result = mvc.perform(put("/api/products")
-                .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(mapper.writeValueAsString(request)))
+                        .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(mapper.writeValueAsString(request)))
                 .andReturn();
 
         assertAll(
@@ -84,9 +94,9 @@ class ProductControllerTest {
                 .build();
 
         MvcResult result = mvc.perform(put("/api/products")
-                .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(mapper.writeValueAsString(request)))
+                        .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(mapper.writeValueAsString(request)))
                 .andReturn();
 
         assertAll(
@@ -103,9 +113,9 @@ class ProductControllerTest {
                 .build();
 
         MvcResult result = mvc.perform(put("/api/products")
-                .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(mapper.writeValueAsString(request)))
+                        .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(mapper.writeValueAsString(request)))
                 .andReturn();
 
         assertAll(
@@ -122,14 +132,62 @@ class ProductControllerTest {
                 .build();
 
         MvcResult result = mvc.perform(put("/api/products")
-                .header(authHeaderName, "Bearer wrong_token")
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(mapper.writeValueAsString(request)))
+                        .header(authHeaderName, "Bearer wrong_token")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(mapper.writeValueAsString(request)))
                 .andReturn();
 
         assertAll(
                 () -> assertEquals(401, result.getResponse().getStatus()),
                 () -> verify(productService, times(0)).addProduct(eq(request))
+        );
+    }
+
+    @Test
+    void getUserProducts_validJwt_listOfProducts() throws Exception {
+        List<ProductResponse> products = List.of(
+                ProductResponse.builder().id(0L).build(),
+                ProductResponse.builder().id(1L).build(),
+                ProductResponse.builder().id(2L).build()
+        );
+
+        when(productService.getUserProducts(any())).thenReturn(Collections.emptyList());
+        when(productService.getUserProducts(testConfig.getTestUser())).thenReturn(products);
+
+        MvcResult result = mvc.perform(get("/api/products")
+                        .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user")))
+                .andReturn();
+
+        ArrayList<ProductResponse> resultProducts = mapper.readValue(
+                result.getResponse().getContentAsString(),
+                mapper.getTypeFactory().constructCollectionType(ArrayList.class, ProductResponse.class)
+        );
+
+        assertAll(
+                () -> assertEquals(200, result.getResponse().getStatus()),
+                () -> assertThat(resultProducts, containsInAnyOrder(products.toArray())),
+                () -> verify(productService, times(1)).getUserProducts(testConfig.getTestUser())
+        );
+    }
+
+    @Test
+    void getUserProducts_invalidJwt_http401() throws Exception {
+        List<ProductResponse> products = List.of(
+                ProductResponse.builder().id(0L).build(),
+                ProductResponse.builder().id(1L).build(),
+                ProductResponse.builder().id(2L).build()
+        );
+
+        when(productService.getUserProducts(any())).thenReturn(Collections.emptyList());
+        when(productService.getUserProducts(testConfig.getTestUser())).thenReturn(products);
+
+        MvcResult result = mvc.perform(get("/api/products")
+                        .header(authHeaderName, "wrong jwt"))
+                .andReturn();
+
+        assertAll(
+                () -> assertEquals(401, result.getResponse().getStatus()),
+                () -> verify(productService, times(0)).getUserProducts(testConfig.getTestUser())
         );
     }
 }

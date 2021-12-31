@@ -3,14 +3,15 @@ package an.evdokimov.discount.watcher.server.api.product.controller;
 import an.evdokimov.discount.watcher.server.api.error.ServerException;
 import an.evdokimov.discount.watcher.server.api.product.dto.request.NewProductRequest;
 import an.evdokimov.discount.watcher.server.api.product.dto.response.ProductResponse;
+import an.evdokimov.discount.watcher.server.database.user.model.User;
 import an.evdokimov.discount.watcher.server.service.product.ProductService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.MediaType;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Collection;
 
 @RestController
 @RequestMapping("/api")
@@ -22,9 +23,21 @@ public class ProductController {
         this.productService = productService;
     }
 
-    @PutMapping("/products")
+    @PutMapping(value = "/products", produces = MediaType.APPLICATION_JSON_VALUE)
     public ProductResponse addProduct(@Valid @RequestBody NewProductRequest newProduct) throws ServerException {
         log.info("Adding new product: {}", newProduct.toString());
         return productService.addProduct(newProduct);
+    }
+
+    @GetMapping(value = "/products", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Collection<ProductResponse> getUserProducts(Authentication authentication) {
+        log.info("Getting products. user={}", ((User) authentication.getPrincipal()).getLogin());
+        return productService.getUserProducts((User) authentication.getPrincipal());
+    }
+
+    @GetMapping(value = "/product/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ProductResponse getProduct(@PathVariable Long id) throws ServerException {
+        log.info("Getting product by id={}", id);
+        return productService.getProduct(id);
     }
 }

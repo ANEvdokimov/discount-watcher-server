@@ -49,10 +49,12 @@ CREATE TABLE shop
 
 CREATE TABLE product_information
 (
-    id        BIGINT PRIMARY KEY AUTO_INCREMENT,
-    name      VARCHAR(255) NOT NULL,
-    url_lenta VARCHAR(512) NOT NULL UNIQUE,
-    INDEX (url_lenta)
+    id                    BIGINT PRIMARY KEY AUTO_INCREMENT,
+    name                  VARCHAR(255) NOT NULL,
+    url                   VARCHAR(512) NOT NULL UNIQUE,
+    commercial_network_id BIGINT       NOT NULL,
+    FOREIGN KEY (commercial_network_id) REFERENCES commercial_network (id) ON UPDATE CASCADE ON DELETE RESTRICT,
+    INDEX (url)
 )
     ENGINE = InnoDB
     CHARSET = UTF8;
@@ -83,17 +85,17 @@ CREATE TABLE product_price_lenta
     ENGINE = InnoDB
     CHARSET = UTF8;
 
-CREATE TABLE user_product_lenta
+CREATE TABLE user_product
 (
-    id                     BIGINT PRIMARY KEY AUTO_INCREMENT,
-    user_id                BIGINT  NOT NULL,
-    product_information_id BIGINT  NOT NULL,
-    monitor_discount       BOOLEAN NOT NULL,
-    monitor_availability   BOOLEAN NOT NULL,
-    monitor_price_changes  BOOLEAN NOT NULL,
+    id                    BIGINT PRIMARY KEY AUTO_INCREMENT,
+    user_id               BIGINT  NOT NULL,
+    product_price_id      BIGINT  NOT NULL,
+    monitor_discount      BOOLEAN NOT NULL,
+    monitor_availability  BOOLEAN NOT NULL,
+    monitor_price_changes BOOLEAN NOT NULL,
     FOREIGN KEY (user_id) REFERENCES user (id) ON UPDATE CASCADE ON DELETE CASCADE,
-    FOREIGN KEY (product_information_id) REFERENCES product_information (id) ON UPDATE CASCADE ON DELETE CASCADE,
-    UNIQUE (user_id, product_information_id)
+    FOREIGN KEY (product_price_id) REFERENCES product_information (id) ON UPDATE CASCADE ON DELETE CASCADE,
+    UNIQUE (user_id, product_price_id)
 )
     ENGINE = InnoDB
     CHARSET = UTF8;

@@ -6,7 +6,8 @@ public enum ServerErrorCode {
     SHOP_NOT_FOUND("A shop with this id is not exist."),
     UNSUPPORTED_SHOP("The url is incorrect or unsupported shop"),
     PAGE_DOWNLOAD_ERROR("Unable to download page."),
-    PARSE_PAGE_ERROR("Error in parsing page");
+    PARSE_PAGE_ERROR("Error in parsing page"),
+    PRODUCT_NOT_FOUND("A product with this id not found.");
 
     private final String message;
 

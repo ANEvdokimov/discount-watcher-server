@@ -110,7 +110,7 @@ class CommercialNetworkControllerTest {
     @Test
     void getAllCommercialNetworks_NoCityId_http200() throws Exception {
         MvcResult result = mvc.perform(get("/api/commercial_networks")
-                .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user")))
+                        .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user")))
                 .andReturn();
 
         Object resultContent = objectMapper.readValue(
@@ -127,8 +127,8 @@ class CommercialNetworkControllerTest {
     @Test
     void getAllCommercialNetworks_withShopsNoCityId_http200() throws Exception {
         MvcResult result = mvc.perform(get("/api/commercial_networks")
-                .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
-                .header("With-Shops", "true"))
+                        .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
+                        .header("With-Shops", "true"))
                 .andReturn();
 
         Object resultContent = objectMapper.readValue(
@@ -146,9 +146,9 @@ class CommercialNetworkControllerTest {
     @Test
     void getAllCommercialNetworks_withShopsCityId17_http200() throws Exception {
         MvcResult result = mvc.perform(get("/api/commercial_networks")
-                .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
-                .header("With-Shops", "true")
-                .header("City-Id", 17))
+                        .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
+                        .header("With-Shops", "true")
+                        .header("City-Id", 17))
                 .andReturn();
 
         Object resultContent = objectMapper.readValue(
@@ -166,9 +166,9 @@ class CommercialNetworkControllerTest {
     @Test
     void getAllCommercialNetworks_wrongToken_http401() throws Exception {
         mvc.perform(get("/api/commercial_networks")
-                .header(authHeaderName, "Bearer wrong token")
-                .header("With-Shops", "true")
-                .header("City-Id", 17))
+                        .header(authHeaderName, "Bearer wrong token")
+                        .header("With-Shops", "true")
+                        .header("City-Id", 17))
                 .andExpect(status().isUnauthorized());
     }
 }

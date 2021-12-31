@@ -19,5 +19,5 @@ public class ProductInformation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-    private URL urlLenta;
+    private URL url;
 }
