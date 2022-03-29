@@ -2,13 +2,11 @@ package an.evdokimov.discount.watcher.server.service.product;
 
 import an.evdokimov.discount.watcher.server.api.error.ServerException;
 import an.evdokimov.discount.watcher.server.api.product.dto.request.NewProductRequest;
-import an.evdokimov.discount.watcher.server.api.product.dto.response.LentaProductResponse;
+import an.evdokimov.discount.watcher.server.api.product.dto.response.LentaProductPriceResponse;
 import an.evdokimov.discount.watcher.server.api.product.dto.response.ProductResponse;
-import an.evdokimov.discount.watcher.server.database.product.model.LentaProduct;
+import an.evdokimov.discount.watcher.server.database.product.model.LentaProductPrice;
 import an.evdokimov.discount.watcher.server.database.product.model.Product;
-import an.evdokimov.discount.watcher.server.database.product.model.UserProduct;
 import an.evdokimov.discount.watcher.server.database.product.repository.ProductRepository;
-import an.evdokimov.discount.watcher.server.database.product.repository.UserProductRepository;
 import an.evdokimov.discount.watcher.server.database.shop.model.Shop;
 import an.evdokimov.discount.watcher.server.database.shop.repository.ShopRepository;
 import an.evdokimov.discount.watcher.server.database.user.model.User;
@@ -50,9 +48,6 @@ class ProductServiceTest {
     private ProductRepository productRepository;
 
     @MockBean
-    private UserProductRepository userProductRepository;
-
-    @MockBean
     private ShopRepository shopRepository;
 
     @Autowired
@@ -67,16 +62,23 @@ class ProductServiceTest {
 
     @Test
     void addProduct_LentaProduct_LentaProductResponse() throws ParserException, PageDownloaderException, MalformedURLException, ServerException {
-        LentaProduct product = LentaProduct.builder()
+        LentaProductPrice productPrice = LentaProductPrice.builder()
                 .price(BigDecimal.valueOf(100))
                 .priceWithDiscount(BigDecimal.valueOf(50))
                 .priceWithCard(BigDecimal.valueOf(50))
                 .build();
+        Product product = Product.builder()
+                .prices(List.of(productPrice))
+                .build();
+        productPrice.setProduct(product);
 
-        LentaProductResponse expectedProduct = LentaProductResponse.builder()
+        LentaProductPriceResponse expectedProductPrice = LentaProductPriceResponse.builder()
                 .price(BigDecimal.valueOf(100))
                 .priceWithDiscount(BigDecimal.valueOf(50))
                 .priceWithCard(BigDecimal.valueOf(50))
+                .build();
+        ProductResponse expectedProduct = ProductResponse.builder()
+                .prices(List.of(expectedProductPrice))
                 .build();
 
         when(shopRepository.findById(666L)).thenReturn(Optional.of(new Shop()));
@@ -120,12 +122,12 @@ class ProductServiceTest {
 
     @Test
     void getProduct_LentaProduct_validLentaProduct() throws ServerException {
-        LentaProduct testProduct = LentaProduct.builder().id(666L).build();
+        Product testProduct = Product.builder().id(666L).build();
         when(productRepository.findById(666L)).thenReturn(Optional.of(testProduct));
 
         ProductResponse returnedProduct = productService.getProduct(666L);
 
-        ProductResponse expectedProduct = LentaProductResponse.builder().id(666L).build();
+        ProductResponse expectedProduct = ProductResponse.builder().id(666L).build();
         assertEquals(expectedProduct, returnedProduct);
     }
 
@@ -140,31 +142,32 @@ class ProductServiceTest {
     }
 
     @Test
-    void getProducts_LentaProducts_collectionOfProducts() {
+    void getUserProducts_Products_collectionOfProducts() {
         User userWithProducts = User.builder().id(666L).build();
-        when(userProductRepository.findByUser(userWithProducts)).thenReturn(List.of(
-                UserProduct.builder().product(LentaProduct.builder().id(1L).build()).build(),
-                UserProduct.builder().product(LentaProduct.builder().id(2L).build()).build(),
-                UserProduct.builder().product(LentaProduct.builder().id(3L).build()).build()
+        when(productRepository.findAllUsersProducts(userWithProducts)).thenReturn(List.of(
+                Product.builder().id(1L).build(),
+                Product.builder().id(2L).build(),
+                Product.builder().id(3L).build()
         ));
 
-        List<LentaProductResponse> expectedProducts = List.of(
-                LentaProductResponse.builder().id(1L).build(),
-                LentaProductResponse.builder().id(2L).build(),
-                LentaProductResponse.builder().id(3L).build()
+        List<ProductResponse> expectedProducts = List.of(
+                ProductResponse.builder().id(1L).build(),
+                ProductResponse.builder().id(2L).build(),
+                ProductResponse.builder().id(3L).build()
         );
 
         assertThat(productService.getUserProducts(userWithProducts), containsInAnyOrder(expectedProducts.toArray()));
     }
 
     @Test
-    void getProducts_nonexistentLentaProducts_emptyCollection() {
+    void getUserProducts_nonexistentProducts_emptyCollection() {
         User userWithoutProducts = User.builder().id(666L).build();
-        when(userProductRepository.findByUser(userWithoutProducts)).thenReturn(Collections.emptyList());
+        when(productRepository.findAllUsersProducts(userWithoutProducts)).thenReturn(Collections.emptyList());
 
         assertAll(
                 () -> assertEquals(0, productService.getUserProducts(userWithoutProducts).size()),
-                () -> verify(userProductRepository, times(1)).findByUser(userWithoutProducts)
+                () -> verify(productRepository, times(1))
+                        .findAllUsersProducts(userWithoutProducts)
         );
     }
 }

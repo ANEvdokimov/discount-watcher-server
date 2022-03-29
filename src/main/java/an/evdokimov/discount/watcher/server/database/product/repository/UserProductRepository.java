@@ -10,4 +10,14 @@ import java.util.Collection;
 @Repository
 public interface UserProductRepository extends CrudRepository<UserProduct, Long> {
     Collection<UserProduct> findByUser(User user);
+//
+//    @Query("""
+//            SELECT UserProduct.product FROM UserProduct
+//                WHERE (
+//                    UserProduct.monitor_availability = true OR
+//                    UserProduct.monitor_discount = true OR
+//                    UserProduct.monitor_price_changes = true
+//                )
+//            """)
+//    Collection<Product> findAllActiveProducts();
 }

@@ -22,7 +22,7 @@ public class UserProduct {
     @JoinColumn(name = "user_id")
     private User user;
     @ManyToOne
-    @JoinColumn(name = "product_price_id")
+    @JoinColumn(name = "product_id")
     private Product product;
     private boolean monitor_discount;
     private boolean monitor_availability;

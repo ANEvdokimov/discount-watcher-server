@@ -59,19 +59,28 @@ CREATE TABLE product_information
     ENGINE = InnoDB
     CHARSET = UTF8;
 
+CREATE TABLE product
+(
+    id                     BIGINT PRIMARY KEY AUTO_INCREMENT,
+    product_information_id BIGINT NOT NULL,
+    shop_id                BIGINT NOT NULL,
+    FOREIGN KEY (product_information_id) REFERENCES product_information (id) ON UPDATE CASCADE ON DELETE RESTRICT,
+    FOREIGN KEY (shop_id) REFERENCES shop (id) ON UPDATE CASCADE ON DELETE RESTRICT
+)
+    ENGINE = InnoDB
+    CHARSET = UTF8;
+
 CREATE TABLE product_price
 (
     id                       BIGINT PRIMARY KEY AUTO_INCREMENT,
     product_id               BIGINT         NOT NULL,
-    shop_id                  BIGINT         NOT NULL,
     price                    DECIMAL(10, 2) NOT NULL,
     discount                 DOUBLE,
     price_with_discount      DECIMAL(10, 2),
     is_in_stock              BOOLEAN        NOT NULL,
     availability_information VARCHAR(255),
     date                     DATETIME       NOT NULL,
-    FOREIGN KEY (product_id) REFERENCES product_information (id) ON UPDATE CASCADE ON DELETE RESTRICT,
-    FOREIGN KEY (shop_id) REFERENCES shop (id) ON UPDATE CASCADE ON DELETE RESTRICT
+    FOREIGN KEY (product_id) REFERENCES product (id) ON UPDATE CASCADE ON DELETE RESTRICT
 )
     ENGINE = InnoDB
     CHARSET = UTF8;
@@ -89,13 +98,13 @@ CREATE TABLE user_product
 (
     id                    BIGINT PRIMARY KEY AUTO_INCREMENT,
     user_id               BIGINT  NOT NULL,
-    product_price_id      BIGINT  NOT NULL,
+    product_id            BIGINT  NOT NULL,
     monitor_discount      BOOLEAN NOT NULL,
     monitor_availability  BOOLEAN NOT NULL,
     monitor_price_changes BOOLEAN NOT NULL,
     FOREIGN KEY (user_id) REFERENCES user (id) ON UPDATE CASCADE ON DELETE CASCADE,
-    FOREIGN KEY (product_price_id) REFERENCES product_information (id) ON UPDATE CASCADE ON DELETE CASCADE,
-    UNIQUE (user_id, product_price_id)
+    FOREIGN KEY (product_id) REFERENCES product (id) ON UPDATE CASCADE ON DELETE CASCADE,
+    UNIQUE (user_id, product_id)
 )
     ENGINE = InnoDB
     CHARSET = UTF8;

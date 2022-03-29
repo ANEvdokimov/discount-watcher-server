@@ -1,6 +1,6 @@
 package an.evdokimov.discount.watcher.server.parser.lenta;
 
-import an.evdokimov.discount.watcher.server.database.product.model.LentaProduct;
+import an.evdokimov.discount.watcher.server.database.product.model.LentaProductPrice;
 import an.evdokimov.discount.watcher.server.database.product.model.Product;
 import an.evdokimov.discount.watcher.server.database.product.model.ProductInformation;
 import an.evdokimov.discount.watcher.server.database.shop.model.Shop;
@@ -22,6 +22,7 @@ import java.math.BigDecimal;
 import java.net.URL;
 import java.time.Clock;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Component
 @Slf4j
@@ -114,8 +115,7 @@ public class LentaParser implements Parser {
         };
     }
 
-    private LentaProduct createProduct(LentaProductFromPage productFromPage, ProductInformation productInformation,
-                                       Shop shop)
+    private Product createProduct(LentaProductFromPage productFromPage, ProductInformation productInformation, Shop shop)
             throws ParserException {
         Double discount;
         BigDecimal priceWithDiscount;
@@ -133,9 +133,7 @@ public class LentaParser implements Parser {
             throw new ParserException(ParserErrorCode.WRONG_NUMBER_FORMAT, e);
         }
 
-        return LentaProduct.builder()
-                .productInformation(productInformation)
-                .shop(shop)
+        LentaProductPrice lentaProductPrice = LentaProductPrice.builder()
                 .price(productFromPage.getRegularPrice().getValue())
                 .priceWithCard(productFromPage.getCardPrice().getValue())
                 .discount(discount)
@@ -144,5 +142,15 @@ public class LentaParser implements Parser {
                 .availabilityInformation(getAvailabilityInformation(productFromPage.getStock()))
                 .date(LocalDateTime.now(clock))
                 .build();
+
+        Product product = Product.builder()
+                .shop(shop)
+                .productInformation(productInformation)
+                .prices(List.of(lentaProductPrice))
+                .build();
+
+        lentaProductPrice.setProduct(product);
+
+        return product;
     }
 }

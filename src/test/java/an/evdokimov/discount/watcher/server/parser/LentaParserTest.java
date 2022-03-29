@@ -1,6 +1,6 @@
 package an.evdokimov.discount.watcher.server.parser;
 
-import an.evdokimov.discount.watcher.server.database.product.model.LentaProduct;
+import an.evdokimov.discount.watcher.server.database.product.model.LentaProductPrice;
 import an.evdokimov.discount.watcher.server.database.product.model.Product;
 import an.evdokimov.discount.watcher.server.database.product.model.ProductInformation;
 import an.evdokimov.discount.watcher.server.database.shop.model.Shop;
@@ -24,6 +24,7 @@ import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -122,9 +123,7 @@ class LentaParserTest {
 
         Shop shop = new Shop();
 
-        LentaProduct expected_product = LentaProduct.builder()
-                .productInformation(productInformation)
-                .shop(shop)
+        LentaProductPrice expectedProductPrice = LentaProductPrice.builder()
                 .price(BigDecimal.valueOf(10050, 2))
                 .discount(10.0)
                 .priceWithDiscount(BigDecimal.valueOf(9050, 2))
@@ -134,9 +133,17 @@ class LentaParserTest {
                 .date(LocalDateTime.now(clock))
                 .build();
 
+        Product expectedProduct = Product.builder()
+                .prices(List.of(expectedProductPrice))
+                .shop(shop)
+                .productInformation(productInformation)
+                .build();
+
+        expectedProductPrice.setProduct(expectedProduct);
+
         Product result = parser.parse(productInformation.getUrl(), shop);
 
-        assertEquals(expected_product, result);
+        assertEquals(expectedProduct, result);
     }
 
     @Test
@@ -152,9 +159,7 @@ class LentaParserTest {
 
         Shop shop = new Shop();
 
-        LentaProduct expected_product = LentaProduct.builder()
-                .productInformation(productInformation)
-                .shop(shop)
+        LentaProductPrice expectedProductPrice = LentaProductPrice.builder()
                 .price(BigDecimal.valueOf(10050, 2))
                 .discount(10.0)
                 .priceWithDiscount(BigDecimal.valueOf(9050, 2))
@@ -164,9 +169,17 @@ class LentaParserTest {
                 .date(LocalDateTime.now(clock))
                 .build();
 
+        Product expectedProduct = Product.builder()
+                .prices(List.of(expectedProductPrice))
+                .shop(shop)
+                .productInformation(productInformation)
+                .build();
+
+        expectedProductPrice.setProduct(expectedProduct);
+
         Product result = parser.parse(productInformation, shop);
 
-        assertEquals(expected_product, result);
+        assertEquals(expectedProduct, result);
     }
 
     @Test
@@ -182,9 +195,7 @@ class LentaParserTest {
 
         Shop shop = new Shop();
 
-        LentaProduct expected_product = LentaProduct.builder()
-                .productInformation(productInformation)
-                .shop(shop)
+        LentaProductPrice expectedProductPrice = LentaProductPrice.builder()
                 .price(BigDecimal.valueOf(10050, 2))
                 .discount(10.0)
                 .priceWithDiscount(BigDecimal.valueOf(9050, 2))
@@ -194,9 +205,17 @@ class LentaParserTest {
                 .date(LocalDateTime.now(clock))
                 .build();
 
+        Product expectedProduct = Product.builder()
+                .prices(List.of(expectedProductPrice))
+                .shop(shop)
+                .productInformation(productInformation)
+                .build();
+
+        expectedProductPrice.setProduct(expectedProduct);
+
         Product result = parser.parse(productInformation.getUrl(), shop);
 
-        assertEquals(expected_product, result);
+        assertEquals(expectedProduct, result);
     }
 
     @Test
@@ -212,9 +231,7 @@ class LentaParserTest {
 
         Shop shop = new Shop();
 
-        LentaProduct expected_product = LentaProduct.builder()
-                .productInformation(productInformation)
-                .shop(shop)
+        LentaProductPrice expectedProductPrice = LentaProductPrice.builder()
                 .price(BigDecimal.valueOf(10050, 2))
                 .discount(10.0)
                 .priceWithDiscount(BigDecimal.valueOf(9050, 2))
@@ -224,9 +241,17 @@ class LentaParserTest {
                 .date(LocalDateTime.now(clock))
                 .build();
 
+        Product expectedProduct = Product.builder()
+                .prices(List.of(expectedProductPrice))
+                .shop(shop)
+                .productInformation(productInformation)
+                .build();
+
+        expectedProductPrice.setProduct(expectedProduct);
+
         Product result = parser.parse(productInformation.getUrl(), shop);
 
-        assertEquals(expected_product, result);
+        assertEquals(expectedProduct, result);
     }
 
     @Test
@@ -242,9 +267,7 @@ class LentaParserTest {
 
         Shop shop = new Shop();
 
-        LentaProduct expected_product = LentaProduct.builder()
-                .productInformation(productInformation)
-                .shop(shop)
+        LentaProductPrice expectedProductPrice = LentaProductPrice.builder()
                 .price(BigDecimal.valueOf(10050, 2))
                 .discount(10.0)
                 .priceWithDiscount(BigDecimal.valueOf(9050, 2))
@@ -254,9 +277,17 @@ class LentaParserTest {
                 .date(LocalDateTime.now(clock))
                 .build();
 
+        Product expectedProduct = Product.builder()
+                .prices(List.of(expectedProductPrice))
+                .shop(shop)
+                .productInformation(productInformation)
+                .build();
+
+        expectedProductPrice.setProduct(expectedProduct);
+
         Product result = parser.parse(productInformation.getUrl(), shop);
 
-        assertEquals(expected_product, result);
+        assertEquals(expectedProduct, result);
     }
 
     @Test
@@ -272,9 +303,7 @@ class LentaParserTest {
 
         Shop shop = new Shop();
 
-        LentaProduct expected_product = LentaProduct.builder()
-                .productInformation(productInformation)
-                .shop(shop)
+        LentaProductPrice expectedProductPrice = LentaProductPrice.builder()
                 .price(BigDecimal.valueOf(10050, 2))
                 .discount(null)
                 .priceWithDiscount(null)
@@ -284,8 +313,16 @@ class LentaParserTest {
                 .date(LocalDateTime.now(clock))
                 .build();
 
+        Product expectedProduct = Product.builder()
+                .prices(List.of(expectedProductPrice))
+                .shop(shop)
+                .productInformation(productInformation)
+                .build();
+
+        expectedProductPrice.setProduct(expectedProduct);
+
         Product result = parser.parse(productInformation.getUrl(), shop);
 
-        assertEquals(expected_product, result);
+        assertEquals(expectedProduct, result);
     }
 }

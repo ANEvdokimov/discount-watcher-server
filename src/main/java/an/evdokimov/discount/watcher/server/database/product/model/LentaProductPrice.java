@@ -1,7 +1,7 @@
 package an.evdokimov.discount.watcher.server.database.product.model;
 
-import an.evdokimov.discount.watcher.server.api.product.dto.response.LentaProductResponse;
-import an.evdokimov.discount.watcher.server.api.product.dto.response.ProductResponse;
+import an.evdokimov.discount.watcher.server.api.product.dto.response.LentaProductPriceResponse;
+import an.evdokimov.discount.watcher.server.api.product.dto.response.ProductPriceResponse;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -19,11 +19,11 @@ import java.math.BigDecimal;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class LentaProduct extends Product {
+public class LentaProductPrice extends ProductPrice {
     private BigDecimal priceWithCard;
 
     @Override
-    public Class<? extends ProductResponse> getDtoClass() {
-        return LentaProductResponse.class;
+    public Class<? extends ProductPriceResponse> getDtoClass() {
+        return LentaProductPriceResponse.class;
     }
 }

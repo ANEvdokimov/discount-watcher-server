@@ -1,21 +1,18 @@
 package an.evdokimov.discount.watcher.server.database.product.model;
 
-import an.evdokimov.discount.watcher.server.api.product.dto.response.ProductResponse;
 import an.evdokimov.discount.watcher.server.database.shop.model.Shop;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
-@Table(name = "product_price")
-@Inheritance(strategy = InheritanceType.JOINED)
+@Table(name = "product")
 @Data
-@SuperBuilder
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Product {
@@ -23,19 +20,11 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne
-    @JoinColumn(name = "product_id")
+    @JoinColumn(name = "product_information_id")
     private ProductInformation productInformation;
     @ManyToOne
     @JoinColumn(name = "shop_id")
     private Shop shop;
-    private BigDecimal price;
-    private Double discount;
-    private BigDecimal priceWithDiscount;
-    private boolean isInStock;
-    private String availabilityInformation;
-    private LocalDateTime date;
-
-    public Class<? extends ProductResponse> getDtoClass() {
-        return ProductResponse.class;
-    }
+    @OneToMany
+    private List<ProductPrice> prices;
 }

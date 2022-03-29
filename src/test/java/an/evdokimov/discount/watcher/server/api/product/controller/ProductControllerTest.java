@@ -2,7 +2,7 @@ package an.evdokimov.discount.watcher.server.api.product.controller;
 
 import an.evdokimov.discount.watcher.server.api.TestConfig;
 import an.evdokimov.discount.watcher.server.api.product.dto.request.NewProductRequest;
-import an.evdokimov.discount.watcher.server.api.product.dto.response.LentaProductResponse;
+import an.evdokimov.discount.watcher.server.api.product.dto.response.LentaProductPriceResponse;
 import an.evdokimov.discount.watcher.server.api.product.dto.response.ProductResponse;
 import an.evdokimov.discount.watcher.server.security.JwtUtils;
 import an.evdokimov.discount.watcher.server.service.product.ProductService;
@@ -59,12 +59,17 @@ class ProductControllerTest {
 
     @Test
     void addProduct_correctRequest_ProductResponse() throws Exception {
-        LentaProductResponse product = LentaProductResponse.builder()
+        LentaProductPriceResponse productPriceResponse = LentaProductPriceResponse.builder()
                 .price(BigDecimal.valueOf(100))
                 .priceWithCard(BigDecimal.valueOf(50))
                 .priceWithDiscount(BigDecimal.valueOf(30))
                 .build();
-        when(productService.addProduct(any())).thenReturn(product);
+        ProductResponse productResponse = ProductResponse.builder()
+                .id(2312312L)
+                .prices(List.of(productPriceResponse))
+                .build();
+
+        when(productService.addProduct(any())).thenReturn(productResponse);
 
         NewProductRequest request = NewProductRequest.builder()
                 .shopId(1L)
@@ -80,8 +85,8 @@ class ProductControllerTest {
         assertAll(
                 () -> assertEquals(200, result.getResponse().getStatus()),
                 () -> assertEquals(
-                        product,
-                        mapper.readValue(result.getResponse().getContentAsString(), LentaProductResponse.class)),
+                        mapper.writeValueAsString(productResponse),
+                        result.getResponse().getContentAsString()),
                 () -> verify(productService, times(1)).addProduct(eq(request))
         );
     }

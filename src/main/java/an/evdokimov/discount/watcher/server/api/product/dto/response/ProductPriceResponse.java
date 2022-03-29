@@ -2,19 +2,25 @@ package an.evdokimov.discount.watcher.server.api.product.dto.response;
 
 import an.evdokimov.discount.watcher.server.api.shop.dto.response.ShopResponse;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
-import java.util.List;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Data
-@Builder
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductResponse {
+public class ProductPriceResponse {
     private Long id;
     private ProductInformationResponse productInformation;
     private ShopResponse shop;
-    private List<ProductPriceResponse> prices;
+    private BigDecimal price;
+    private Double discount;
+    private BigDecimal priceWithDiscount;
+    private boolean isInStock;
+    private String availabilityInformation;
+    private LocalDateTime date;
 }

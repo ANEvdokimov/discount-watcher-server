@@ -13,6 +13,6 @@ import java.math.BigDecimal;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class LentaProductResponse extends ProductResponse {
+public class LentaProductPriceResponse extends ProductPriceResponse {
     private BigDecimal priceWithCard;
 }
