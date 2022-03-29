@@ -139,6 +139,11 @@
                             <artifactId>mapstruct-processor</artifactId>
                             <version>${org.mapstruct.version}</version>
                         </path>
+                        <annotationProcessorPath>
+                            <groupId>org.springframework.boot</groupId>
+                            <artifactId>spring-boot-configuration-processor</artifactId>
+                            <version>2.4.3</version>
+                        </annotationProcessorPath>
                         <!-- other annotation processors -->
                     </annotationProcessorPaths>
                 </configuration>
