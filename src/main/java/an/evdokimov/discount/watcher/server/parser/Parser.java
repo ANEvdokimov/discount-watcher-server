@@ -13,4 +13,6 @@ public interface Parser {
     Product parse(URL url, Shop shop) throws PageDownloaderException, ParserException;
 
     Product parse(ProductInformation productInformation, Shop shop) throws PageDownloaderException, ParserException;
+
+    Product parse(Product product) throws ParserException, PageDownloaderException;
 }

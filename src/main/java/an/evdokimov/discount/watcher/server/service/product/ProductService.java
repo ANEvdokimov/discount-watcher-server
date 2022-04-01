@@ -86,7 +86,7 @@ public class ProductService {
 
         Product parsedProduct;
         try {
-            parsedProduct = parser.parse(product.getProductInformation(), product.getShop());
+            parsedProduct = parser.parse(product);
         } catch (PageDownloaderException e) {
             throw new ServerException(ServerErrorCode.PAGE_DOWNLOAD_ERROR, e);
         } catch (ParserException e) {

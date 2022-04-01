@@ -5,16 +5,21 @@ import an.evdokimov.discount.watcher.server.database.product.model.ProductInform
 import an.evdokimov.discount.watcher.server.database.product.model.UserProduct;
 import an.evdokimov.discount.watcher.server.database.user.model.User;
 import an.evdokimov.discount.watcher.server.database.user.repository.UserRepository;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+
+import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 
 
 @DataJpaTest
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ProductRepositoryTest {
     @Autowired
     private ProductRepository productRepository;
@@ -28,11 +33,21 @@ class ProductRepositoryTest {
     @Autowired
     private ProductInformationRepository productInformationRepository;
 
-    @BeforeEach
+    @BeforeAll
     public void fillDb() {
+        userProductRepository.deleteAll();
+        userProductRepository.flush();
+        productRepository.deleteAll();
+        productRepository.flush();
+        productInformationRepository.deleteAll();
+        productInformationRepository.flush();
+        userRepository.deleteAll();
+        userRepository.flush();
+
         user1 = userRepository.save(User.builder().name("user1").build());
         user2 = userRepository.save(User.builder().name("user2").build());
         user3 = userRepository.save(User.builder().name("user3").build());
+        userRepository.flush();
 
         ProductInformation productInformation1 =
                 productInformationRepository.save(ProductInformation.builder().name("product1").build());
@@ -42,17 +57,30 @@ class ProductRepositoryTest {
                 productInformationRepository.save(ProductInformation.builder().name("product3").build());
         ProductInformation productInformation4 =
                 productInformationRepository.save(ProductInformation.builder().name("product4").build());
+        productInformationRepository.flush();
 
-        product1 = productRepository.save(Product.builder().productInformation(productInformation1).build());
-        product2 = productRepository.save(Product.builder().productInformation(productInformation2).build());
-        product3 = productRepository.save(Product.builder().productInformation(productInformation3).build());
-        product4 = productRepository.save(Product.builder().productInformation(productInformation4).build());
+        product1 = productRepository.save(Product.builder().productInformation(productInformation1)
+                .prices(new ArrayList<>()).build());
+        product2 = productRepository.save(Product.builder().productInformation(productInformation2)
+                .prices(new ArrayList<>()).build());
+        product3 = productRepository.save(Product.builder().productInformation(productInformation3)
+                .prices(new ArrayList<>()).build());
+        product4 = productRepository.save(Product.builder().productInformation(productInformation4)
+                .prices(new ArrayList<>()).build());
+        productRepository.flush();
 
-        userProductRepository.save(UserProduct.builder().user(user1).product(product1).build());
-        userProductRepository.save(UserProduct.builder().user(user1).product(product2).build());
+        userProductRepository.save(UserProduct.builder().user(user1).monitor_availability(true).monitor_discount(false)
+                .monitor_price_changes(false).product(product1).build());
+        userProductRepository.save(UserProduct.builder().user(user1).monitor_availability(false).monitor_discount(false)
+                .monitor_price_changes(false).product(product2).build());
 
-        userProductRepository.save(UserProduct.builder().user(user2).product(product3).build());
-        userProductRepository.save(UserProduct.builder().user(user2).product(product4).build());
+        userProductRepository.save(UserProduct.builder().user(user2).monitor_availability(true).monitor_discount(true)
+                .monitor_price_changes(true).product(product2).build());
+        userProductRepository.save(UserProduct.builder().user(user2).monitor_availability(false).monitor_discount(true)
+                .monitor_price_changes(false).product(product3).build());
+        userProductRepository.save(UserProduct.builder().user(user2).monitor_availability(false).monitor_discount(false)
+                .monitor_price_changes(false).product(product4).build());
+        userProductRepository.flush();
     }
 
     private User user1;
@@ -66,8 +94,16 @@ class ProductRepositoryTest {
     @Test
     void findAllByUser_getProductByUser_productList() {
         assertThat(
-                productRepository.findAllUsersProducts(user1),
-                containsInAnyOrder(product1, product2)
+                productRepository.findAllUsersProducts(user1).stream().map(Product::getId).collect(Collectors.toList()),
+                containsInAnyOrder(product1.getId(), product2.getId())
+        );
+    }
+
+    @Test
+    void findAllActiveProducts_Products_listOfActiveProducts() {
+        assertThat(
+                productRepository.findAllActiveProducts().stream().map(Product::getId).collect(Collectors.toList()),
+                containsInAnyOrder(product1.getId(), product2.getId(), product3.getId())
         );
     }
 }

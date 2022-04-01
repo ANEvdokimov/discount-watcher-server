@@ -69,6 +69,11 @@ public class LentaParser implements Parser {
         return createProduct(productFromPage, productInformation, shop);
     }
 
+    @Override
+    public Product parse(@NotNull Product product) throws ParserException, PageDownloaderException {
+        return parse(product.getProductInformation(), product.getShop());
+    }
+
     private void validateUrl(@NotNull URL url) throws ParserException {
         if (!url.getHost().equals(HOST_NAME)) {
             log.warn("wrong host. url={}", url);

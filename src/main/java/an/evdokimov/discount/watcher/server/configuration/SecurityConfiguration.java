@@ -1,4 +1,4 @@
-package an.evdokimov.discount.watcher.server;
+package an.evdokimov.discount.watcher.server.configuration;
 
 import an.evdokimov.discount.watcher.server.security.JwtAuthenticationFilter;
 import an.evdokimov.discount.watcher.server.security.JwtAuthenticationProvider;
@@ -43,7 +43,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     }
 
     @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+    protected void configure(AuthenticationManagerBuilder auth) {
         auth.authenticationProvider(jwtAuthenticationProvider);
     }
 

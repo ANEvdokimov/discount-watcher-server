@@ -6,6 +6,8 @@ import an.evdokimov.discount.watcher.server.api.product.dto.response.LentaProduc
 import an.evdokimov.discount.watcher.server.api.product.dto.response.ProductResponse;
 import an.evdokimov.discount.watcher.server.database.product.model.LentaProductPrice;
 import an.evdokimov.discount.watcher.server.database.product.model.Product;
+import an.evdokimov.discount.watcher.server.database.product.model.ProductInformation;
+import an.evdokimov.discount.watcher.server.database.product.model.ProductPrice;
 import an.evdokimov.discount.watcher.server.database.product.repository.ProductRepository;
 import an.evdokimov.discount.watcher.server.database.shop.model.Shop;
 import an.evdokimov.discount.watcher.server.database.shop.repository.ShopRepository;
@@ -36,7 +38,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest()
+@SpringBootTest
 class ProductServiceTest {
     @MockBean
     private LentaParser lentaParser;
@@ -169,5 +171,38 @@ class ProductServiceTest {
                 () -> verify(productRepository, times(1))
                         .findAllUsersProducts(userWithoutProducts)
         );
+    }
+
+    @Test
+    void updateProduct_validProduct_updatedProducts() throws ParserException, PageDownloaderException, ServerException,
+            MalformedURLException {
+        Product product = Product.builder()
+                .shop(Shop.builder().id(1L).build())
+                .productInformation(ProductInformation.builder().id(1L).name("product")
+                        .url(new URL("https://lenta.com")).build())
+                .prices(List.of(ProductPrice.builder().id(1L).price(BigDecimal.valueOf(100)).build()))
+                .build();
+        Product parsedProduct = Product.builder()
+                .shop(Shop.builder().id(1L).build())
+                .productInformation(ProductInformation.builder().id(1L).name("product")
+                        .url(new URL("https://lenta.com")).build())
+                .prices(List.of(ProductPrice.builder().price(BigDecimal.valueOf(5000)).build()))
+                .build();
+
+        when(lentaParser.parse(product)).thenReturn(parsedProduct);
+
+        assertEquals(parsedProduct, productService.updateProduct(product));
+    }
+
+    @Test
+    void updateProduct_wrongUrl_ServerException() throws MalformedURLException {
+        Product product = Product.builder()
+                .shop(Shop.builder().id(1L).build())
+                .productInformation(ProductInformation.builder().id(1L).name("product")
+                        .url(new URL("https://not-lenta.com")).build())
+                .prices(List.of(ProductPrice.builder().id(1L).price(BigDecimal.valueOf(100)).build()))
+                .build();
+
+        assertThrows(ServerException.class, () -> productService.updateProduct(product));
     }
 }
