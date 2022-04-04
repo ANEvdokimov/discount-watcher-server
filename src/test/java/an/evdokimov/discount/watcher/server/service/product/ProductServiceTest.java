@@ -8,6 +8,8 @@ import an.evdokimov.discount.watcher.server.database.product.model.LentaProductP
 import an.evdokimov.discount.watcher.server.database.product.model.Product;
 import an.evdokimov.discount.watcher.server.database.product.model.ProductInformation;
 import an.evdokimov.discount.watcher.server.database.product.model.ProductPrice;
+import an.evdokimov.discount.watcher.server.database.product.repository.ProductInformationRepository;
+import an.evdokimov.discount.watcher.server.database.product.repository.ProductPriceRepository;
 import an.evdokimov.discount.watcher.server.database.product.repository.ProductRepository;
 import an.evdokimov.discount.watcher.server.database.shop.model.Shop;
 import an.evdokimov.discount.watcher.server.database.shop.repository.ShopRepository;
@@ -48,6 +50,12 @@ class ProductServiceTest {
 
     @MockBean
     private ProductRepository productRepository;
+
+    @MockBean
+    private ProductPriceRepository productPriceRepository;
+
+    @MockBean
+    private ProductInformationRepository productInformationRepository;
 
     @MockBean
     private ShopRepository shopRepository;
@@ -176,20 +184,23 @@ class ProductServiceTest {
     @Test
     void updateProduct_validProduct_updatedProducts() throws ParserException, PageDownloaderException, ServerException,
             MalformedURLException {
+        ProductPrice oldPrice = ProductPrice.builder().id(1L).price(BigDecimal.valueOf(100)).build();
         Product product = Product.builder()
                 .shop(Shop.builder().id(1L).build())
                 .productInformation(ProductInformation.builder().id(1L).name("product")
                         .url(new URL("https://lenta.com")).build())
-                .prices(List.of(ProductPrice.builder().id(1L).price(BigDecimal.valueOf(100)).build()))
+                .prices(List.of(oldPrice))
                 .build();
+
+        LentaProductPrice parsedProductPrice = LentaProductPrice.builder().price(BigDecimal.valueOf(5000)).build();
         Product parsedProduct = Product.builder()
                 .shop(Shop.builder().id(1L).build())
                 .productInformation(ProductInformation.builder().id(1L).name("product")
                         .url(new URL("https://lenta.com")).build())
-                .prices(List.of(ProductPrice.builder().price(BigDecimal.valueOf(5000)).build()))
+                .prices(List.of(oldPrice, parsedProductPrice))
                 .build();
 
-        when(lentaParser.parse(product)).thenReturn(parsedProduct);
+        when(lentaParser.parse(product)).thenReturn(parsedProductPrice);
 
         assertEquals(parsedProduct, productService.updateProduct(product));
     }

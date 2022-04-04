@@ -70,8 +70,14 @@ public class LentaParser implements Parser {
     }
 
     @Override
-    public Product parse(@NotNull Product product) throws ParserException, PageDownloaderException {
-        return parse(product.getProductInformation(), product.getShop());
+    public LentaProductPrice parse(@NotNull Product product) throws ParserException, PageDownloaderException {
+        LentaProductFromPage productFromPage =
+                downloadProduct(product.getProductInformation().getUrl(), product.getShop());
+
+        LentaProductPrice lentaProductPrice = createProductPrice(productFromPage);
+        lentaProductPrice.setProduct(product);
+
+        return lentaProductPrice;
     }
 
     private void validateUrl(@NotNull URL url) throws ParserException {
@@ -120,8 +126,23 @@ public class LentaParser implements Parser {
         };
     }
 
-    private Product createProduct(LentaProductFromPage productFromPage, ProductInformation productInformation, Shop shop)
+    private Product createProduct(LentaProductFromPage productFromPage, ProductInformation productInformation,
+                                  Shop shop)
             throws ParserException {
+        LentaProductPrice lentaProductPrice = createProductPrice(productFromPage);
+
+        Product product = Product.builder()
+                .shop(shop)
+                .productInformation(productInformation)
+                .prices(List.of(lentaProductPrice))
+                .build();
+
+        lentaProductPrice.setProduct(product);
+
+        return product;
+    }
+
+    private LentaProductPrice createProductPrice(LentaProductFromPage productFromPage) throws ParserException {
         Double discount;
         BigDecimal priceWithDiscount;
         try {
@@ -138,7 +159,7 @@ public class LentaParser implements Parser {
             throw new ParserException(ParserErrorCode.WRONG_NUMBER_FORMAT, e);
         }
 
-        LentaProductPrice lentaProductPrice = LentaProductPrice.builder()
+        return LentaProductPrice.builder()
                 .price(productFromPage.getRegularPrice().getValue())
                 .priceWithCard(productFromPage.getCardPrice().getValue())
                 .discount(discount)
@@ -147,15 +168,5 @@ public class LentaParser implements Parser {
                 .availabilityInformation(getAvailabilityInformation(productFromPage.getStock()))
                 .date(LocalDateTime.now(clock))
                 .build();
-
-        Product product = Product.builder()
-                .shop(shop)
-                .productInformation(productInformation)
-                .prices(List.of(lentaProductPrice))
-                .build();
-
-        lentaProductPrice.setProduct(product);
-
-        return product;
     }
 }

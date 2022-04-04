@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -27,4 +28,10 @@ public class Product {
     private Shop shop;
     @OneToMany
     private List<ProductPrice> prices;
+
+    public void addPrice(ProductPrice price) {
+        ArrayList<ProductPrice> newPrices = new ArrayList<>(getPrices());
+        newPrices.add(price);
+        setPrices(newPrices);
+    }
 }
