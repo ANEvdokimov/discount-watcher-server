@@ -56,4 +56,18 @@ public class ProductPrice {
     public Class<? extends ProductPriceResponse> getDtoClass() {
         return ProductPriceResponse.class;
     }
+
+    @Override
+    public String toString() {
+        return "ProductPrice{" +
+                "id=" + id +
+                ", productId=" + product.getId() +
+                ", price=" + price +
+                ", discount=" + discount +
+                ", priceWithDiscount=" + priceWithDiscount +
+                ", isInStock=" + isInStock +
+                ", availabilityInformation='" + availabilityInformation + '\'' +
+                ", date=" + date +
+                '}';
+    }
 }

@@ -26,7 +26,8 @@ public class Product {
     @ManyToOne
     @JoinColumn(name = "shop_id")
     private Shop shop;
-    @OneToMany
+    @OneToMany(mappedBy = "product")
+    @OrderBy("date DESC")
     private List<ProductPrice> prices;
 
     public void addPrice(ProductPrice price) {

@@ -54,6 +54,13 @@ public class ProductService {
         return productMapper.map(product);
     }
 
+    public ProductResponse getProductWithLastPrice(@NotNull Long id) throws ServerException {
+        Product product = productRepository.findByIdWithLastPrice(id)
+                .orElseThrow(() -> new ServerException(ServerErrorCode.PRODUCT_NOT_FOUND));
+
+        return productMapper.map(product);
+    }
+
     public Collection<ProductResponse> getUserProducts(@NotNull User user) {
         Collection<Product> userProducts = productRepository.findAllUsersProducts(user);
         return userProducts.stream()
