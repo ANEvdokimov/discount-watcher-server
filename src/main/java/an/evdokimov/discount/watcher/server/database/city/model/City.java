@@ -1,15 +1,16 @@
 package an.evdokimov.discount.watcher.server.database.city.model;
 
 import an.evdokimov.discount.watcher.server.database.shop.model.Shop;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.Hibernate;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.Objects;
 
-@Data
+@Getter
+@Setter
+@ToString
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -22,5 +23,19 @@ public class City {
     private String name;
     private String cyrillicName;
     @OneToMany(mappedBy = "city")
+    @ToString.Exclude
     private List<Shop> shops;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        City city = (City) o;
+        return id != null && Objects.equals(id, city.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

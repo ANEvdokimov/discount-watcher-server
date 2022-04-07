@@ -1,8 +1,11 @@
 package an.evdokimov.discount.watcher.server.parser;
 
+import an.evdokimov.discount.watcher.server.database.city.model.City;
 import an.evdokimov.discount.watcher.server.database.product.model.LentaProductPrice;
 import an.evdokimov.discount.watcher.server.database.product.model.Product;
 import an.evdokimov.discount.watcher.server.database.product.model.ProductInformation;
+import an.evdokimov.discount.watcher.server.database.product.model.ProductPrice;
+import an.evdokimov.discount.watcher.server.database.shop.model.CommercialNetwork;
 import an.evdokimov.discount.watcher.server.database.shop.model.Shop;
 import an.evdokimov.discount.watcher.server.parser.downloader.PageDownloader;
 import an.evdokimov.discount.watcher.server.parser.downloader.PageDownloaderException;
@@ -24,10 +27,12 @@ import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -143,7 +148,7 @@ class LentaParserTest {
 
         Product result = parser.parse(productInformation.getUrl(), shop);
 
-        assertEquals(expectedProduct, result);
+        assertTrue(compareProducts(expectedProduct, result));
     }
 
     @Test
@@ -179,7 +184,7 @@ class LentaParserTest {
 
         Product result = parser.parse(productInformation, shop);
 
-        assertEquals(expectedProduct, result);
+        assertTrue(compareProducts(expectedProduct, result));
     }
 
     @Test
@@ -215,7 +220,7 @@ class LentaParserTest {
 
         Product result = parser.parse(productInformation.getUrl(), shop);
 
-        assertEquals(expectedProduct, result);
+        assertTrue(compareProducts(expectedProduct, result));
     }
 
     @Test
@@ -251,7 +256,7 @@ class LentaParserTest {
 
         Product result = parser.parse(productInformation.getUrl(), shop);
 
-        assertEquals(expectedProduct, result);
+        assertTrue(compareProducts(expectedProduct, result));
     }
 
     @Test
@@ -287,7 +292,7 @@ class LentaParserTest {
 
         Product result = parser.parse(productInformation.getUrl(), shop);
 
-        assertEquals(expectedProduct, result);
+        assertTrue(compareProducts(expectedProduct, result));
     }
 
     @Test
@@ -323,6 +328,174 @@ class LentaParserTest {
 
         Product result = parser.parse(productInformation.getUrl(), shop);
 
-        assertEquals(expectedProduct, result);
+        assertTrue(compareProducts(expectedProduct, result));
+    }
+
+    private boolean compareProducts(Product product1, Product product2) {
+        ArrayList<Boolean> comparisonResults = new ArrayList<>();
+
+        comparisonResults.add(Objects.equals(product1.getId(), product2.getId()));
+        comparisonResults.add(compareShops(product1.getShop(), product2.getShop()));
+        comparisonResults.add(compareProductInformation(
+                product1.getProductInformation(),
+                product2.getProductInformation())
+        );
+        if (product1.getPrices().size() == product2.getPrices().size()) {
+            for (int i = 0; i < product1.getPrices().size(); i++) {
+                comparisonResults.add(compareProductPrices(
+                        product1.getPrices().get(i),
+                        product2.getPrices().get(i)
+                ));
+            }
+        } else {
+            return false;
+        }
+
+        for (Boolean bool : comparisonResults) {
+            if (bool.equals(false)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean compareShops(Shop shop1, Shop shop2) {
+        if (shop1 == null && shop2 == null) {
+            return true;
+        }
+
+        if (shop1 != null && shop2 != null) {
+            ArrayList<Boolean> comparisonResults = new ArrayList<>();
+
+            comparisonResults.add(Objects.equals(shop1.getId(), shop2.getId()));
+            comparisonResults.add(Objects.equals(shop1.getName(), shop2.getName()));
+            comparisonResults.add(Objects.equals(shop1.getAddress(), shop2.getAddress()));
+            comparisonResults.add(Objects.equals(shop1.getCookie(), shop2.getCookie()));
+            comparisonResults.add(compareCites(shop1.getCity(), shop2.getCity()));
+            comparisonResults.add(compareCommercialNetwork(shop1.getCommercialNetwork(), shop2.getCommercialNetwork()));
+
+            for (Boolean bool : comparisonResults) {
+                if (bool.equals(false)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        return false;
+    }
+
+    private boolean compareCites(City city1, City city2) {
+        if (city1 == null && city2 == null) {
+            return true;
+        }
+
+        if (city1 != null && city2 != null) {
+            ArrayList<Boolean> comparisonResults = new ArrayList<>();
+
+            comparisonResults.add(Objects.equals(city1.getId(), city2.getId()));
+            comparisonResults.add(Objects.equals(city1.getName(), city2.getName()));
+            comparisonResults.add(Objects.equals(city1.getCyrillicName(), city2.getCyrillicName()));
+
+            for (Boolean bool : comparisonResults) {
+                if (bool.equals(false)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        return false;
+    }
+
+    private boolean compareCommercialNetwork(CommercialNetwork commercialNetwork1,
+                                             CommercialNetwork commercialNetwork2) {
+        if (commercialNetwork1 == null && commercialNetwork2 == null) {
+            return true;
+        }
+
+        if (commercialNetwork1 != null && commercialNetwork2 != null) {
+            ArrayList<Boolean> comparisonResults = new ArrayList<>();
+
+            comparisonResults.add(Objects.equals(commercialNetwork1.getId(), commercialNetwork2.getId()));
+            comparisonResults.add(Objects.equals(commercialNetwork1.getName(), commercialNetwork2.getName()));
+            comparisonResults.add(
+                    Objects.equals(commercialNetwork1.getCyrillicName(), commercialNetwork2.getCyrillicName())
+            );
+            for (Boolean bool : comparisonResults) {
+                if (bool.equals(false)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        return false;
+    }
+
+    private boolean compareProductInformation(ProductInformation productInformation1,
+                                              ProductInformation productInformation2) {
+        if (productInformation1 == null && productInformation2 == null) {
+            return true;
+        }
+
+        if (productInformation1 != null && productInformation2 != null) {
+            ArrayList<Boolean> comparisonResults = new ArrayList<>();
+
+            comparisonResults.add(Objects.equals(productInformation1.getId(), productInformation2.getId()));
+            comparisonResults.add(Objects.equals(productInformation1.getName(), productInformation2.getName()));
+            comparisonResults.add(Objects.equals(productInformation1.getUrl(), productInformation2.getUrl()));
+
+            for (Boolean bool : comparisonResults) {
+                if (bool.equals(false)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        return false;
+    }
+
+    private boolean compareProductPrices(ProductPrice productPrice1, ProductPrice productPrice2) {
+        if (productPrice1 == null && productPrice2 == null) {
+            return true;
+        }
+
+        if (productPrice1 != null && productPrice2 != null) {
+            if (!productPrice1.getClass().equals(productPrice2.getClass())) {
+                return false;
+            }
+
+            ArrayList<Boolean> comparisonResults = new ArrayList<>();
+
+            comparisonResults.add(Objects.equals(productPrice1.getId(), productPrice2.getId()));
+            comparisonResults.add(Objects.equals(productPrice1.getDate(), productPrice2.getDate()));
+            comparisonResults.add(Objects.equals(productPrice1.getPrice(), productPrice2.getPrice()));
+            comparisonResults.add(Objects.equals(productPrice1.getDiscount(), productPrice2.getDiscount()));
+            comparisonResults.add(Objects.equals(
+                    productPrice1.getAvailabilityInformation(),
+                    productPrice2.getAvailabilityInformation())
+            );
+            comparisonResults.add(Objects.equals(
+                    productPrice1.getPriceWithDiscount(),
+                    productPrice2.getPriceWithDiscount())
+            );
+            if (productPrice1 instanceof LentaProductPrice) {
+                comparisonResults.add(Objects.equals(
+                        ((LentaProductPrice) productPrice1).getPriceWithCard(),
+                        ((LentaProductPrice) productPrice2).getPriceWithCard()
+                ));
+            }
+
+            for (Boolean bool : comparisonResults) {
+                if (bool.equals(false)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        return false;
     }
 }

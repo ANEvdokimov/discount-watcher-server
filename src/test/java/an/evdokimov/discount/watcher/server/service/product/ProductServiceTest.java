@@ -336,6 +336,7 @@ class ProductServiceTest {
             MalformedURLException {
         ProductPrice oldPrice = ProductPrice.builder().id(1L).price(BigDecimal.valueOf(100)).build();
         Product product = Product.builder()
+                .id(666L)
                 .shop(Shop.builder().id(1L).build())
                 .productInformation(ProductInformation.builder().id(1L).name("product")
                         .url(new URL("https://lenta.com")).build())
@@ -344,6 +345,7 @@ class ProductServiceTest {
 
         LentaProductPrice parsedProductPrice = LentaProductPrice.builder().price(BigDecimal.valueOf(5000)).build();
         Product parsedProduct = Product.builder()
+                .id(666L)
                 .shop(Shop.builder().id(1L).build())
                 .productInformation(ProductInformation.builder().id(1L).name("product")
                         .url(new URL("https://lenta.com")).build())

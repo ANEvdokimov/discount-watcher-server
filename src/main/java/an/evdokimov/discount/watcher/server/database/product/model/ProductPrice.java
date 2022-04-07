@@ -1,10 +1,8 @@
 package an.evdokimov.discount.watcher.server.database.product.model;
 
-import an.evdokimov.discount.watcher.server.api.product.dto.response.ProductPriceResponse;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.Hibernate;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -14,7 +12,9 @@ import java.util.Objects;
 @Entity
 @Table(name = "product_price")
 @Inheritance(strategy = InheritanceType.JOINED)
-@Data
+@Getter
+@Setter
+@ToString
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -35,39 +35,13 @@ public class ProductPrice {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof ProductPrice)) return false;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
         ProductPrice that = (ProductPrice) o;
-        return isInStock() == that.isInStock() &&
-                Objects.equals(getId(), that.getId()) &&
-                Objects.equals(getProduct().getId(), that.getProduct().getId()) &&
-                Objects.equals(getPrice(), that.getPrice()) &&
-                Objects.equals(getDiscount(), that.getDiscount()) &&
-                Objects.equals(getPriceWithDiscount(), that.getPriceWithDiscount()) &&
-                Objects.equals(getAvailabilityInformation(), that.getAvailabilityInformation()) &&
-                Objects.equals(getDate(), that.getDate());
+        return id != null && Objects.equals(id, that.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getProduct().getId(), getPrice(), getDiscount(), getPriceWithDiscount(),
-                isInStock(), getAvailabilityInformation(), getDate());
-    }
-
-    public Class<? extends ProductPriceResponse> getDtoClass() {
-        return ProductPriceResponse.class;
-    }
-
-    @Override
-    public String toString() {
-        return "ProductPrice{" +
-                "id=" + id +
-                ", productId=" + product.getId() +
-                ", price=" + price +
-                ", discount=" + discount +
-                ", priceWithDiscount=" + priceWithDiscount +
-                ", isInStock=" + isInStock +
-                ", availabilityInformation='" + availabilityInformation + '\'' +
-                ", date=" + date +
-                '}';
+        return getClass().hashCode();
     }
 }

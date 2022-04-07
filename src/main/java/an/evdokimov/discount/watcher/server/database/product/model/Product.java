@@ -1,18 +1,19 @@
 package an.evdokimov.discount.watcher.server.database.product.model;
 
 import an.evdokimov.discount.watcher.server.database.shop.model.Shop;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.Hibernate;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "product")
-@Data
+@Getter
+@Setter
+@ToString
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -28,11 +29,25 @@ public class Product {
     private Shop shop;
     @OneToMany(mappedBy = "product")
     @OrderBy("date DESC")
+    @ToString.Exclude
     private List<ProductPrice> prices;
 
     public void addPrice(ProductPrice price) {
         ArrayList<ProductPrice> newPrices = new ArrayList<>(getPrices());
         newPrices.add(price);
         setPrices(newPrices);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        Product product = (Product) o;
+        return id != null && Objects.equals(id, product.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
     }
 }
