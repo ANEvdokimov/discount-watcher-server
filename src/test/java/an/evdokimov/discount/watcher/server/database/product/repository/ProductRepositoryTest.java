@@ -153,16 +153,6 @@ class ProductRepositoryTest {
 
     @Test
     void findByIdWithLastPrice_productWith3Prices_productWithLastPrice() {
-//        assertAll(
-//                () -> assertThat(
-//                        productRepository.findByIdWithLastPrice(product1.getId()).get().getPrices(),
-//                        contains(price3)
-//                ),
-//                () -> assertThat(
-//                        productRepository.findById(product1.getId()).get().getPrices(),
-//                        contains(price3, price2, price1)
-//                )
-//        );
         assertThat(
                 productRepository.findByIdWithLastPrice(product1.getId()).get().getPrices(),
                 contains(price3)
