@@ -221,4 +221,56 @@ class ProductControllerTest {
                         .getUserProducts(eq(testConfig.getTestUser()), anyBoolean())
         );
     }
+
+    @Test
+    void getProduct_validJwt_http200() throws Exception {
+        ProductResponse expectedProductResponse = ProductResponse.builder().id(1L).build();
+        when(productService.getProduct(anyLong(), anyBoolean())).thenReturn(expectedProductResponse);
+
+        MvcResult result = mvc.perform(get("/api/product/" + expectedProductResponse.getId())
+                .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
+                .header("with_price_history", true)
+        ).andReturn();
+
+        ProductResponse returnedProductResponse =
+                mapper.readValue(result.getResponse().getContentAsString(), ProductResponse.class);
+
+        assertAll(
+                () -> assertEquals(200, result.getResponse().getStatus()),
+                () -> assertEquals(expectedProductResponse, returnedProductResponse),
+                () -> verify(productService, times(1))
+                        .getProduct(expectedProductResponse.getId(), true)
+        );
+    }
+
+    @Test
+    void getProduct_invalidJwt_http401() throws Exception {
+        ProductResponse expectedProductResponse = ProductResponse.builder().id(1L).build();
+        when(productService.getProduct(anyLong(), anyBoolean())).thenReturn(expectedProductResponse);
+
+        MvcResult result = mvc.perform(get("/api/product/" + expectedProductResponse.getId())
+                .header(authHeaderName, "invalid jwt")
+                .header("with_price_history", true)
+        ).andReturn();
+
+        assertAll(
+                () -> assertEquals(401, result.getResponse().getStatus()),
+                () -> verify(productService, times(0)).getProduct(anyLong(), anyBoolean())
+        );
+    }
+
+    @Test
+    void getProduct_withoutWithPriceHistoryHeader_http400() throws Exception {
+        ProductResponse expectedProductResponse = ProductResponse.builder().id(1L).build();
+        when(productService.getProduct(anyLong(), anyBoolean())).thenReturn(expectedProductResponse);
+
+        MvcResult result = mvc.perform(get("/api/product/" + expectedProductResponse.getId())
+                .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
+        ).andReturn();
+
+        assertAll(
+                () -> assertEquals(400, result.getResponse().getStatus()),
+                () -> verify(productService, times(0)).getProduct(anyLong(), anyBoolean())
+        );
+    }
 }
