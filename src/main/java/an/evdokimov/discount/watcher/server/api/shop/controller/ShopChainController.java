@@ -1,7 +1,7 @@
 package an.evdokimov.discount.watcher.server.api.shop.controller;
 
-import an.evdokimov.discount.watcher.server.api.shop.dto.response.CommercialNetworkResponse;
-import an.evdokimov.discount.watcher.server.service.shop.CommercialNetworkService;
+import an.evdokimov.discount.watcher.server.api.shop.dto.response.ShopChainResponse;
+import an.evdokimov.discount.watcher.server.service.shop.ShopChainService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.lang.Nullable;
@@ -13,21 +13,21 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Collection;
 
 @RestController
-@RequestMapping("/api/commercial_networks")
+@RequestMapping("/api/shop_chains")
 @Slf4j
-public class CommercialNetworkController {
-    private final CommercialNetworkService commercialNetworkService;
+public class ShopChainController {
+    private final ShopChainService shopChainService;
 
-    public CommercialNetworkController(CommercialNetworkService commercialNetworkService) {
-        this.commercialNetworkService = commercialNetworkService;
+    public ShopChainController(ShopChainService shopChainService) {
+        this.shopChainService = shopChainService;
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public Collection<CommercialNetworkResponse> getAllCommercialNetworks(
+    public Collection<ShopChainResponse> getAllCommercialNetworks(
             @Nullable @RequestHeader("With-Shops") boolean withShops,
             @Nullable @RequestHeader("City-Id") Long cityId) {
         log.debug("Getting all commercial networks. withShops: {}, cityId: {}", withShops, cityId);
 
-        return commercialNetworkService.getCommercialNetworks(withShops, cityId);
+        return shopChainService.getShopChains(withShops, cityId);
     }
 }

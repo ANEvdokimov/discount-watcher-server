@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ShopResponse {
     private Long id;
-    private CommercialNetworkResponse commercialNetwork;
+    private ShopChainResponse commercialNetwork;
     private String name;
     private CityResponse city;
     private String address;

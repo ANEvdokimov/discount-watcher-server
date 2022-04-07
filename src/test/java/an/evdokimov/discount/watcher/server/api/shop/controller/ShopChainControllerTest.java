@@ -1,13 +1,13 @@
 package an.evdokimov.discount.watcher.server.api.shop.controller;
 
 import an.evdokimov.discount.watcher.server.api.TestConfig;
-import an.evdokimov.discount.watcher.server.api.shop.dto.response.CommercialNetworkResponse;
-import an.evdokimov.discount.watcher.server.api.shop.dto.response.CommercialNetworkWithShopsResponse;
+import an.evdokimov.discount.watcher.server.api.shop.dto.response.ShopChainResponse;
+import an.evdokimov.discount.watcher.server.api.shop.dto.response.ShopChainWithShopsResponse;
 import an.evdokimov.discount.watcher.server.database.city.model.City;
-import an.evdokimov.discount.watcher.server.database.shop.model.CommercialNetwork;
 import an.evdokimov.discount.watcher.server.database.shop.model.Shop;
+import an.evdokimov.discount.watcher.server.database.shop.model.ShopChain;
 import an.evdokimov.discount.watcher.server.security.JwtUtils;
-import an.evdokimov.discount.watcher.server.service.shop.CommercialNetworkService;
+import an.evdokimov.discount.watcher.server.service.shop.ShopChainService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,9 +34,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
-@WebMvcTest(CommercialNetworkController.class)
+@WebMvcTest(ShopChainController.class)
 @Import({TestConfig.class})
-class CommercialNetworkControllerTest {
+class ShopChainControllerTest {
     @Value("${header.authentication}")
     private String authHeaderName;
 
@@ -50,14 +50,14 @@ class CommercialNetworkControllerTest {
     private JwtUtils jwtUtils;
 
     @MockBean
-    private CommercialNetworkService service;
+    private ShopChainService service;
 
-    private static List<CommercialNetworkResponse> cnResponsesInAllCity;
-    private static List<CommercialNetworkResponse> cnResponsesInCity1;
-    private static List<CommercialNetworkResponse> cnResponsesInCity17;
-    private static List<CommercialNetworkResponse> cnWithShopsResponsesInAllCity;
-    private static List<CommercialNetworkResponse> cnWithShopsResponsesInCity1;
-    private static List<CommercialNetworkResponse> cnWithShopsResponsesInCity17;
+    private static List<ShopChainResponse> cnResponsesInAllCity;
+    private static List<ShopChainResponse> cnResponsesInCity1;
+    private static List<ShopChainResponse> cnResponsesInCity17;
+    private static List<ShopChainResponse> cnWithShopsResponsesInAllCity;
+    private static List<ShopChainResponse> cnWithShopsResponsesInCity1;
+    private static List<ShopChainResponse> cnWithShopsResponsesInCity17;
 
     @BeforeAll
     public static void createCn() {
@@ -69,53 +69,53 @@ class CommercialNetworkControllerTest {
         Shop shop3InCity17 = Shop.builder().id(3L).city(city17).build();
         Shop shop4InCity17 = Shop.builder().id(4L).city(city17).build();
 
-        CommercialNetwork cnInCity1 = CommercialNetwork.builder().id(1L).shops(List.of(shop1InCity1)).build();
-        CommercialNetwork cnInCities1And17 =
-                CommercialNetwork.builder().id(2L).shops(List.of(shop2InCity1, shop3InCity17)).build();
-        CommercialNetwork cnInCity17 = CommercialNetwork.builder().id(3L).shops(List.of(shop4InCity17)).build();
+        ShopChain cnInCity1 = ShopChain.builder().id(1L).shops(List.of(shop1InCity1)).build();
+        ShopChain cnInCities1And17 =
+                ShopChain.builder().id(2L).shops(List.of(shop2InCity1, shop3InCity17)).build();
+        ShopChain cnInCity17 = ShopChain.builder().id(3L).shops(List.of(shop4InCity17)).build();
 
         ModelMapper modelMapper = new ModelMapper();
 
         cnResponsesInAllCity = modelMapper.map(List.of(cnInCity1, cnInCities1And17, cnInCity17),
-                new TypeToken<ArrayList<CommercialNetworkResponse>>() {
+                new TypeToken<ArrayList<ShopChainResponse>>() {
                 }.getType());
         cnResponsesInCity1 = modelMapper.map(List.of(cnInCity1, cnInCities1And17),
-                new TypeToken<ArrayList<CommercialNetworkResponse>>() {
+                new TypeToken<ArrayList<ShopChainResponse>>() {
                 }.getType());
         cnResponsesInCity17 = modelMapper.map(List.of(cnInCities1And17, cnInCity17),
-                new TypeToken<ArrayList<CommercialNetworkResponse>>() {
+                new TypeToken<ArrayList<ShopChainResponse>>() {
                 }.getType());
 
         cnWithShopsResponsesInAllCity = modelMapper.map(List.of(cnInCity1, cnInCities1And17, cnInCity17),
-                new TypeToken<ArrayList<CommercialNetworkWithShopsResponse>>() {
+                new TypeToken<ArrayList<ShopChainWithShopsResponse>>() {
                 }.getType());
         cnWithShopsResponsesInCity1 = modelMapper.map(List.of(cnInCity1, cnInCities1And17),
-                new TypeToken<ArrayList<CommercialNetworkWithShopsResponse>>() {
+                new TypeToken<ArrayList<ShopChainWithShopsResponse>>() {
                 }.getType());
         cnWithShopsResponsesInCity17 = modelMapper.map(List.of(cnInCities1And17, cnInCity17),
-                new TypeToken<ArrayList<CommercialNetworkWithShopsResponse>>() {
+                new TypeToken<ArrayList<ShopChainWithShopsResponse>>() {
                 }.getType());
     }
 
     @BeforeEach
     public void mockRepository() {
-        when(service.getCommercialNetworks(false, null)).thenReturn(cnResponsesInAllCity);
-        when(service.getCommercialNetworks(false, 1L)).thenReturn(cnResponsesInCity1);
-        when(service.getCommercialNetworks(false, 17L)).thenReturn(cnResponsesInCity17);
-        when(service.getCommercialNetworks(true, null)).thenReturn(cnWithShopsResponsesInAllCity);
-        when(service.getCommercialNetworks(true, 1L)).thenReturn(cnWithShopsResponsesInCity1);
-        when(service.getCommercialNetworks(true, 17L)).thenReturn(cnWithShopsResponsesInCity17);
+        when(service.getShopChains(false, null)).thenReturn(cnResponsesInAllCity);
+        when(service.getShopChains(false, 1L)).thenReturn(cnResponsesInCity1);
+        when(service.getShopChains(false, 17L)).thenReturn(cnResponsesInCity17);
+        when(service.getShopChains(true, null)).thenReturn(cnWithShopsResponsesInAllCity);
+        when(service.getShopChains(true, 1L)).thenReturn(cnWithShopsResponsesInCity1);
+        when(service.getShopChains(true, 17L)).thenReturn(cnWithShopsResponsesInCity17);
     }
 
     @Test
     void getAllCommercialNetworks_NoCityId_http200() throws Exception {
-        MvcResult result = mvc.perform(get("/api/commercial_networks")
+        MvcResult result = mvc.perform(get("/api/shop_chains")
                         .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user")))
                 .andReturn();
 
         Object resultContent = objectMapper.readValue(
                 result.getResponse().getContentAsString(),
-                objectMapper.getTypeFactory().constructCollectionType(ArrayList.class, CommercialNetworkResponse.class)
+                objectMapper.getTypeFactory().constructCollectionType(ArrayList.class, ShopChainResponse.class)
         );
 
         assertAll(
@@ -126,7 +126,7 @@ class CommercialNetworkControllerTest {
 
     @Test
     void getAllCommercialNetworks_withShopsNoCityId_http200() throws Exception {
-        MvcResult result = mvc.perform(get("/api/commercial_networks")
+        MvcResult result = mvc.perform(get("/api/shop_chains")
                         .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
                         .header("With-Shops", "true"))
                 .andReturn();
@@ -134,7 +134,7 @@ class CommercialNetworkControllerTest {
         Object resultContent = objectMapper.readValue(
                 result.getResponse().getContentAsString(),
                 objectMapper.getTypeFactory()
-                        .constructCollectionType(ArrayList.class, CommercialNetworkWithShopsResponse.class)
+                        .constructCollectionType(ArrayList.class, ShopChainWithShopsResponse.class)
         );
 
         assertAll(
@@ -145,7 +145,7 @@ class CommercialNetworkControllerTest {
 
     @Test
     void getAllCommercialNetworks_withShopsCityId17_http200() throws Exception {
-        MvcResult result = mvc.perform(get("/api/commercial_networks")
+        MvcResult result = mvc.perform(get("/api/shop_chains")
                         .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
                         .header("With-Shops", "true")
                         .header("City-Id", 17))
@@ -154,7 +154,7 @@ class CommercialNetworkControllerTest {
         Object resultContent = objectMapper.readValue(
                 result.getResponse().getContentAsString(),
                 objectMapper.getTypeFactory()
-                        .constructCollectionType(ArrayList.class, CommercialNetworkWithShopsResponse.class)
+                        .constructCollectionType(ArrayList.class, ShopChainWithShopsResponse.class)
         );
 
         assertAll(
@@ -165,7 +165,7 @@ class CommercialNetworkControllerTest {
 
     @Test
     void getAllCommercialNetworks_wrongToken_http401() throws Exception {
-        mvc.perform(get("/api/commercial_networks")
+        mvc.perform(get("/api/shop_chains")
                         .header(authHeaderName, "Bearer wrong token")
                         .header("With-Shops", "true")
                         .header("City-Id", 17))

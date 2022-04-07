@@ -1,11 +1,11 @@
 package an.evdokimov.discount.watcher.server.service.shop;
 
-import an.evdokimov.discount.watcher.server.api.shop.dto.response.CommercialNetworkResponse;
-import an.evdokimov.discount.watcher.server.api.shop.dto.response.CommercialNetworkWithShopsResponse;
+import an.evdokimov.discount.watcher.server.api.shop.dto.response.ShopChainResponse;
+import an.evdokimov.discount.watcher.server.api.shop.dto.response.ShopChainWithShopsResponse;
 import an.evdokimov.discount.watcher.server.database.city.model.City;
-import an.evdokimov.discount.watcher.server.database.shop.model.CommercialNetwork;
 import an.evdokimov.discount.watcher.server.database.shop.model.Shop;
-import an.evdokimov.discount.watcher.server.database.shop.repository.CommercialNetworkRepository;
+import an.evdokimov.discount.watcher.server.database.shop.model.ShopChain;
+import an.evdokimov.discount.watcher.server.database.shop.repository.ShopChainRepository;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,19 +23,19 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
-class CommercialNetworkServiceTest {
+class ShopChainServiceTest {
     @Autowired
-    private CommercialNetworkService service;
+    private ShopChainService service;
 
     @Autowired
     private ModelMapper modelMapper;
 
     @MockBean
-    private CommercialNetworkRepository repository;
+    private ShopChainRepository repository;
 
-    private static CommercialNetwork cnInCity1;
-    private static CommercialNetwork cnInCities1And17;
-    private static CommercialNetwork cnInCity17;
+    private static ShopChain cnInCity1;
+    private static ShopChain cnInCities1And17;
+    private static ShopChain cnInCity17;
 
     @BeforeAll
     public static void createCn() {
@@ -47,9 +47,9 @@ class CommercialNetworkServiceTest {
         Shop shop3InCity17 = Shop.builder().id(3L).city(city17).build();
         Shop shop4InCity17 = Shop.builder().id(4L).city(city17).build();
 
-        cnInCity1 = CommercialNetwork.builder().id(1L).shops(List.of(shop1InCity1)).build();
-        cnInCities1And17 = CommercialNetwork.builder().id(2L).shops(List.of(shop2InCity1, shop3InCity17)).build();
-        cnInCity17 = CommercialNetwork.builder().id(3L).shops(List.of(shop4InCity17)).build();
+        cnInCity1 = ShopChain.builder().id(1L).shops(List.of(shop1InCity1)).build();
+        cnInCities1And17 = ShopChain.builder().id(2L).shops(List.of(shop2InCity1, shop3InCity17)).build();
+        cnInCity17 = ShopChain.builder().id(3L).shops(List.of(shop4InCity17)).build();
     }
 
     @BeforeEach
@@ -61,11 +61,11 @@ class CommercialNetworkServiceTest {
 
     @Test
     void getAllCommercialNetworks_viewShopsFalseCityNull_listOfCn() {
-        Collection<CommercialNetworkResponse> result = service.getCommercialNetworks(false, null);
+        Collection<ShopChainResponse> result = service.getShopChains(false, null);
 
-        List<CommercialNetworkResponse> expectedResult = modelMapper.map(
+        List<ShopChainResponse> expectedResult = modelMapper.map(
                 List.of(cnInCity1, cnInCities1And17, cnInCity17),
-                new TypeToken<ArrayList<CommercialNetworkResponse>>() {
+                new TypeToken<ArrayList<ShopChainResponse>>() {
                 }.getType());
 
         assertEquals(expectedResult, result);
@@ -73,11 +73,11 @@ class CommercialNetworkServiceTest {
 
     @Test
     void getAllCommercialNetworks_viewShopsTrueCityNull_listOfCn() {
-        Collection<CommercialNetworkResponse> result = service.getCommercialNetworks(true, null);
+        Collection<ShopChainResponse> result = service.getShopChains(true, null);
 
-        List<CommercialNetworkResponse> expectedResult = modelMapper.map(
+        List<ShopChainResponse> expectedResult = modelMapper.map(
                 List.of(cnInCity1, cnInCities1And17, cnInCity17),
-                new TypeToken<ArrayList<CommercialNetworkWithShopsResponse>>() {
+                new TypeToken<ArrayList<ShopChainWithShopsResponse>>() {
                 }.getType());
 
         assertEquals(expectedResult, result);
@@ -85,11 +85,11 @@ class CommercialNetworkServiceTest {
 
     @Test
     void getAllCommercialNetworks_viewShopsFalseCity1_listOfCn() {
-        Collection<CommercialNetworkResponse> result = service.getCommercialNetworks(false, 1L);
+        Collection<ShopChainResponse> result = service.getShopChains(false, 1L);
 
-        List<CommercialNetworkResponse> expectedResult = modelMapper.map(
+        List<ShopChainResponse> expectedResult = modelMapper.map(
                 List.of(cnInCity1, cnInCities1And17),
-                new TypeToken<ArrayList<CommercialNetworkResponse>>() {
+                new TypeToken<ArrayList<ShopChainResponse>>() {
                 }.getType());
 
         assertEquals(expectedResult, result);
@@ -97,11 +97,11 @@ class CommercialNetworkServiceTest {
 
     @Test
     void getAllCommercialNetworks_viewShopsTrueCity17_listOfCn() {
-        Collection<CommercialNetworkResponse> result = service.getCommercialNetworks(true, 17L);
+        Collection<ShopChainResponse> result = service.getShopChains(true, 17L);
 
-        List<CommercialNetworkResponse> expectedResult = modelMapper.map(
+        List<ShopChainResponse> expectedResult = modelMapper.map(
                 List.of(cnInCities1And17, cnInCity17),
-                new TypeToken<ArrayList<CommercialNetworkWithShopsResponse>>() {
+                new TypeToken<ArrayList<ShopChainWithShopsResponse>>() {
                 }.getType());
 
         assertEquals(expectedResult, result);

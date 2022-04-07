@@ -9,7 +9,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CommercialNetworkResponse {
+public class ShopChainResponse {
     private Long id;
     private String name;
     private String cyrillicName;

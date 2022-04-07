@@ -5,8 +5,8 @@ import an.evdokimov.discount.watcher.server.database.product.model.LentaProductP
 import an.evdokimov.discount.watcher.server.database.product.model.Product;
 import an.evdokimov.discount.watcher.server.database.product.model.ProductInformation;
 import an.evdokimov.discount.watcher.server.database.product.model.ProductPrice;
-import an.evdokimov.discount.watcher.server.database.shop.model.CommercialNetwork;
 import an.evdokimov.discount.watcher.server.database.shop.model.Shop;
+import an.evdokimov.discount.watcher.server.database.shop.model.ShopChain;
 import an.evdokimov.discount.watcher.server.parser.downloader.PageDownloader;
 import an.evdokimov.discount.watcher.server.parser.downloader.PageDownloaderException;
 import an.evdokimov.discount.watcher.server.parser.lenta.LentaParser;
@@ -372,7 +372,7 @@ class LentaParserTest {
             comparisonResults.add(Objects.equals(shop1.getAddress(), shop2.getAddress()));
             comparisonResults.add(Objects.equals(shop1.getCookie(), shop2.getCookie()));
             comparisonResults.add(compareCites(shop1.getCity(), shop2.getCity()));
-            comparisonResults.add(compareCommercialNetwork(shop1.getCommercialNetwork(), shop2.getCommercialNetwork()));
+            comparisonResults.add(compareCommercialNetwork(shop1.getShopChain(), shop2.getShopChain()));
 
             for (Boolean bool : comparisonResults) {
                 if (bool.equals(false)) {
@@ -408,19 +408,19 @@ class LentaParserTest {
         return false;
     }
 
-    private boolean compareCommercialNetwork(CommercialNetwork commercialNetwork1,
-                                             CommercialNetwork commercialNetwork2) {
-        if (commercialNetwork1 == null && commercialNetwork2 == null) {
+    private boolean compareCommercialNetwork(ShopChain shopChain1,
+                                             ShopChain shopChain2) {
+        if (shopChain1 == null && shopChain2 == null) {
             return true;
         }
 
-        if (commercialNetwork1 != null && commercialNetwork2 != null) {
+        if (shopChain1 != null && shopChain2 != null) {
             ArrayList<Boolean> comparisonResults = new ArrayList<>();
 
-            comparisonResults.add(Objects.equals(commercialNetwork1.getId(), commercialNetwork2.getId()));
-            comparisonResults.add(Objects.equals(commercialNetwork1.getName(), commercialNetwork2.getName()));
+            comparisonResults.add(Objects.equals(shopChain1.getId(), shopChain2.getId()));
+            comparisonResults.add(Objects.equals(shopChain1.getName(), shopChain2.getName()));
             comparisonResults.add(
-                    Objects.equals(commercialNetwork1.getCyrillicName(), commercialNetwork2.getCyrillicName())
+                    Objects.equals(shopChain1.getCyrillicName(), shopChain2.getCyrillicName())
             );
             for (Boolean bool : comparisonResults) {
                 if (bool.equals(false)) {

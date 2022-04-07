@@ -24,7 +24,7 @@ CREATE TABLE city
     ENGINE = InnoDB
     CHARSET = UTF8;
 
-CREATE TABLE commercial_network
+CREATE TABLE shop_chain
 (
     id            BIGINT PRIMARY KEY AUTO_INCREMENT,
     name          VARCHAR(255) NOT NULL,
@@ -35,13 +35,13 @@ CREATE TABLE commercial_network
 
 CREATE TABLE shop
 (
-    id                    BIGINT PRIMARY KEY AUTO_INCREMENT,
-    commercial_network_id BIGINT       NOT NULL,
-    name                  VARCHAR(255) NOT NULL,
-    city_id               BIGINT       NOT NULL,
-    address               VARCHAR(255) NOT NULL,
-    cookie                VARCHAR(255) NOT NULL,
-    FOREIGN KEY (commercial_network_id) REFERENCES commercial_network (id) ON UPDATE CASCADE ON DELETE RESTRICT,
+    id            BIGINT PRIMARY KEY AUTO_INCREMENT,
+    shop_chain_id BIGINT       NOT NULL,
+    name          VARCHAR(255) NOT NULL,
+    city_id       BIGINT       NOT NULL,
+    address       VARCHAR(255) NOT NULL,
+    cookie        VARCHAR(255) NOT NULL,
+    FOREIGN KEY (shop_chain_id) REFERENCES shop_chain (id) ON UPDATE CASCADE ON DELETE RESTRICT,
     FOREIGN KEY (city_id) REFERENCES city (id) ON UPDATE CASCADE ON DELETE RESTRICT
 )
     ENGINE = InnoDB
@@ -52,8 +52,6 @@ CREATE TABLE product_information
     id                    BIGINT PRIMARY KEY AUTO_INCREMENT,
     name                  VARCHAR(255) NOT NULL,
     url                   VARCHAR(512) NOT NULL UNIQUE,
-    commercial_network_id BIGINT       NOT NULL,
-    FOREIGN KEY (commercial_network_id) REFERENCES commercial_network (id) ON UPDATE CASCADE ON DELETE RESTRICT,
     INDEX (url)
 )
     ENGINE = InnoDB

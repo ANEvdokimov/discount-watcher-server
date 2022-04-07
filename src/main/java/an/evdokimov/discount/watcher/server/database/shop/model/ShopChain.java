@@ -14,14 +14,14 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "commercial_network")
-public class CommercialNetwork {
+@Table(name = "shop_chain")
+public class ShopChain {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
     private String cyrillicName;
-    @OneToMany(mappedBy = "commercialNetwork")
+    @OneToMany(mappedBy = "shopChain")
     @ToString.Exclude
     private List<Shop> shops;
 
@@ -29,7 +29,7 @@ public class CommercialNetwork {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        CommercialNetwork that = (CommercialNetwork) o;
+        ShopChain that = (ShopChain) o;
         return id != null && Objects.equals(id, that.id);
     }
 

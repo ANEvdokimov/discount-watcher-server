@@ -20,8 +20,8 @@ public class Shop {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne
-    @JoinColumn(name = "commercial_network_id")
-    private CommercialNetwork commercialNetwork;
+    @JoinColumn(name = "shop_chain_id")
+    private ShopChain shopChain;
     private String name;
     @ManyToOne
     @JoinColumn(name = "city_id")

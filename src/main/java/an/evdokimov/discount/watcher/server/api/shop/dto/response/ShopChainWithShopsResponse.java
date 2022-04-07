@@ -14,7 +14,7 @@ import java.util.List;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CommercialNetworkWithShopsResponse extends CommercialNetworkResponse {
+public class ShopChainWithShopsResponse extends ShopChainResponse {
     private List<ShopResponse> shops;
 
     @Data
