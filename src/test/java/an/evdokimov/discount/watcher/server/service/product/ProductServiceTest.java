@@ -3,6 +3,7 @@ package an.evdokimov.discount.watcher.server.service.product;
 import an.evdokimov.discount.watcher.server.api.error.ServerException;
 import an.evdokimov.discount.watcher.server.api.product.dto.request.NewProductRequest;
 import an.evdokimov.discount.watcher.server.api.product.dto.response.LentaProductPriceResponse;
+import an.evdokimov.discount.watcher.server.api.product.dto.response.ProductPriceResponse;
 import an.evdokimov.discount.watcher.server.api.product.dto.response.ProductResponse;
 import an.evdokimov.discount.watcher.server.database.product.model.LentaProductPrice;
 import an.evdokimov.discount.watcher.server.database.product.model.Product;
@@ -19,6 +20,7 @@ import an.evdokimov.discount.watcher.server.parser.ParserFactory;
 import an.evdokimov.discount.watcher.server.parser.ParserFactoryException;
 import an.evdokimov.discount.watcher.server.parser.downloader.PageDownloaderException;
 import an.evdokimov.discount.watcher.server.parser.lenta.LentaParser;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,11 +30,12 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.AdditionalMatchers.not;
@@ -131,53 +134,200 @@ class ProductServiceTest {
     }
 
     @Test
-    void getProduct_LentaProduct_validLentaProduct() throws ServerException {
-        Product testProduct = Product.builder().id(666L).build();
-        when(productRepository.findById(666L)).thenReturn(Optional.of(testProduct));
+    void getProduct_Product_validLentaProductWithPriceHistory() throws ServerException {
+        LentaProductPrice price1 = LentaProductPrice.builder().id(1L).price(BigDecimal.valueOf(10)).build();
+        LentaProductPrice price2 = LentaProductPrice.builder().id(2L).price(BigDecimal.valueOf(5)).build();
 
-        ProductResponse returnedProduct = productService.getProduct(666L);
+        Product testProduct = Product.builder()
+                .id(666L)
+                .prices(List.of(price2))
+                .build();
+        Product testProductWithPriceHistory = Product.builder()
+                .id(666L)
+                .prices(List.of(price2, price1))
+                .build();
+        when(productRepository.findByIdWithLastPrice(666L)).thenReturn(Optional.of(testProduct));
+        when(productRepository.findById(666L)).thenReturn(Optional.of(testProductWithPriceHistory));
 
-        ProductResponse expectedProduct = ProductResponse.builder().id(666L).build();
-        assertEquals(expectedProduct, returnedProduct);
-    }
-
-    @Test
-    void getProduct_nonexistentProduct_ServerException() {
-        when(productRepository.findById(666L)).thenReturn(Optional.empty());
+        ProductResponse returnedProduct = productService.getProduct(666L, true);
 
         assertAll(
-                () -> assertThrows(ServerException.class, () -> productService.getProduct(666L)),
-                () -> verify(productRepository, times(1)).findById(666L)
+                () -> assertEquals(testProduct.getId(), returnedProduct.getId()),
+                () -> assertThat(
+                        returnedProduct.getPrices().stream().map(ProductPriceResponse::getId).toList(),
+                        Matchers.contains(price2.getId(), price1.getId())
+                )
         );
     }
 
     @Test
-    void getUserProducts_Products_collectionOfProducts() {
+    void getProduct_Product_validLentaProductWithoutPriceHistory() throws ServerException {
+        LentaProductPrice price1 = LentaProductPrice.builder().id(1L).price(BigDecimal.valueOf(10)).build();
+        LentaProductPrice price2 = LentaProductPrice.builder().id(2L).price(BigDecimal.valueOf(5)).build();
+
+        Product testProduct = Product.builder()
+                .id(666L)
+                .prices(List.of(price2))
+                .build();
+        Product testProductWithPriceHistory = Product.builder()
+                .id(666L)
+                .prices(List.of(price2, price1))
+                .build();
+        when(productRepository.findByIdWithLastPrice(666L)).thenReturn(Optional.of(testProduct));
+        when(productRepository.findById(666L)).thenReturn(Optional.of(testProductWithPriceHistory));
+
+        ProductResponse returnedProduct = productService.getProduct(666L, false);
+
+        assertAll(
+                () -> assertEquals(testProduct.getId(), returnedProduct.getId()),
+                () -> assertThat(
+                        returnedProduct.getPrices().stream().map(ProductPriceResponse::getId).toList(),
+                        Matchers.contains(price2.getId())
+                )
+        );
+    }
+
+    @Test
+    void getProduct_nonexistentProductWithPriceHistory_ServerException() {
+        when(productRepository.findById(666L)).thenReturn(Optional.empty());
+        when(productRepository.findByIdWithLastPrice(666L)).thenReturn(Optional.empty());
+
+        assertAll(
+                () -> assertThrows(ServerException.class, () -> productService.getProduct(666L, true)),
+                () -> verify(productRepository, times(1)).findById(666L),
+                () -> verify(productRepository, times(0)).findByIdWithLastPrice(666L)
+        );
+    }
+
+    @Test
+    void getProduct_nonexistentProductWithoutPriceHistory_ServerException() {
+        when(productRepository.findById(666L)).thenReturn(Optional.empty());
+        when(productRepository.findByIdWithLastPrice(666L)).thenReturn(Optional.empty());
+
+        assertAll(
+                () -> assertThrows(ServerException.class, () -> productService.getProduct(666L, false)),
+                () -> verify(productRepository, times(0)).findById(666L),
+                () -> verify(productRepository, times(1)).findByIdWithLastPrice(666L)
+        );
+    }
+
+    @Test
+    void getUserProducts_ProductsWithPriceHistory_collectionOfProducts() {
+        LentaProductPrice price1 = LentaProductPrice.builder().id(1L).price(BigDecimal.valueOf(10)).build();
+        LentaProductPrice price2 = LentaProductPrice.builder().id(2L).price(BigDecimal.valueOf(5)).build();
+
+        Product testProduct1 = Product.builder()
+                .id(1L)
+                .prices(List.of(price2))
+                .build();
+        Product testProduct1WithPriceHistory = Product.builder()
+                .id(1L)
+                .prices(List.of(price2, price1))
+                .build();
+
+        LentaProductPrice price3 = LentaProductPrice.builder().id(3L).price(BigDecimal.valueOf(100)).build();
+        LentaProductPrice price4 = LentaProductPrice.builder().id(4L).price(BigDecimal.valueOf(200)).build();
+
+        Product testProduct2 = Product.builder()
+                .id(2L)
+                .prices(List.of(price4))
+                .build();
+        Product testProduct2WithPriceHistory = Product.builder()
+                .id(2L)
+                .prices(List.of(price4, price3))
+                .build();
+
+
         User userWithProducts = User.builder().id(666L).build();
         when(productRepository.findAllUsersProducts(userWithProducts)).thenReturn(List.of(
-                Product.builder().id(1L).build(),
-                Product.builder().id(2L).build(),
-                Product.builder().id(3L).build()
+                testProduct1WithPriceHistory,
+                testProduct2WithPriceHistory
+        ));
+        when(productRepository.findAllUsersProductsWithLastPrice(userWithProducts)).thenReturn(List.of(
+                testProduct1,
+                testProduct2
         ));
 
-        List<ProductResponse> expectedProducts = List.of(
-                ProductResponse.builder().id(1L).build(),
-                ProductResponse.builder().id(2L).build(),
-                ProductResponse.builder().id(3L).build()
+        Collection<ProductResponse> returnedProducts = productService.getUserProducts(userWithProducts, true);
+        assertAll(
+                () -> assertThat(
+                        returnedProducts.stream().map(ProductResponse::getId).toList(),
+                        containsInAnyOrder(testProduct1WithPriceHistory.getId(), testProduct2WithPriceHistory.getId())
+                ),
+                () -> assertThat(
+                        returnedProducts.stream()
+                                .filter(productResponse -> productResponse.getId().equals(testProduct1.getId()))
+                                .toList().get(0).getPrices()
+                                .stream().map(ProductPriceResponse::getId).toList(),
+                        containsInAnyOrder(price1.getId(), price2.getId())
+                ),
+                () -> assertThat(
+                        returnedProducts.stream()
+                                .filter(productResponse -> productResponse.getId().equals(testProduct2.getId()))
+                                .toList().get(0).getPrices()
+                                .stream().map(ProductPriceResponse::getId).toList(),
+                        containsInAnyOrder(price3.getId(), price4.getId())
+                )
         );
-
-        assertThat(productService.getUserProducts(userWithProducts), containsInAnyOrder(expectedProducts.toArray()));
     }
 
     @Test
-    void getUserProducts_nonexistentProducts_emptyCollection() {
-        User userWithoutProducts = User.builder().id(666L).build();
-        when(productRepository.findAllUsersProducts(userWithoutProducts)).thenReturn(Collections.emptyList());
+    void getUserProducts_ProductsWithoutPriceHistory_collectionOfProducts() {
+        LentaProductPrice price1 = LentaProductPrice.builder().id(1L).price(BigDecimal.valueOf(10)).build();
+        LentaProductPrice price2 = LentaProductPrice.builder().id(2L).price(BigDecimal.valueOf(5)).build();
 
+        Product testProduct1 = Product.builder()
+                .id(1L)
+                .prices(List.of(price2))
+                .build();
+        Product testProduct1WithPriceHistory = Product.builder()
+                .id(1L)
+                .prices(List.of(price2, price1))
+                .build();
+
+        LentaProductPrice price3 = LentaProductPrice.builder().id(3L).price(BigDecimal.valueOf(100)).build();
+        LentaProductPrice price4 = LentaProductPrice.builder().id(4L).price(BigDecimal.valueOf(200)).build();
+
+        Product testProduct2 = Product.builder()
+                .id(2L)
+                .prices(List.of(price4))
+                .build();
+        Product testProduct2WithPriceHistory = Product.builder()
+                .id(2L)
+                .prices(List.of(price4, price3))
+                .build();
+
+
+        User userWithProducts = User.builder().id(666L).build();
+        when(productRepository.findAllUsersProducts(userWithProducts)).thenReturn(List.of(
+                testProduct1WithPriceHistory,
+                testProduct2WithPriceHistory
+        ));
+        when(productRepository.findAllUsersProductsWithLastPrice(userWithProducts)).thenReturn(List.of(
+                testProduct1,
+                testProduct2
+        ));
+
+        Collection<ProductResponse> returnedProducts = productService.getUserProducts(userWithProducts, false);
         assertAll(
-                () -> assertEquals(0, productService.getUserProducts(userWithoutProducts).size()),
-                () -> verify(productRepository, times(1))
-                        .findAllUsersProducts(userWithoutProducts)
+                () -> assertThat(
+                        returnedProducts.stream().map(ProductResponse::getId).toList(),
+                        containsInAnyOrder(testProduct1WithPriceHistory.getId(), testProduct2WithPriceHistory.getId())
+                ),
+                () -> assertThat(
+                        returnedProducts.stream()
+                                .filter(productResponse -> productResponse.getId().equals(testProduct1.getId()))
+                                .toList().get(0).getPrices()
+                                .stream().map(ProductPriceResponse::getId).toList(),
+                        contains(price2.getId())
+                ),
+                () -> assertThat(
+                        returnedProducts.stream()
+                                .filter(productResponse -> productResponse.getId().equals(testProduct2.getId()))
+                                .toList().get(0).getPrices()
+                                .stream().map(ProductPriceResponse::getId).toList(),
+                        contains(price4.getId())
+                )
         );
     }
 

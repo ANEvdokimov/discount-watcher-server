@@ -30,14 +30,19 @@ public class ProductController {
     }
 
     @GetMapping(value = "/products", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Collection<ProductResponse> getUserProducts(Authentication authentication) {
-        log.info("Getting products. user={}", ((User) authentication.getPrincipal()).getLogin());
-        return productService.getUserProducts((User) authentication.getPrincipal());
+    public Collection<ProductResponse> getUserProducts(Authentication authentication,
+                                                       @RequestHeader(name = "with_price_history")
+                                                               boolean withPriceHistory) {
+        log.info("Getting products. user={}, price_history={}",
+                ((User) authentication.getPrincipal()).getLogin(), withPriceHistory);
+        return productService.getUserProducts((User) authentication.getPrincipal(), withPriceHistory);
     }
 
     @GetMapping(value = "/product/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ProductResponse getProduct(@PathVariable Long id) throws ServerException {
-        log.info("Getting product by id={}", id);
-        return productService.getProduct(id);
+    public ProductResponse getProduct(@PathVariable Long id,
+                                      @RequestHeader(name = "with_price_history") boolean withPriceHistory)
+            throws ServerException {
+        log.info("Getting product by id={}, price_history={}", id, withPriceHistory);
+        return productService.getProduct(id, withPriceHistory);
     }
 }

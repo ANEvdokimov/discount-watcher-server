@@ -47,22 +47,26 @@ public class ProductService {
         this.productMapper = productMapper;
     }
 
-    public ProductResponse getProduct(@NotNull Long id) throws ServerException {
-        Product product = productRepository.findById(id)
-                .orElseThrow(() -> new ServerException(ServerErrorCode.PRODUCT_NOT_FOUND));
+    public ProductResponse getProduct(@NotNull Long id, boolean withPriceHistory) throws ServerException {
+        Product product;
+        if (withPriceHistory) {
+            product = productRepository.findById(id)
+                    .orElseThrow(() -> new ServerException(ServerErrorCode.PRODUCT_NOT_FOUND));
+        } else {
+            product = productRepository.findByIdWithLastPrice(id)
+                    .orElseThrow(() -> new ServerException(ServerErrorCode.PRODUCT_NOT_FOUND));
+        }
 
         return productMapper.map(product);
     }
 
-    public ProductResponse getProductWithLastPrice(@NotNull Long id) throws ServerException {
-        Product product = productRepository.findByIdWithLastPrice(id)
-                .orElseThrow(() -> new ServerException(ServerErrorCode.PRODUCT_NOT_FOUND));
-
-        return productMapper.map(product);
-    }
-
-    public Collection<ProductResponse> getUserProducts(@NotNull User user) {
-        Collection<Product> userProducts = productRepository.findAllUsersProducts(user);
+    public Collection<ProductResponse> getUserProducts(@NotNull User user, boolean withPriceHistory) {
+        Collection<Product> userProducts;
+        if (withPriceHistory) {
+            userProducts = productRepository.findAllUsersProducts(user);
+        } else {
+            userProducts = productRepository.findAllUsersProductsWithLastPrice(user);
+        }
         return userProducts.stream()
                 .map(productMapper::map)
                 .collect(Collectors.toList());
