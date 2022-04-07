@@ -3,6 +3,7 @@ package an.evdokimov.discount.watcher.server.configuration;
 import an.evdokimov.discount.watcher.server.security.JwtAuthenticationFilter;
 import an.evdokimov.discount.watcher.server.security.JwtAuthenticationProvider;
 import an.evdokimov.discount.watcher.server.security.JwtUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,6 +21,10 @@ import java.util.List;
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private final JwtUtils jwtUtils;
     private final JwtAuthenticationProvider jwtAuthenticationProvider;
+    @Value("${springdoc.api-docs.path}")
+    private String docsUrl;
+    @Value("${springdoc.swagger-ui.path}")
+    private String swaggerUiUrl;
 
     public SecurityConfiguration(JwtUtils jwtUtils, JwtAuthenticationProvider jwtAuthenticationProvider) {
         this.jwtUtils = jwtUtils;
@@ -36,6 +41,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/api/users/registration").permitAll()
                 .antMatchers("/api/users/login").permitAll()
+                .antMatchers(docsUrl + "/**").permitAll()
+                .antMatchers(swaggerUiUrl + "/**").permitAll()
                 .anyRequest()
                 .authenticated()
                 .and()
@@ -51,7 +58,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     public JwtAuthenticationFilter tokenFilter() {
         return new JwtAuthenticationFilter(
                 "/**",
-                List.of("/api/users/registration", "/api/users/login"),
+                List.of("/api/users/registration", "/api/users/login", docsUrl + "/**", swaggerUiUrl + "/**"),
                 jwtUtils);
     }
 
