@@ -7,17 +7,30 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 
+/**
+ * Information about new registered user.
+ */
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class RegisterRequest {
+    /**
+     * User's login.
+     */
     @NotBlank
     private String login;
 
+    /**
+     * User's password.
+     */
     @NotBlank
     private String password;
 
+    /**
+     * User's name.
+     */
     @NotBlank
     private String name;
 }

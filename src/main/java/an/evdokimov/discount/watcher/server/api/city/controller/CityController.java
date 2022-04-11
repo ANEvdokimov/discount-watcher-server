@@ -20,6 +20,11 @@ public class CityController {
         this.cityService = cityService;
     }
 
+    /**
+     * Getting supported cities.
+     *
+     * @return A list of cities.
+     */
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public Collection<CityResponse> getAllCities() {
         log.debug("getting all cities");

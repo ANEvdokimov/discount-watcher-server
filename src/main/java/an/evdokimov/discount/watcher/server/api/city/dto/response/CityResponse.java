@@ -11,6 +11,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CityResponse {
     private Long id;
+    /**
+     * A name of the city in English.
+     */
     private String name;
+
+    /**
+     * A name of the city in Russian.
+     */
     private String cyrillicName;
 }

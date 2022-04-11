@@ -23,12 +23,27 @@ public class ProductController {
         this.productService = productService;
     }
 
+    /**
+     * Addition a new product to the current user. The product will be parsed from a shop cite.
+     *
+     * @param newProduct information about the added product.
+     * @return an actual product information.
+     * @throws ServerException any errors during adding the product.
+     */
     @PutMapping(value = "/products", produces = MediaType.APPLICATION_JSON_VALUE)
     public ProductResponse addProduct(@Valid @RequestBody NewProductRequest newProduct) throws ServerException {
         log.info("Adding new product: {}", newProduct.toString());
         return productService.addProduct(newProduct);
     }
 
+    /**
+     * Getting all current user's products.
+     *
+     * @param authentication   information about a current user.
+     * @param withPriceHistory flag - return product with whole history of changing price [true]
+     *                         or only with an actual price [false].
+     * @return a list of user's products.
+     */
     @GetMapping(value = "/products", produces = MediaType.APPLICATION_JSON_VALUE)
     public Collection<ProductResponse> getUserProducts(Authentication authentication,
                                                        @RequestHeader(name = "with_price_history")
@@ -38,6 +53,15 @@ public class ProductController {
         return productService.getUserProducts((User) authentication.getPrincipal(), withPriceHistory);
     }
 
+    /**
+     * Getting a product by product id.
+     *
+     * @param id               a product id.
+     * @param withPriceHistory flag - return product with whole history of changing price [true]
+     *                         or only with an actual price [false].
+     * @return Information about the product.
+     * @throws ServerException any errors during getting the product.
+     */
     @GetMapping(value = "/product/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ProductResponse getProduct(@PathVariable Long id,
                                       @RequestHeader(name = "with_price_history") boolean withPriceHistory)

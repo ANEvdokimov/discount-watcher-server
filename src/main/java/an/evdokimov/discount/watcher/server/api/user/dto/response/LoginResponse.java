@@ -5,6 +5,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * User's credentials for authentication without login/password.
+ */
+
 @Data
 @Builder
 @NoArgsConstructor

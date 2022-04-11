@@ -21,6 +21,13 @@ public class UserController {
         this.userService = userService;
     }
 
+    /**
+     * Registration of new user.
+     *
+     * @param request information about registered user.
+     * @return A token for authentication.
+     * @throws ServerException any errors during user registration.
+     */
     @PostMapping(path = "/registration", produces = MediaType.APPLICATION_JSON_VALUE)
     public LoginResponse register(@RequestBody @Valid RegisterRequest request) throws ServerException {
         log.debug("registration user {}", request.getLogin());
@@ -28,6 +35,13 @@ public class UserController {
         return userService.register(request);
     }
 
+    /**
+     * A user authentication.
+     *
+     * @param request A user's login and password.
+     * @return A token for authentication.
+     * @throws ServerException any errors during authentication.
+     */
     @PostMapping(path = "/login", produces = MediaType.APPLICATION_JSON_VALUE)
     public LoginResponse login(@RequestBody @Valid LoginRequest request) throws ServerException {
         log.debug("login user {}", request.getLogin());

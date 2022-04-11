@@ -22,6 +22,13 @@ public class ShopChainController {
         this.shopChainService = shopChainService;
     }
 
+    /**
+     * Getting all supported shop chains.
+     *
+     * @param withShops flag - return a shop chain with all connected shops [true].
+     * @param cityId    return all shop chains in the city.
+     * @return a list of shop chains.
+     */
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public Collection<ShopChainResponse> getAllCommercialNetworks(
             @Nullable @RequestHeader("With-Shops") boolean withShops,
