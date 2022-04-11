@@ -28,7 +28,7 @@ public class ProductPrice {
     private BigDecimal price;
     private Double discount;
     private BigDecimal priceWithDiscount;
-    private boolean isInStock;
+    private Boolean isInStock;
     private String availabilityInformation;
     private LocalDateTime date;
 

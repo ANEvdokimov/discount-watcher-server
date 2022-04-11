@@ -14,5 +14,5 @@ import java.net.URL;
 public class ProductInformationResponse {
     private Long id;
     private String name;
-    private URL lentaUrl;
+    private URL url;
 }
