@@ -32,7 +32,7 @@ public class ProductUpdateScheduler {
 
         Random random = new Random();
 
-        for(Product product : activeProducts){
+        for (Product product : activeProducts) {
             try {
                 Thread.sleep(random.nextLong(minDelay, maxDelay));
                 productService.updateProduct(product);

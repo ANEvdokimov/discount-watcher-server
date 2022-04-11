@@ -37,7 +37,7 @@ import static org.mockito.Mockito.when;
 @SpringBootTest
 public class ProductServiceIntegrationTest {
     @Autowired
-    private ProductService productService;
+    private ProductServiceImpl productService;
 
     @Autowired
     private ProductRepository productRepository;

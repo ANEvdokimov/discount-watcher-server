@@ -26,7 +26,7 @@ class ShopServiceTest {
     private ShopRepository shopRepository;
 
     @Autowired
-    private ShopService shopService;
+    private ShopServiceImpl shopService;
 
     @Autowired
     private ShopMapper shopMapper;

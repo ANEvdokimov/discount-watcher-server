@@ -25,7 +25,7 @@ import static org.mockito.Mockito.when;
 @SpringBootTest
 class ShopChainServiceTest {
     @Autowired
-    private ShopChainService service;
+    private ShopChainServiceImpl service;
 
     @Autowired
     private ModelMapper modelMapper;

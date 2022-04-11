@@ -64,7 +64,7 @@ class ProductServiceTest {
     private ShopRepository shopRepository;
 
     @Autowired
-    private ProductService productService;
+    private ProductServiceImpl productService;
 
     @BeforeEach
     public void mockFactory() throws MalformedURLException, ParserFactoryException {

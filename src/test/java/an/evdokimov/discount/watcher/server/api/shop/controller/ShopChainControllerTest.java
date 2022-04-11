@@ -7,7 +7,7 @@ import an.evdokimov.discount.watcher.server.database.city.model.City;
 import an.evdokimov.discount.watcher.server.database.shop.model.Shop;
 import an.evdokimov.discount.watcher.server.database.shop.model.ShopChain;
 import an.evdokimov.discount.watcher.server.security.JwtUtils;
-import an.evdokimov.discount.watcher.server.service.shop.ShopChainService;
+import an.evdokimov.discount.watcher.server.service.shop.ShopChainServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -50,7 +50,7 @@ class ShopChainControllerTest {
     private JwtUtils jwtUtils;
 
     @MockBean
-    private ShopChainService service;
+    private ShopChainServiceImpl service;
 
     private static List<ShopChainResponse> cnResponsesInAllCity;
     private static List<ShopChainResponse> cnResponsesInCity1;

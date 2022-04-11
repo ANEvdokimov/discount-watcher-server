@@ -25,7 +25,7 @@ class CityServiceTest {
     private final ModelMapper mapper = new ModelMapper();
 
     @Autowired
-    private CityService cityService;
+    private CityServiceImpl cityService;
 
     @MockBean
     private CityRepository repository;

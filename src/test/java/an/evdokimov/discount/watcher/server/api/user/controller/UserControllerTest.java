@@ -5,7 +5,7 @@ import an.evdokimov.discount.watcher.server.api.user.dto.request.LoginRequest;
 import an.evdokimov.discount.watcher.server.api.user.dto.request.RegisterRequest;
 import an.evdokimov.discount.watcher.server.api.user.dto.response.LoginResponse;
 import an.evdokimov.discount.watcher.server.security.JwtUtils;
-import an.evdokimov.discount.watcher.server.service.user.UserService;
+import an.evdokimov.discount.watcher.server.service.user.UserServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,7 +35,7 @@ class UserControllerTest {
     private ObjectMapper mapper;
 
     @MockBean
-    private UserService userService;
+    private UserServiceImpl userService;
 
     @MockBean
     private JwtUtils jwtUtils;

@@ -5,7 +5,7 @@ import an.evdokimov.discount.watcher.server.api.error.ServerErrorCode;
 import an.evdokimov.discount.watcher.server.api.error.ServerException;
 import an.evdokimov.discount.watcher.server.api.shop.dto.response.ShopResponse;
 import an.evdokimov.discount.watcher.server.security.JwtUtils;
-import an.evdokimov.discount.watcher.server.service.shop.ShopService;
+import an.evdokimov.discount.watcher.server.service.shop.ShopServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -42,7 +42,7 @@ class ShopControllerTest {
     private ObjectMapper mapper;
 
     @MockBean
-    private ShopService shopService;
+    private ShopServiceImpl shopService;
 
     @Autowired
     private MockMvc mvc;

@@ -5,7 +5,7 @@ import an.evdokimov.discount.watcher.server.database.product.model.ProductInform
 import an.evdokimov.discount.watcher.server.database.product.model.ProductPrice;
 import an.evdokimov.discount.watcher.server.database.product.repository.ProductRepository;
 import an.evdokimov.discount.watcher.server.database.shop.model.Shop;
-import an.evdokimov.discount.watcher.server.service.product.ProductService;
+import an.evdokimov.discount.watcher.server.service.product.ProductServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,7 +23,7 @@ class ProductUpdateSchedulerTest {
     private ProductUpdateScheduler productUpdateScheduler;
 
     @MockBean
-    private ProductService productService;
+    private ProductServiceImpl productService;
 
     @MockBean
     private ProductRepository productRepository;

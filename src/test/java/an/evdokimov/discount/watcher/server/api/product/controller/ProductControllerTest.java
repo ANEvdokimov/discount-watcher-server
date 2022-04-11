@@ -5,7 +5,7 @@ import an.evdokimov.discount.watcher.server.api.product.dto.request.NewProductRe
 import an.evdokimov.discount.watcher.server.api.product.dto.response.LentaProductPriceResponse;
 import an.evdokimov.discount.watcher.server.api.product.dto.response.ProductResponse;
 import an.evdokimov.discount.watcher.server.security.JwtUtils;
-import an.evdokimov.discount.watcher.server.service.product.ProductService;
+import an.evdokimov.discount.watcher.server.service.product.ProductServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -52,7 +52,7 @@ class ProductControllerTest {
     private ObjectMapper mapper;
 
     @MockBean
-    private ProductService productService;
+    private ProductServiceImpl productService;
 
     @Autowired
     private MockMvc mvc;

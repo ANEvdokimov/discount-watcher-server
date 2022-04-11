@@ -3,7 +3,7 @@ package an.evdokimov.discount.watcher.server.api.city.controller;
 import an.evdokimov.discount.watcher.server.api.TestConfig;
 import an.evdokimov.discount.watcher.server.api.city.dto.response.CityResponse;
 import an.evdokimov.discount.watcher.server.security.JwtUtils;
-import an.evdokimov.discount.watcher.server.service.city.CityService;
+import an.evdokimov.discount.watcher.server.service.city.CityServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -47,7 +47,7 @@ class CityControllerTest {
     private JwtUtils jwtUtils;
 
     @MockBean
-    private CityService cityService;
+    private CityServiceImpl cityService;
 
     @Test
     void getAllCities_validJwt_http200() throws Exception {

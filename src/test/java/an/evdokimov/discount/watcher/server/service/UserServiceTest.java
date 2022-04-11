@@ -6,7 +6,7 @@ import an.evdokimov.discount.watcher.server.api.user.dto.request.RegisterRequest
 import an.evdokimov.discount.watcher.server.database.user.model.User;
 import an.evdokimov.discount.watcher.server.database.user.repository.UserRepository;
 import an.evdokimov.discount.watcher.server.security.JwtUtils;
-import an.evdokimov.discount.watcher.server.service.user.UserService;
+import an.evdokimov.discount.watcher.server.service.user.UserServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +23,7 @@ import static org.mockito.Mockito.*;
 @SpringBootTest
 class UserServiceTest {
     @Autowired
-    private UserService userService;
+    private UserServiceImpl userService;
 
     @MockBean
     private UserRepository userRepository;
