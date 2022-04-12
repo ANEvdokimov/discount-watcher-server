@@ -180,4 +180,24 @@ class ProductRepositoryTest {
                 )
         );
     }
+
+    @Test
+    void findAllActiveUsersProductsWithLastPrice_products_activeUsersProductsWithLastPrice() {
+        ArrayList<Product> products = new ArrayList<>(productRepository.findAllActiveUsersProductsWithLastPrice(user1));
+
+        assertAll(
+                () -> assertThat(products, contains(product1)),
+                () -> assertThat(products.get(0).getPrices(), contains(price3))
+        );
+    }
+
+    @Test
+    void findAllActiveUsersProducts_products_activeUsersProductsWithLastPrice() {
+        ArrayList<Product> products = new ArrayList<>(productRepository.findAllActiveUsersProducts(user1));
+
+        assertAll(
+                () -> assertThat(products, contains(product1)),
+                () -> assertThat(products.get(0).getPrices(), contains(price3, price2, price1))
+        );
+    }
 }

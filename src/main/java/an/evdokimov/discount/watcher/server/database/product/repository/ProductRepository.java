@@ -16,6 +16,18 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Collection<Product> findAllUsersProducts(@Param("user") User user);
 
     @Query("""
+            SELECT DISTINCT up.product FROM UserProduct up
+                WHERE (
+                    up.user = :user AND (
+                        up.monitor_availability = true OR
+                        up.monitor_discount = true OR
+                        up.monitor_price_changes = true
+                    )
+                )
+            """)
+    Collection<Product> findAllActiveUsersProducts(@Param("user") User user);
+
+    @Query("""
             SELECT p FROM Product p
                 LEFT JOIN FETCH p.prices pp
             WHERE
@@ -23,6 +35,24 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                 pp.date = (SELECT MAX(pp2.date) FROM ProductPrice pp2 WHERE pp2.product = p)
             """)
     Collection<Product> findAllUsersProductsWithLastPrice(@Param("user") User user);
+
+    @Query("""
+            SELECT p FROM Product p
+                LEFT JOIN FETCH p.prices pp
+            WHERE
+                pp.date = (SELECT MAX(pp2.date) FROM ProductPrice pp2 WHERE pp2.product = p) AND
+                p.id in (
+                    SELECT DISTINCT up.product FROM UserProduct up
+                        WHERE (
+                            up.user = :user AND (
+                                up.monitor_availability = true OR
+                                up.monitor_discount = true OR
+                                up.monitor_price_changes = true
+                            )
+                        )
+                    )
+            """)
+    Collection<Product> findAllActiveUsersProductsWithLastPrice(@Param("user") User user);
 
     @Query("""
             SELECT DISTINCT up.product FROM UserProduct up
