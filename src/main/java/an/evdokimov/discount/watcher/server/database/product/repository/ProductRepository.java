@@ -56,6 +56,27 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Collection<Product> findAllActiveUsersProductsWithLastPrice(@Param("user") User user);
 
     @Query("""
+            SELECT up.product FROM UserProduct up
+                WHERE
+                    up.user = :user AND
+                    up.product.shop = :shop
+            """)
+    Collection<Product> findAllUsersProductsInShop(@Param("user") User user, @Param("shop") Shop shop);
+
+    @Query("""
+            SELECT p FROM Product p
+                LEFT JOIN FETCH p.prices pp
+            WHERE
+                pp.date = (SELECT MAX(pp2.date) FROM ProductPrice pp2 WHERE pp2.product = p) AND
+                p.shop = :shop AND
+                p.id in (
+                    SELECT DISTINCT up.product FROM UserProduct up
+                        WHERE up.user = :user
+                )
+            """)
+    Collection<Product> findAllUsersProductsWithLastPriceInShop(@Param("user") User user, @Param("shop") Shop shop);
+
+    @Query("""
             SELECT DISTINCT up.product FROM UserProduct up
                 WHERE (
                     up.user = :user AND

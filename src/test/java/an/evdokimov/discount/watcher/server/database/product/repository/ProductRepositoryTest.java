@@ -280,4 +280,28 @@ class ProductRepositoryTest {
                 () -> assertThat(products.get(0).getPrices(), contains(price3))
         );
     }
+
+    @Test
+    void findAllUsersProductsInShop_user1AndShop1_listOfProducts() {
+        Collection<Product> allUsersProductsInShop = productRepository.findAllUsersProductsInShop(user1, shop1);
+
+        assertAll(
+                () -> assertThat(allUsersProductsInShop, contains(product1)),
+                () -> assertThat(
+                        allUsersProductsInShop.stream().findAny().get().getPrices(),
+                        contains(price3, price2, price1)
+                )
+        );
+    }
+
+    @Test
+    void findAllUsersProductsWithLastPriceInShop_user1AndShop1_listOfProducts() {
+        Collection<Product> allUsersProductsInShop =
+                productRepository.findAllUsersProductsWithLastPriceInShop(user1, shop1);
+
+        assertAll(
+                () -> assertThat(allUsersProductsInShop, contains(product1)),
+                () -> assertThat(allUsersProductsInShop.stream().findAny().get().getPrices(), contains(price3))
+        );
+    }
 }
