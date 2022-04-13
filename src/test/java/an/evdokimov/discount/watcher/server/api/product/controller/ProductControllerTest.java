@@ -156,12 +156,14 @@ class ProductControllerTest {
                 ProductResponse.builder().id(2L).build()
         );
 
-        when(productService.getUserProducts(any(), anyBoolean())).thenReturn(Collections.emptyList());
-        when(productService.getUserProducts(eq(testConfig.getTestUser()), anyBoolean())).thenReturn(products);
+        when(productService.getUserProducts(any(), anyBoolean(), anyBoolean())).thenReturn(Collections.emptyList());
+        when(productService.getUserProducts(eq(testConfig.getTestUser()), anyBoolean(), anyBoolean()))
+                .thenReturn(products);
 
         MvcResult result = mvc.perform(get("/api/products")
                 .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
-                .header("with_price_history", true)
+                .header("with-price-history", true)
+                .header("only-active", true)
         ).andReturn();
 
         ArrayList<ProductResponse> resultProducts = mapper.readValue(
@@ -173,7 +175,43 @@ class ProductControllerTest {
                 () -> assertEquals(200, result.getResponse().getStatus()),
                 () -> assertThat(resultProducts, containsInAnyOrder(products.toArray())),
                 () -> verify(productService, times(1))
-                        .getUserProducts(eq(testConfig.getTestUser()), anyBoolean())
+                        .getUserProducts(eq(testConfig.getTestUser()), anyBoolean(), anyBoolean()),
+                () -> verify(productService, times(0))
+                        .getUserProductsInShop(eq(testConfig.getTestUser()), anyLong(), anyBoolean(), anyBoolean())
+        );
+    }
+
+    @Test
+    void getUserProducts_validJwtAndShopId_listOfProducts() throws Exception {
+        List<ProductResponse> products = List.of(
+                ProductResponse.builder().id(0L).build(),
+                ProductResponse.builder().id(1L).build(),
+                ProductResponse.builder().id(2L).build()
+        );
+
+        when(productService.getUserProducts(any(), anyBoolean(), anyBoolean())).thenReturn(Collections.emptyList());
+        when(productService.getUserProductsInShop(eq(testConfig.getTestUser()), eq(1L), anyBoolean(), anyBoolean()))
+                .thenReturn(products);
+
+        MvcResult result = mvc.perform(get("/api/products")
+                .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
+                .header("with-price-history", true)
+                .header("only-active", true)
+                .header("shop-id", 1)
+        ).andReturn();
+
+        ArrayList<ProductResponse> resultProducts = mapper.readValue(
+                result.getResponse().getContentAsString(),
+                mapper.getTypeFactory().constructCollectionType(ArrayList.class, ProductResponse.class)
+        );
+
+        assertAll(
+                () -> assertEquals(200, result.getResponse().getStatus()),
+                () -> assertThat(resultProducts, containsInAnyOrder(products.toArray())),
+                () -> verify(productService, times(0))
+                        .getUserProducts(eq(testConfig.getTestUser()), anyBoolean(), anyBoolean()),
+                () -> verify(productService, times(1))
+                        .getUserProductsInShop(eq(testConfig.getTestUser()), anyLong(), anyBoolean(), anyBoolean())
         );
     }
 
@@ -185,18 +223,19 @@ class ProductControllerTest {
                 ProductResponse.builder().id(2L).build()
         );
 
-        when(productService.getUserProducts(any(), anyBoolean())).thenReturn(Collections.emptyList());
-        when(productService.getUserProducts(eq(testConfig.getTestUser()), anyBoolean())).thenReturn(products);
+        when(productService.getUserProducts(any(), anyBoolean(), anyBoolean())).thenReturn(Collections.emptyList());
+        when(productService.getUserProducts(eq(testConfig.getTestUser()), anyBoolean(), anyBoolean()))
+                .thenReturn(products);
 
         MvcResult result = mvc.perform(get("/api/products")
                 .header(authHeaderName, "wrong jwt")
-                .header("with_price_history", true)
+                .header("with-price-history", true)
         ).andReturn();
 
         assertAll(
                 () -> assertEquals(401, result.getResponse().getStatus()),
                 () -> verify(productService, times(0))
-                        .getUserProducts(eq(testConfig.getTestUser()), anyBoolean())
+                        .getUserProducts(eq(testConfig.getTestUser()), anyBoolean(), anyBoolean())
         );
     }
 
@@ -208,8 +247,9 @@ class ProductControllerTest {
                 ProductResponse.builder().id(2L).build()
         );
 
-        when(productService.getUserProducts(any(), anyBoolean())).thenReturn(Collections.emptyList());
-        when(productService.getUserProducts(eq(testConfig.getTestUser()), anyBoolean())).thenReturn(products);
+        when(productService.getUserProducts(any(), anyBoolean(), anyBoolean())).thenReturn(Collections.emptyList());
+        when(productService.getUserProducts(eq(testConfig.getTestUser()), anyBoolean(), anyBoolean()))
+                .thenReturn(products);
 
         MvcResult result = mvc.perform(get("/api/products")
                 .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
@@ -218,7 +258,7 @@ class ProductControllerTest {
         assertAll(
                 () -> assertEquals(400, result.getResponse().getStatus()),
                 () -> verify(productService, times(0))
-                        .getUserProducts(eq(testConfig.getTestUser()), anyBoolean())
+                        .getUserProducts(eq(testConfig.getTestUser()), anyBoolean(), anyBoolean())
         );
     }
 
@@ -229,7 +269,7 @@ class ProductControllerTest {
 
         MvcResult result = mvc.perform(get("/api/product/" + expectedProductResponse.getId())
                 .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
-                .header("with_price_history", true)
+                .header("with-price-history", true)
         ).andReturn();
 
         ProductResponse returnedProductResponse =
@@ -250,7 +290,7 @@ class ProductControllerTest {
 
         MvcResult result = mvc.perform(get("/api/product/" + expectedProductResponse.getId())
                 .header(authHeaderName, "invalid jwt")
-                .header("with_price_history", true)
+                .header("with-price-history", true)
         ).andReturn();
 
         assertAll(

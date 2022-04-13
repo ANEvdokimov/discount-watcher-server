@@ -7,6 +7,7 @@ import an.evdokimov.discount.watcher.server.database.user.model.User;
 import an.evdokimov.discount.watcher.server.service.product.ProductService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
+import org.springframework.lang.Nullable;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,15 +43,27 @@ public class ProductController {
      * @param authentication   information about a current user.
      * @param withPriceHistory flag - return product with whole history of changing price [true]
      *                         or only with an actual price [false].
+     * @param onlyActive       flag - return only active products.
+     * @param shopId           An id of the shop where the products are sold.
      * @return a list of user's products.
      */
     @GetMapping(value = "/products", produces = MediaType.APPLICATION_JSON_VALUE)
     public Collection<ProductResponse> getUserProducts(Authentication authentication,
-                                                       @RequestHeader(name = "with_price_history")
-                                                               boolean withPriceHistory) {
-        log.info("Getting products. user={}, price_history={}",
-                ((User) authentication.getPrincipal()).getLogin(), withPriceHistory);
-        return productService.getUserProducts((User) authentication.getPrincipal(), withPriceHistory);
+                                                       @RequestHeader(name = "with-price-history")
+                                                               boolean withPriceHistory,
+                                                       @RequestHeader(name = "only-active")
+                                                               boolean onlyActive,
+                                                       @RequestHeader(name = "shop-id") @Nullable
+                                                               Long shopId) throws ServerException {
+        log.info("Getting products. user={}, price_history={}, only-active={}, shopId={}",
+                ((User) authentication.getPrincipal()).getLogin(), withPriceHistory, onlyActive, shopId);
+
+        if (shopId != null) {
+            return productService.getUserProductsInShop((User) authentication.getPrincipal(), shopId, withPriceHistory,
+                    onlyActive);
+        } else {
+            return productService.getUserProducts((User) authentication.getPrincipal(), withPriceHistory, onlyActive);
+        }
     }
 
     /**
@@ -64,7 +77,7 @@ public class ProductController {
      */
     @GetMapping(value = "/product/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ProductResponse getProduct(@PathVariable Long id,
-                                      @RequestHeader(name = "with_price_history") boolean withPriceHistory)
+                                      @RequestHeader(name = "with-price-history") boolean withPriceHistory)
             throws ServerException {
         log.info("Getting product by id={}, price_history={}", id, withPriceHistory);
         return productService.getProduct(id, withPriceHistory);

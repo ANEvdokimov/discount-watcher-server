@@ -62,16 +62,52 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Collection<ProductResponse> getUserProducts(@NotNull User user, boolean withPriceHistory) {
+    public Collection<ProductResponse> getUserProducts(@NotNull User user, boolean withPriceHistory,
+                                                       boolean onlyActive) {
         Collection<Product> userProducts;
         if (withPriceHistory) {
-            userProducts = productRepository.findAllUsersProducts(user);
+            if (onlyActive) {
+                userProducts = productRepository.findAllActiveUsersProducts(user);
+            } else {
+                userProducts = productRepository.findAllUsersProducts(user);
+            }
         } else {
-            userProducts = productRepository.findAllUsersProductsWithLastPrice(user);
+            if (onlyActive) {
+                userProducts = productRepository.findAllActiveUsersProductsWithLastPrice(user);
+            } else {
+                userProducts = productRepository.findAllUsersProductsWithLastPrice(user);
+            }
         }
         return userProducts.stream()
                 .map(productMapper::map)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Collection<ProductResponse> getUserProductsInShop(@NotNull User user, @NotNull Long shopId,
+                                                             boolean withPriceHistory, boolean onlyActive)
+            throws ServerException {
+        Shop shop =
+                shopRepository.findById(shopId).orElseThrow(() -> new ServerException(ServerErrorCode.SHOP_NOT_FOUND));
+
+        Collection<Product> userProducts;
+        if (withPriceHistory) {
+            if (onlyActive) {
+                userProducts = productRepository.findAllActiveUsersProductsInShop(user, shop);
+            } else {
+                userProducts = productRepository.findAllUsersProductsInShop(user, shop);
+            }
+        } else {
+            if (onlyActive) {
+                userProducts = productRepository.findAllActiveUserProductsWithLastPriceInShop(user, shop);
+            } else {
+                userProducts = productRepository.findAllUsersProductsWithLastPriceInShop(user, shop);
+            }
+        }
+
+        return userProducts.stream()
+                .map(productMapper::map)
+                .toList();
     }
 
     @Override
