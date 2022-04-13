@@ -1,6 +1,7 @@
 package an.evdokimov.discount.watcher.server.database.product.repository;
 
 import an.evdokimov.discount.watcher.server.database.product.model.Product;
+import an.evdokimov.discount.watcher.server.database.shop.model.Shop;
 import an.evdokimov.discount.watcher.server.database.user.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -53,6 +54,39 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                     )
             """)
     Collection<Product> findAllActiveUsersProductsWithLastPrice(@Param("user") User user);
+
+    @Query("""
+            SELECT DISTINCT up.product FROM UserProduct up
+                WHERE (
+                    up.user = :user AND
+                    up.product.shop = :shop AND (
+                        up.monitor_availability = true OR
+                        up.monitor_discount = true OR
+                        up.monitor_price_changes = true
+                    )
+                )
+            """)
+    Collection<Product> findAllActiveUsersProductsInShop(@Param("user") User user, @Param("shop") Shop shop);
+
+    @Query("""
+            SELECT p FROM Product p
+                LEFT JOIN FETCH p.prices pp
+            WHERE
+                pp.date = (SELECT MAX(pp2.date) FROM ProductPrice pp2 WHERE pp2.product = p) AND
+                p.shop = :shop AND
+                p.id in (
+                    SELECT DISTINCT up.product FROM UserProduct up
+                        WHERE (
+                            up.user = :user AND (
+                                up.monitor_availability = true OR
+                                up.monitor_discount = true OR
+                                up.monitor_price_changes = true
+                            )
+                        )
+                )
+            """)
+    Collection<Product> findAllActiveUserProductsWithLastPriceInShop(@Param("user") User user,
+                                                                     @Param("shop") Shop shop);
 
     @Query("""
             SELECT DISTINCT up.product FROM UserProduct up
