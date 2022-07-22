@@ -1,4 +1,4 @@
-package an.evdokimov.discount.watcher.server.configuration;
+package an.evdokimov.discount.watcher.server.configuration.property;
 
 import lombok.Getter;
 import lombok.Setter;
