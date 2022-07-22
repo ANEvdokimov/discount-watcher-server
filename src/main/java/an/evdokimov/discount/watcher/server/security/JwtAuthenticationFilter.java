@@ -80,7 +80,7 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
         }
 
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-            log.warn(AuthenticationErrorMessage.BAD_TOKEN.getMessage() + ". token: {}", authorizationHeader);
+            log.warn(AuthenticationErrorMessage.BAD_TOKEN.getMessage() + ". token: {}", authorizationHeader);//TODO баг: вызывается при недоступности БД
             throw new AuthenticationCredentialsNotFoundException(AuthenticationErrorMessage.BAD_TOKEN.getMessage());
         }
 
