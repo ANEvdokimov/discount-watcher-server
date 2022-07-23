@@ -12,6 +12,6 @@ ENV KEY_STORE_ALIAS DWS
 RUN mkdir ${key_store_dir}
 
 COPY ./target/*.jar ~/app.jar
-COPY ./*.p12 ${key_store_dir}${key_store_name}
+COPY ./dev-certificates/*.p12 ${key_store_dir}${key_store_name}
 
-ENTRYPOINT ["java", "-jar", "~/app.jar"]
+ENTRYPOINT ["java", "-Dspring.profiles.active=docker", "-jar", "~/app.jar"]

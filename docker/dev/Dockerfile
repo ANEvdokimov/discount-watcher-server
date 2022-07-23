@@ -11,4 +11,4 @@ ENV KEY_STORE_ALIAS DWS
 
 RUN mkdir ${key_store_dir}
 
-ADD . ${key_store_dir}
+ADD ./dev-certificates ${key_store_dir}
