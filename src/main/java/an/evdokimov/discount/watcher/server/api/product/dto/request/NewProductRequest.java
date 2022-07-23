@@ -28,4 +28,22 @@ public class NewProductRequest {
      */
     @NotNull
     private Long shopId;
+
+    /**
+     * A product discount tracking flag.
+     */
+    @NotNull
+    private Boolean monitorDiscount;
+
+    /**
+     * A product availability in the shop tracking flag.
+     */
+    @NotNull
+    private Boolean monitorAvailability;
+
+    /**
+     * A price change tracking flag.
+     */
+    @NotNull
+    private Boolean monitorPriceChanges;
 }

@@ -15,9 +15,10 @@ public interface ProductService {
     Collection<ProductResponse> getUserProducts(@NotNull User user, boolean withPriceHistory, boolean onlyActive);
 
     Collection<ProductResponse> getUserProductsInShop(@NotNull User user, @NotNull Long shopId,
-                                                      boolean withPriceHistory, boolean onlyActive) throws ServerException;
+                                                      boolean withPriceHistory, boolean onlyActive)
+            throws ServerException;
 
-    ProductResponse addProduct(@NotNull NewProductRequest newProduct) throws ServerException;
+    ProductResponse addProduct(@NotNull User user, @NotNull NewProductRequest newProduct) throws ServerException;
 
     Product updateProduct(@NotNull Product product) throws ServerException;
 }

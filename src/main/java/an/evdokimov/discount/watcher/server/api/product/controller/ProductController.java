@@ -32,9 +32,11 @@ public class ProductController {
      * @throws ServerException any errors during adding the product.
      */
     @PutMapping(value = "/products", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ProductResponse addProduct(@Valid @RequestBody NewProductRequest newProduct) throws ServerException {
-        log.info("Adding new product: {}", newProduct.toString());
-        return productService.addProduct(newProduct);
+    public ProductResponse addProduct(Authentication authentication,
+                                      @Valid @RequestBody NewProductRequest newProduct) throws ServerException {
+        log.info("Adding new product {} to user {}", newProduct.toString(),
+                ((User) authentication.getPrincipal()).getLogin());
+        return productService.addProduct((User) authentication.getPrincipal(), newProduct);
     }
 
     /**

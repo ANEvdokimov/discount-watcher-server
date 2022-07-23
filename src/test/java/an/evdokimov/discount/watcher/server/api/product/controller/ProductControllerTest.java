@@ -69,11 +69,14 @@ class ProductControllerTest {
                 .prices(List.of(productPriceResponse))
                 .build();
 
-        when(productService.addProduct(any())).thenReturn(productResponse);
+        when(productService.addProduct(any(), any())).thenReturn(productResponse);
 
         NewProductRequest request = NewProductRequest.builder()
                 .shopId(1L)
                 .url(new URL("https://test_url.com"))
+                .monitorAvailability(false)
+                .monitorDiscount(true)
+                .monitorPriceChanges(false)
                 .build();
 
         MvcResult result = mvc.perform(put("/api/products")
@@ -87,7 +90,8 @@ class ProductControllerTest {
                 () -> assertEquals(
                         mapper.writeValueAsString(productResponse),
                         result.getResponse().getContentAsString()),
-                () -> verify(productService, times(1)).addProduct(eq(request))
+                () -> verify(productService, times(1))
+                        .addProduct(eq(testConfig.getTestUser()), eq(request))
         );
     }
 
@@ -106,7 +110,8 @@ class ProductControllerTest {
 
         assertAll(
                 () -> assertEquals(400, result.getResponse().getStatus()),
-                () -> verify(productService, times(0)).addProduct(eq(request))
+                () -> verify(productService, times(0))
+                        .addProduct(eq(testConfig.getTestUser()), eq(request))
         );
     }
 
@@ -125,7 +130,8 @@ class ProductControllerTest {
 
         assertAll(
                 () -> assertEquals(400, result.getResponse().getStatus()),
-                () -> verify(productService, times(0)).addProduct(eq(request))
+                () -> verify(productService, times(0))
+                        .addProduct(eq(testConfig.getTestUser()), eq(request))
         );
     }
 
@@ -144,7 +150,8 @@ class ProductControllerTest {
 
         assertAll(
                 () -> assertEquals(401, result.getResponse().getStatus()),
-                () -> verify(productService, times(0)).addProduct(eq(request))
+                () -> verify(productService, times(0))
+                        .addProduct(eq(testConfig.getTestUser()), eq(request))
         );
     }
 

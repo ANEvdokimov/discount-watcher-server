@@ -103,7 +103,7 @@ CREATE TABLE user_product
     monitor_price_changes BOOLEAN NOT NULL,
     FOREIGN KEY (user_id) REFERENCES user (id) ON UPDATE CASCADE ON DELETE CASCADE,
     FOREIGN KEY (product_id) REFERENCES product (id) ON UPDATE CASCADE ON DELETE CASCADE,
-    UNIQUE (user_id, product_id)
+    UNIQUE INDEX (user_id, product_id)
 )
     ENGINE = InnoDB
     CHARSET = UTF8;

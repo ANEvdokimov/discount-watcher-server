@@ -25,9 +25,9 @@ public class UserProduct {
     @ManyToOne
     @JoinColumn(name = "product_id")
     private Product product;
-    private boolean monitor_discount;
-    private boolean monitor_availability;
-    private boolean monitor_price_changes;
+    private boolean monitorDiscount;
+    private boolean monitorAvailability;
+    private boolean monitorPriceChanges;
 
     @Override
     public boolean equals(Object o) {

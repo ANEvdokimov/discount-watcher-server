@@ -21,9 +21,9 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             SELECT DISTINCT up.product FROM UserProduct up
                 WHERE (
                     up.user = :user AND (
-                        up.monitor_availability = true OR
-                        up.monitor_discount = true OR
-                        up.monitor_price_changes = true
+                        up.monitorAvailability = true OR
+                        up.monitorDiscount = true OR
+                        up.monitorPriceChanges = true
                     )
                 )
             """)
@@ -47,9 +47,9 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                     SELECT DISTINCT up.product FROM UserProduct up
                         WHERE (
                             up.user = :user AND (
-                                up.monitor_availability = true OR
-                                up.monitor_discount = true OR
-                                up.monitor_price_changes = true
+                                up.monitorAvailability = true OR
+                                up.monitorDiscount = true OR
+                                up.monitorPriceChanges = true
                             )
                         )
                     )
@@ -82,9 +82,9 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                 WHERE (
                     up.user = :user AND
                     up.product.shop = :shop AND (
-                        up.monitor_availability = true OR
-                        up.monitor_discount = true OR
-                        up.monitor_price_changes = true
+                        up.monitorAvailability = true OR
+                        up.monitorDiscount = true OR
+                        up.monitorPriceChanges = true
                     )
                 )
             """)
@@ -100,9 +100,9 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                     SELECT DISTINCT up.product FROM UserProduct up
                         WHERE (
                             up.user = :user AND (
-                                up.monitor_availability = true OR
-                                up.monitor_discount = true OR
-                                up.monitor_price_changes = true
+                                up.monitorAvailability = true OR
+                                up.monitorDiscount = true OR
+                                up.monitorPriceChanges = true
                             )
                         )
                 )
@@ -113,9 +113,9 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("""
             SELECT DISTINCT up.product FROM UserProduct up
                 WHERE (
-                    up.monitor_availability = true OR
-                    up.monitor_discount = true OR
-                    up.monitor_price_changes = true
+                    up.monitorAvailability = true OR
+                    up.monitorDiscount = true OR
+                    up.monitorPriceChanges = true
                 )
             """)
     Collection<Product> findAllActiveProducts();

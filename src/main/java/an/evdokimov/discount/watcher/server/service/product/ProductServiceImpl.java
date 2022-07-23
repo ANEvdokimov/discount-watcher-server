@@ -9,10 +9,12 @@ import an.evdokimov.discount.watcher.server.database.product.model.ProductPrice;
 import an.evdokimov.discount.watcher.server.database.product.repository.ProductInformationRepository;
 import an.evdokimov.discount.watcher.server.database.product.repository.ProductPriceRepository;
 import an.evdokimov.discount.watcher.server.database.product.repository.ProductRepository;
+import an.evdokimov.discount.watcher.server.database.product.repository.UserProductRepository;
 import an.evdokimov.discount.watcher.server.database.shop.model.Shop;
 import an.evdokimov.discount.watcher.server.database.shop.repository.ShopRepository;
 import an.evdokimov.discount.watcher.server.database.user.model.User;
 import an.evdokimov.discount.watcher.server.mapper.product.ProductMapper;
+import an.evdokimov.discount.watcher.server.mapper.product.UserProductMapper;
 import an.evdokimov.discount.watcher.server.parser.Parser;
 import an.evdokimov.discount.watcher.server.parser.ParserException;
 import an.evdokimov.discount.watcher.server.parser.ParserFactory;
@@ -30,21 +32,29 @@ import java.util.stream.Collectors;
 public class ProductServiceImpl implements ProductService {
     private final ParserFactory parserFactory;
     private final ProductRepository productRepository;
+    private final UserProductRepository userProductRepository;
     private final ProductPriceRepository productPriceRepository;
     private final ProductInformationRepository productInformationRepository;
     private final ShopRepository shopRepository;
     private final ProductMapper productMapper;
+    private final UserProductMapper userProductMapper;
 
-    public ProductServiceImpl(ParserFactory parserFactory, ProductRepository productRepository,
+    public ProductServiceImpl(ParserFactory parserFactory,
+                              ProductRepository productRepository,
+                              UserProductRepository userProductRepository,
                               ProductPriceRepository productPriceRepository,
-                              ProductInformationRepository productInformationRepository, ShopRepository shopRepository,
-                              ProductMapper productMapper) {
+                              ProductInformationRepository productInformationRepository,
+                              ShopRepository shopRepository,
+                              ProductMapper productMapper,
+                              UserProductMapper userProductMapper) {
         this.parserFactory = parserFactory;
         this.productRepository = productRepository;
+        this.userProductRepository = userProductRepository;
         this.productPriceRepository = productPriceRepository;
         this.productInformationRepository = productInformationRepository;
         this.shopRepository = shopRepository;
         this.productMapper = productMapper;
+        this.userProductMapper = userProductMapper;
     }
 
     @Override
@@ -111,7 +121,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResponse addProduct(@NotNull NewProductRequest newProduct) throws ServerException {
+    public ProductResponse addProduct(@NotNull User user, @NotNull NewProductRequest newProduct)
+            throws ServerException {
         Shop shop = shopRepository.findById(newProduct.getShopId())
                 .orElseThrow(() -> new ServerException(ServerErrorCode.SHOP_NOT_FOUND));
 
@@ -134,6 +145,7 @@ public class ProductServiceImpl implements ProductService {
         productInformationRepository.saveIfAbsent(parsedProduct.getProductInformation());
         productRepository.saveIfAbsent(parsedProduct);
         productPriceRepository.saveAll(parsedProduct.getPrices());
+        userProductRepository.saveOrUpdate(userProductMapper.map(newProduct, user, parsedProduct));
 
         return productMapper.map(parsedProduct);
     }

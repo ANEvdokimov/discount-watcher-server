@@ -143,19 +143,19 @@ class ProductRepositoryTest {
         productPriceRepository.save(price5_1);
         productPriceRepository.flush();
 
-        userProductRepository.save(UserProduct.builder().user(user1).monitor_availability(true).monitor_discount(false)
-                .monitor_price_changes(false).product(product1).build());
-        userProductRepository.save(UserProduct.builder().user(user1).monitor_availability(false).monitor_discount(false)
-                .monitor_price_changes(false).product(product2).build());
+        userProductRepository.save(UserProduct.builder().user(user1).monitorAvailability(true).monitorDiscount(false)
+                .monitorPriceChanges(false).product(product1).build());
+        userProductRepository.save(UserProduct.builder().user(user1).monitorAvailability(false).monitorDiscount(false)
+                .monitorPriceChanges(false).product(product2).build());
 
-        userProductRepository.save(UserProduct.builder().user(user2).monitor_availability(true).monitor_discount(true)
-                .monitor_price_changes(true).product(product2).build());
-        userProductRepository.save(UserProduct.builder().user(user2).monitor_availability(false).monitor_discount(true)
-                .monitor_price_changes(false).product(product3).build());
-        userProductRepository.save(UserProduct.builder().user(user2).monitor_availability(false).monitor_discount(false)
-                .monitor_price_changes(false).product(product4).build());
-        userProductRepository.save(UserProduct.builder().user(user2).monitor_availability(false).monitor_discount(false)
-                .monitor_price_changes(true).product(product5).build());
+        userProductRepository.save(UserProduct.builder().user(user2).monitorAvailability(true).monitorDiscount(true)
+                .monitorPriceChanges(true).product(product2).build());
+        userProductRepository.save(UserProduct.builder().user(user2).monitorAvailability(false).monitorDiscount(true)
+                .monitorPriceChanges(false).product(product3).build());
+        userProductRepository.save(UserProduct.builder().user(user2).monitorAvailability(false).monitorDiscount(false)
+                .monitorPriceChanges(false).product(product4).build());
+        userProductRepository.save(UserProduct.builder().user(user2).monitorAvailability(false).monitorDiscount(false)
+                .monitorPriceChanges(true).product(product5).build());
         userProductRepository.flush();
     }
 

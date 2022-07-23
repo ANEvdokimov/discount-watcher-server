@@ -12,6 +12,7 @@ import an.evdokimov.discount.watcher.server.database.product.model.ProductPrice;
 import an.evdokimov.discount.watcher.server.database.product.repository.ProductInformationRepository;
 import an.evdokimov.discount.watcher.server.database.product.repository.ProductPriceRepository;
 import an.evdokimov.discount.watcher.server.database.product.repository.ProductRepository;
+import an.evdokimov.discount.watcher.server.database.product.repository.UserProductRepository;
 import an.evdokimov.discount.watcher.server.database.shop.model.Shop;
 import an.evdokimov.discount.watcher.server.database.shop.repository.ShopRepository;
 import an.evdokimov.discount.watcher.server.database.user.model.User;
@@ -55,6 +56,9 @@ class ProductServiceTest {
     private ProductRepository productRepository;
 
     @MockBean
+    private UserProductRepository userProductRepository;
+
+    @MockBean
     private ProductPriceRepository productPriceRepository;
 
     @MockBean
@@ -85,6 +89,8 @@ class ProductServiceTest {
                 .build();
         productPrice.setProduct(product);
 
+        User user = User.builder().id(66L).build();
+
         LentaProductPriceResponse expectedProductPrice = LentaProductPriceResponse.builder()
                 .price(BigDecimal.valueOf(100))
                 .priceWithDiscount(BigDecimal.valueOf(50))
@@ -97,7 +103,16 @@ class ProductServiceTest {
         when(shopRepository.findById(666L)).thenReturn(Optional.of(new Shop()));
         when(lentaParser.parse(any(URL.class), any())).thenReturn(product);
 
-        ProductResponse result = productService.addProduct(new NewProductRequest(new URL("https://lenta.com"), 666L));
+        ProductResponse result = productService.addProduct(
+                user,
+                new NewProductRequest(
+                        new URL("https://lenta.com"),
+                        666L,
+                        true,
+                        false,
+                        false
+                )
+        );
 
         assertAll(
                 () -> assertEquals(expectedProduct, result),
@@ -113,7 +128,9 @@ class ProductServiceTest {
         assertAll(
                 () -> assertThrows(
                         ServerException.class,
-                        () -> productService.addProduct(new NewProductRequest(new URL("https://lenta.com"), 666L))
+                        () -> productService.addProduct(
+                                User.builder().id(66L).build(),
+                                new NewProductRequest(new URL("https://lenta.com"), 666L, true, true, true))
                 ),
                 () -> verify(productRepository, times(0)).save(any(Product.class))
         );
@@ -127,7 +144,9 @@ class ProductServiceTest {
         assertAll(
                 () -> assertThrows(
                         ServerException.class,
-                        () -> productService.addProduct(new NewProductRequest(new URL("https://lenta.com"), 666L))
+                        () -> productService.addProduct(
+                                User.builder().id(66L).build(),
+                                new NewProductRequest(new URL("https://lenta.com"), 666L, true, true, true))
                 ),
                 () -> verify(productRepository, times(0)).save(any(Product.class))
         );
