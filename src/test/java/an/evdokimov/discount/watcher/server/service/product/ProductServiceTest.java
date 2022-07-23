@@ -101,7 +101,7 @@ class ProductServiceTest {
 
         assertAll(
                 () -> assertEquals(expectedProduct, result),
-                () -> verify(productRepository, times(1)).save(product)
+                () -> verify(productRepository, times(1)).saveIfAbsent(product)
         );
     }
 

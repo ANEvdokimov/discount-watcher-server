@@ -131,9 +131,9 @@ public class ProductServiceImpl implements ProductService {
             throw new ServerException(ServerErrorCode.PARSE_PAGE_ERROR, e);
         }
 
-        productInformationRepository.save(parsedProduct.getProductInformation());
+        productInformationRepository.saveIfAbsent(parsedProduct.getProductInformation());
+        productRepository.saveIfAbsent(parsedProduct);
         productPriceRepository.saveAll(parsedProduct.getPrices());
-        productRepository.save(parsedProduct);
 
         return productMapper.map(parsedProduct);
     }

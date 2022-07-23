@@ -1,6 +1,7 @@
 package an.evdokimov.discount.watcher.server.database.product.repository;
 
 import an.evdokimov.discount.watcher.server.database.product.model.Product;
+import an.evdokimov.discount.watcher.server.database.product.model.ProductInformation;
 import an.evdokimov.discount.watcher.server.database.shop.model.Shop;
 import an.evdokimov.discount.watcher.server.database.user.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -125,4 +126,16 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             WHERE p.id = :id AND pp.date = (SELECT MAX(pp2.date) FROM ProductPrice pp2 WHERE pp2.product = p)
             """)
     Optional<Product> findByIdWithLastPrice(@Param("id") Long id);
+
+    Optional<Product> findByProductInformationAndShop(ProductInformation productInformation, Shop shop);
+
+    default void saveIfAbsent(Product product) {
+        Optional<Product> productFromDb =
+                findByProductInformationAndShop(product.getProductInformation(), product.getShop());
+        if (productFromDb.isEmpty()) {
+            save(product);
+        } else {
+            product.setId(productFromDb.get().getId());
+        }
+    }
 }

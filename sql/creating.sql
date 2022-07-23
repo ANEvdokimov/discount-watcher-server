@@ -49,9 +49,9 @@ CREATE TABLE shop
 
 CREATE TABLE product_information
 (
-    id                    BIGINT PRIMARY KEY AUTO_INCREMENT,
-    name                  VARCHAR(255) NOT NULL,
-    url                   VARCHAR(512) NOT NULL UNIQUE,
+    id   BIGINT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL,
+    url  VARCHAR(512) NOT NULL UNIQUE,
     INDEX (url)
 )
     ENGINE = InnoDB
@@ -62,6 +62,7 @@ CREATE TABLE product
     id                     BIGINT PRIMARY KEY AUTO_INCREMENT,
     product_information_id BIGINT NOT NULL,
     shop_id                BIGINT NOT NULL,
+    UNIQUE INDEX (product_information_id, shop_id),
     FOREIGN KEY (product_information_id) REFERENCES product_information (id) ON UPDATE CASCADE ON DELETE RESTRICT,
     FOREIGN KEY (shop_id) REFERENCES shop (id) ON UPDATE CASCADE ON DELETE RESTRICT
 )
