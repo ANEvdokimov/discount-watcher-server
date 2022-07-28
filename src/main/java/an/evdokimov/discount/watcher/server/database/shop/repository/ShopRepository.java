@@ -10,8 +10,7 @@ import java.util.Collection;
 
 public interface ShopRepository extends JpaRepository<Shop, Long> {
     @Query("""
-            SELECT pr.shop FROM Product pr
-            JOIN UserProduct upr ON upr = pr
+            SELECT DISTINCT upr.product.shop FROM UserProduct upr
             WHERE upr.user = :user AND (
                     upr.monitorAvailability = true OR
                     upr.monitorDiscount = true OR
