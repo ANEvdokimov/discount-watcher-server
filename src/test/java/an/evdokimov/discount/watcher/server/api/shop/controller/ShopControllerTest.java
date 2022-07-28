@@ -36,6 +36,9 @@ class ShopControllerTest {
     private String authHeaderName;
 
     @Autowired
+    private TestConfig testConfig;
+
+    @Autowired
     private JwtUtils jwtUtils;
 
     @Autowired
@@ -62,6 +65,7 @@ class ShopControllerTest {
                 .name("shop3")
                 .build();
         when(shopService.getAllShops()).thenReturn(List.of(shop1, shop2, shop3));
+        when(shopService.getAllUserShops(testConfig.getTestUser())).thenReturn(List.of(shop1, shop2));
 
         MvcResult result = mvc.perform(get("/api/shops")
                         .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user")))
@@ -77,6 +81,78 @@ class ShopControllerTest {
                 () -> assertThat(
                         returnedShopResponses,
                         containsInAnyOrder(shop1, shop2, shop3)
+                )
+        );
+    }
+
+    @Test
+    void getAllShops_validJwtAndHeaderParameterFalse_http200() throws Exception {
+        ShopResponse shop1 = ShopResponse.builder()
+                .id(1L)
+                .name("shop1")
+                .build();
+        ShopResponse shop2 = ShopResponse.builder()
+                .id(2L)
+                .name("shop2")
+                .build();
+        ShopResponse shop3 = ShopResponse.builder()
+                .id(3L)
+                .name("shop3")
+                .build();
+        when(shopService.getAllShops()).thenReturn(List.of(shop1, shop2, shop3));
+        when(shopService.getAllUserShops(testConfig.getTestUser())).thenReturn(List.of(shop1, shop2));
+
+        MvcResult result = mvc.perform(get("/api/shops")
+                        .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
+                        .header("only-my", "false"))
+                .andReturn();
+
+        ArrayList<ShopResponse> returnedShopResponses = mapper.readValue(
+                result.getResponse().getContentAsString(),
+                mapper.getTypeFactory().constructCollectionType(ArrayList.class, ShopResponse.class)
+        );
+
+        assertAll(
+                () -> assertEquals(200, result.getResponse().getStatus()),
+                () -> assertThat(
+                        returnedShopResponses,
+                        containsInAnyOrder(shop1, shop2, shop3)
+                )
+        );
+    }
+
+    @Test
+    void getAllShops_validJwtAndHeaderParameterTrue_http200() throws Exception {
+        ShopResponse shop1 = ShopResponse.builder()
+                .id(1L)
+                .name("shop1")
+                .build();
+        ShopResponse shop2 = ShopResponse.builder()
+                .id(2L)
+                .name("shop2")
+                .build();
+        ShopResponse shop3 = ShopResponse.builder()
+                .id(3L)
+                .name("shop3")
+                .build();
+        when(shopService.getAllShops()).thenReturn(List.of(shop1, shop2, shop3));
+        when(shopService.getAllUserShops(testConfig.getTestUser())).thenReturn(List.of(shop1, shop2));
+
+        MvcResult result = mvc.perform(get("/api/shops")
+                        .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
+                        .header("only-my", "true"))
+                .andReturn();
+
+        ArrayList<ShopResponse> returnedShopResponses = mapper.readValue(
+                result.getResponse().getContentAsString(),
+                mapper.getTypeFactory().constructCollectionType(ArrayList.class, ShopResponse.class)
+        );
+
+        assertAll(
+                () -> assertEquals(200, result.getResponse().getStatus()),
+                () -> assertThat(
+                        returnedShopResponses,
+                        containsInAnyOrder(shop1, shop2)
                 )
         );
     }
