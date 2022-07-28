@@ -9,7 +9,7 @@ import java.util.Optional;
 
 @Repository
 public interface ProductInformationRepository extends JpaRepository<ProductInformation, Long> {
-    public abstract Optional<ProductInformation> findByUrl(URL url);
+    Optional<ProductInformation> findByUrl(URL url);
 
     default void saveIfAbsent(ProductInformation productInformation) {
         Optional<ProductInformation> productInformationFromDb = findByUrl(productInformation.getUrl());
