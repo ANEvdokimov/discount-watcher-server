@@ -14,7 +14,7 @@ import java.util.Optional;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
-    @Query("SELECT p FROM Product p WHERE p.id in (SELECT up.id FROM UserProduct up WHERE up.user = :user)")
+    @Query("SELECT up.product FROM UserProduct up WHERE up.user = :user")
     Collection<Product> findAllUsersProducts(@Param("user") User user);
 
     @Query("""
@@ -33,7 +33,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             SELECT p FROM Product p
                 LEFT JOIN FETCH p.prices pp
             WHERE
-                p.id in (SELECT up.id FROM UserProduct up WHERE up.user = :user) AND
+                p.id in (SELECT up.product.id FROM UserProduct up WHERE up.user = :user) AND
                 pp.date = (SELECT MAX(pp2.date) FROM ProductPrice pp2 WHERE pp2.product = p)
             """)
     Collection<Product> findAllUsersProductsWithLastPrice(@Param("user") User user);

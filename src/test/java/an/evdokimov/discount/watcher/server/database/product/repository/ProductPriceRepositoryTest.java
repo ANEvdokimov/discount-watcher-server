@@ -2,7 +2,7 @@ package an.evdokimov.discount.watcher.server.database.product.repository;
 
 import an.evdokimov.discount.watcher.server.database.product.model.LentaProductPrice;
 import an.evdokimov.discount.watcher.server.database.product.model.ProductPrice;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -18,13 +18,13 @@ class ProductPriceRepositoryTest {
     @Autowired
     private ProductPriceRepository repository;
 
-    @BeforeEach
+    @AfterEach
     void clearDb() {
         repository.deleteAll();
     }
 
     @Test
-    void findById_LentaProductPrice_instanceOfLentaProductPrice(){
+    void findById_LentaProductPrice_instanceOfLentaProductPrice() {
         LentaProductPrice lentaProductPrice = LentaProductPrice.builder()
                 .price(BigDecimal.valueOf(1000))
                 .priceWithCard(BigDecimal.valueOf(500))
@@ -36,7 +36,7 @@ class ProductPriceRepositoryTest {
     }
 
     @Test
-    void findById_ProductPrice_instanceOfProductPrice(){
+    void findById_ProductPrice_instanceOfProductPrice() {
         ProductPrice productPrice = ProductPrice.builder()
                 .price(BigDecimal.valueOf(1000))
                 .priceWithDiscount(BigDecimal.valueOf(500))

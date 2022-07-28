@@ -8,6 +8,7 @@ import an.evdokimov.discount.watcher.server.database.shop.model.Shop;
 import an.evdokimov.discount.watcher.server.database.shop.repository.ShopRepository;
 import an.evdokimov.discount.watcher.server.database.user.model.User;
 import an.evdokimov.discount.watcher.server.database.user.repository.UserRepository;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -19,7 +20,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
@@ -50,15 +50,6 @@ class ProductRepositoryTest {
 
     @BeforeAll
     public void fillDb() {
-        userProductRepository.deleteAll();
-        userProductRepository.flush();
-        productRepository.deleteAll();
-        productRepository.flush();
-        productInformationRepository.deleteAll();
-        productInformationRepository.flush();
-        userRepository.deleteAll();
-        userRepository.flush();
-
         user1 = userRepository.save(User.builder().name("user1").build());
         user2 = userRepository.save(User.builder().name("user2").build());
         user3 = userRepository.save(User.builder().name("user3").build());
@@ -159,6 +150,16 @@ class ProductRepositoryTest {
         userProductRepository.flush();
     }
 
+    @AfterAll
+    public void afterAll() {
+        userProductRepository.deleteAll();
+        productPriceRepository.deleteAll();
+        productRepository.deleteAll();
+        productInformationRepository.deleteAll();
+        shopRepository.deleteAll();
+        userRepository.deleteAll();
+    }
+
     private User user1;
     private User user2;
     private User user3;
@@ -180,8 +181,8 @@ class ProductRepositoryTest {
     @Test
     void findAllByUser_getProductByUser_productList() {
         assertThat(
-                productRepository.findAllUsersProducts(user1).stream().map(Product::getId).collect(Collectors.toList()),
-                containsInAnyOrder(product1.getId(), product2.getId())
+                productRepository.findAllUsersProducts(user1),
+                containsInAnyOrder(product1, product2)
         );
     }
 
@@ -207,16 +208,16 @@ class ProductRepositoryTest {
 
         assertAll(
                 () -> assertThat(
-                        allUsersProducts.stream().map(Product::getId).collect(Collectors.toList()),
-                        containsInAnyOrder(product1.getId(), product2.getId())
+                        allUsersProducts,
+                        containsInAnyOrder(product1, product2)
                 ),
                 () -> assertThat(
-                        allUsersProducts.stream().filter(product -> product.getId().equals(product1.getId()))
+                        allUsersProducts.stream().filter(product -> product.equals(product1))
                                 .toList().get(0).getPrices(),
                         contains(price3)
                 ),
                 () -> assertThat(
-                        allUsersProducts.stream().filter(product -> product.getId().equals(product2.getId()))
+                        allUsersProducts.stream().filter(product -> product.equals(product2))
                                 .toList().get(0).getPrices(),
                         contains(price4)
                 )
@@ -260,11 +261,15 @@ class ProductRepositoryTest {
         assertAll(
                 () -> assertThat(products, contains(product3, product5)),
                 () -> assertThat(
-                        products.stream().filter(product -> product.getId() == 3).findAny().get().getPrices(),
+                        products.stream()
+                                .filter(product -> product.getId().equals(product3.getId()))
+                                .findAny().get().getPrices(),
                         contains(price3_2, price3_1)
                 ),
                 () -> assertThat(
-                        products.stream().filter(product -> product.getId() == 5).findAny().get().getPrices(),
+                        products.stream()
+                                .filter(product -> product.getId().equals(product5.getId()))
+                                .findAny().get().getPrices(),
                         contains(price5_1)
                 )
         );
