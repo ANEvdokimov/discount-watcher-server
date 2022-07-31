@@ -28,7 +28,7 @@ public class ProductUpdateScheduler {
 
     @Scheduled(cron = "0 0 0,12 * * *", zone = "UTC") // every day at 0:00 and 12:00
     public void updateProduct() {
-        Collection<Product> activeProducts = productRepository.findAllActiveProducts();
+        Collection<Product> activeProducts = productRepository.findAllTrackedProducts();
 
         Random random = new Random();
 

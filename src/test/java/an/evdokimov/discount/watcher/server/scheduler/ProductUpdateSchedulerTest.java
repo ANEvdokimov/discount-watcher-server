@@ -49,7 +49,7 @@ class ProductUpdateSchedulerTest {
                 .prices(List.of())
                 .build();
 
-        when(productRepository.findAllActiveProducts()).thenReturn(List.of(product1, product2, product3));
+        when(productRepository.findAllTrackedProducts()).thenReturn(List.of(product1, product2, product3));
 
         productUpdateScheduler.updateProduct();
         assertAll(

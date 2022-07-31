@@ -14,20 +14,115 @@ import java.util.Optional;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
-    @Query("SELECT up.product FROM UserProduct up WHERE up.user = :user")
-    Collection<Product> findAllUsersProducts(@Param("user") User user);
+
+    // ---------------- BASIC OPERATIONS ----------------
+
+    default void saveIfAbsent(Product product) {
+        Optional<Product> productFromDb =
+                findByProductInformationAndShop(product.getProductInformation(), product.getShop());
+        if (productFromDb.isEmpty()) {
+            save(product);
+        } else {
+            product.setId(productFromDb.get().getId());
+        }
+    }
+
+    Optional<Product> findByProductInformationAndShop(ProductInformation productInformation, Shop shop);
+
+    @Query("""
+            SELECT p FROM Product p
+                LEFT JOIN FETCH p.prices pp
+            WHERE p.id = :id AND pp.date = (SELECT MAX(pp2.date) FROM ProductPrice pp2 WHERE pp2.product = p)
+            """)
+    Optional<Product> findByIdWithLastPrice(@Param("id") Long id);
 
     @Query("""
             SELECT DISTINCT up.product FROM UserProduct up
                 WHERE (
-                    up.user = :user AND (
-                        up.monitorAvailability = true OR
-                        up.monitorDiscount = true OR
-                        up.monitorPriceChanges = true
-                    )
+                    up.monitorAvailability = true OR
+                    up.monitorDiscount = true OR
+                    up.monitorPriceChanges = true
                 )
             """)
-    Collection<Product> findAllActiveUsersProducts(@Param("user") User user);
+    Collection<Product> findAllTrackedProducts();
+
+
+    // ------------- USER'S PRODUCTS SEARCH -------------
+
+    // -------- Find active and inactive products -------
+
+    @Query("""
+            SELECT DISTINCT up.product FROM UserProduct up
+                WHERE up.user = :user
+                  AND up.monitorAvailability = :monitorAvailability
+                  AND up.monitorDiscount = :monitorDiscount
+                  AND up.monitorPriceChanges = :monitorPriceChanges
+            """)
+    Collection<Product> findAllActiveUsersProducts(@Param("user") User user,//todo rename
+                                                   @Param("monitorAvailability") boolean monitorAvailability,
+                                                   @Param("monitorDiscount") boolean monitorDiscount,
+                                                   @Param("monitorPriceChanges") boolean monitorPriceChanges
+    );
+
+    @Query("""
+            SELECT p FROM Product p
+                LEFT JOIN FETCH p.prices pp
+            WHERE
+                pp.date = (SELECT MAX(pp2.date) FROM ProductPrice pp2 WHERE pp2.product = p) AND
+                p.id in (
+                    SELECT DISTINCT up.product FROM UserProduct up
+                        WHERE up.user = :user
+                          AND up.monitorAvailability = :monitorAvailability
+                          AND up.monitorDiscount = :monitorDiscount
+                          AND up.monitorPriceChanges = :monitorPriceChanges
+                        )
+            """)
+    Collection<Product> findAllActiveUsersProductsWithLastPrice(@Param("user") User user,//todo rename
+                                                                @Param("monitorAvailability") boolean monitorAvailability,
+                                                                @Param("monitorDiscount") boolean monitorDiscount,
+                                                                @Param("monitorPriceChanges") boolean monitorPriceChanges
+    );
+
+    @Query("""
+            SELECT DISTINCT up.product FROM UserProduct up
+                WHERE up.user = :user
+                  AND up.monitorAvailability = :monitorAvailability
+                  AND up.monitorDiscount = :monitorDiscount
+                  AND up.monitorPriceChanges = :monitorPriceChanges
+            """)
+    Collection<Product> findAllActiveUsersProductsInShop(@Param("user") User user,//todo rename
+                                                         @Param("shop") Shop shop,
+                                                         @Param("monitorAvailability") boolean monitorAvailability,
+                                                         @Param("monitorDiscount") boolean monitorDiscount,
+                                                         @Param("monitorPriceChanges") boolean monitorPriceChanges
+    );
+
+    @Query("""
+            SELECT p FROM Product p
+                LEFT JOIN FETCH p.prices pp
+            WHERE
+                pp.date = (SELECT MAX(pp2.date) FROM ProductPrice pp2 WHERE pp2.product = p) AND
+                p.shop = :shop AND
+                p.id in (
+                    SELECT DISTINCT up.product FROM UserProduct up
+                        WHERE up.user = :user
+                          AND up.monitorAvailability = :monitorAvailability
+                          AND up.monitorDiscount = :monitorDiscount
+                          AND up.monitorPriceChanges = :monitorPriceChanges
+                )
+            """)
+    Collection<Product> findAllActiveUserProductsWithLastPriceInShop(@Param("user") User user,//todo rename
+                                                                     @Param("shop") Shop shop,
+                                                                     @Param("monitorAvailability") boolean monitorAvailability,
+                                                                     @Param("monitorDiscount") boolean monitorDiscount,
+                                                                     @Param("monitorPriceChanges") boolean monitorPriceChanges
+    );
+
+
+    // ---------------- OTHER OPERATIONS ----------------
+
+    @Query("SELECT up.product FROM UserProduct up WHERE up.user = :user")
+    Collection<Product> findAllUsersProducts(@Param("user") User user);
 
     @Query("""
             SELECT p FROM Product p
@@ -37,24 +132,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                 pp.date = (SELECT MAX(pp2.date) FROM ProductPrice pp2 WHERE pp2.product = p)
             """)
     Collection<Product> findAllUsersProductsWithLastPrice(@Param("user") User user);
-
-    @Query("""
-            SELECT p FROM Product p
-                LEFT JOIN FETCH p.prices pp
-            WHERE
-                pp.date = (SELECT MAX(pp2.date) FROM ProductPrice pp2 WHERE pp2.product = p) AND
-                p.id in (
-                    SELECT DISTINCT up.product FROM UserProduct up
-                        WHERE (
-                            up.user = :user AND (
-                                up.monitorAvailability = true OR
-                                up.monitorDiscount = true OR
-                                up.monitorPriceChanges = true
-                            )
-                        )
-                    )
-            """)
-    Collection<Product> findAllActiveUsersProductsWithLastPrice(@Param("user") User user);
 
     @Query("""
             SELECT up.product FROM UserProduct up
@@ -76,66 +153,4 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                 )
             """)
     Collection<Product> findAllUsersProductsWithLastPriceInShop(@Param("user") User user, @Param("shop") Shop shop);
-
-    @Query("""
-            SELECT DISTINCT up.product FROM UserProduct up
-                WHERE (
-                    up.user = :user AND
-                    up.product.shop = :shop AND (
-                        up.monitorAvailability = true OR
-                        up.monitorDiscount = true OR
-                        up.monitorPriceChanges = true
-                    )
-                )
-            """)
-    Collection<Product> findAllActiveUsersProductsInShop(@Param("user") User user, @Param("shop") Shop shop);
-
-    @Query("""
-            SELECT p FROM Product p
-                LEFT JOIN FETCH p.prices pp
-            WHERE
-                pp.date = (SELECT MAX(pp2.date) FROM ProductPrice pp2 WHERE pp2.product = p) AND
-                p.shop = :shop AND
-                p.id in (
-                    SELECT DISTINCT up.product FROM UserProduct up
-                        WHERE (
-                            up.user = :user AND (
-                                up.monitorAvailability = true OR
-                                up.monitorDiscount = true OR
-                                up.monitorPriceChanges = true
-                            )
-                        )
-                )
-            """)
-    Collection<Product> findAllActiveUserProductsWithLastPriceInShop(@Param("user") User user,
-                                                                     @Param("shop") Shop shop);
-
-    @Query("""
-            SELECT DISTINCT up.product FROM UserProduct up
-                WHERE (
-                    up.monitorAvailability = true OR
-                    up.monitorDiscount = true OR
-                    up.monitorPriceChanges = true
-                )
-            """)
-    Collection<Product> findAllActiveProducts();
-
-    @Query("""
-            SELECT p FROM Product p
-                LEFT JOIN FETCH p.prices pp
-            WHERE p.id = :id AND pp.date = (SELECT MAX(pp2.date) FROM ProductPrice pp2 WHERE pp2.product = p)
-            """)
-    Optional<Product> findByIdWithLastPrice(@Param("id") Long id);
-
-    Optional<Product> findByProductInformationAndShop(ProductInformation productInformation, Shop shop);
-
-    default void saveIfAbsent(Product product) {
-        Optional<Product> productFromDb =
-                findByProductInformationAndShop(product.getProductInformation(), product.getShop());
-        if (productFromDb.isEmpty()) {
-            save(product);
-        } else {
-            product.setId(productFromDb.get().getId());
-        }
-    }
 }
