@@ -156,21 +156,25 @@ class ProductControllerTest {
     }
 
     @Test
-    void getUserProducts_validJwt_listOfProducts() throws Exception {
+    void getUserProducts_availability_listOfProducts() throws Exception {
         List<ProductResponse> products = List.of(
                 ProductResponse.builder().id(0L).build(),
                 ProductResponse.builder().id(1L).build(),
                 ProductResponse.builder().id(2L).build()
         );
 
-        when(productService.getUserProducts(any(), anyBoolean(), anyBoolean())).thenReturn(Collections.emptyList());
-        when(productService.getUserProducts(eq(testConfig.getTestUser()), anyBoolean(), anyBoolean()))
-                .thenReturn(products);
+        when(productService.getUserProducts(
+                any(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean())
+        ).thenReturn(Collections.emptyList());
+        when(productService.getUserProducts(
+                eq(testConfig.getTestUser()), anyBoolean(), anyBoolean(), eq(true), isNull(), isNull())
+        ).thenReturn(products);
 
         MvcResult result = mvc.perform(get("/api/products")
                 .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
                 .header("with-price-history", true)
                 .header("only-active", true)
+                .header("monitor-availability", true)
         ).andReturn();
 
         ArrayList<ProductResponse> resultProducts = mapper.readValue(
@@ -182,28 +186,237 @@ class ProductControllerTest {
                 () -> assertEquals(200, result.getResponse().getStatus()),
                 () -> assertThat(resultProducts, containsInAnyOrder(products.toArray())),
                 () -> verify(productService, times(1))
-                        .getUserProducts(eq(testConfig.getTestUser()), anyBoolean(), anyBoolean()),
+                        .getUserProducts(
+                                eq(testConfig.getTestUser()),
+                                anyBoolean(),
+                                anyBoolean(),
+                                anyBoolean(),
+                                isNull(),
+                                isNull()
+                        ),
                 () -> verify(productService, times(0))
-                        .getUserProductsInShop(eq(testConfig.getTestUser()), anyLong(), anyBoolean(), anyBoolean())
+                        .getUserProductsInShop(
+                                eq(testConfig.getTestUser()),
+                                anyLong(),
+                                anyBoolean(),
+                                anyBoolean(),
+                                anyBoolean(),
+                                anyBoolean(),
+                                anyBoolean()
+                        ),
+                () -> verify(productService, times(0))
+                        .getUserProductsInShop(
+                                eq(testConfig.getTestUser()),
+                                anyLong(),
+                                anyBoolean(),
+                                anyBoolean(),
+                                anyBoolean(),
+                                isNull(),
+                                isNull()
+                        )
         );
     }
 
     @Test
-    void getUserProducts_validJwtAndShopId_listOfProducts() throws Exception {
+    void getUserProducts_discountWithFalseOtherParameters_listOfProducts() throws Exception {
         List<ProductResponse> products = List.of(
                 ProductResponse.builder().id(0L).build(),
                 ProductResponse.builder().id(1L).build(),
                 ProductResponse.builder().id(2L).build()
         );
 
-        when(productService.getUserProducts(any(), anyBoolean(), anyBoolean())).thenReturn(Collections.emptyList());
-        when(productService.getUserProductsInShop(eq(testConfig.getTestUser()), eq(1L), anyBoolean(), anyBoolean()))
-                .thenReturn(products);
+        when(productService.getUserProducts(
+                any(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean())
+        ).thenReturn(Collections.emptyList());
+        when(productService.getUserProducts(
+                eq(testConfig.getTestUser()), anyBoolean(), anyBoolean(), eq(false), eq(true), eq(false))
+        ).thenReturn(products);
 
         MvcResult result = mvc.perform(get("/api/products")
                 .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
                 .header("with-price-history", true)
                 .header("only-active", true)
+                .header("monitor-availability", false)
+                .header("monitor-discount", true)
+                .header("monitor-price-changes", false)
+        ).andReturn();
+
+        ArrayList<ProductResponse> resultProducts = mapper.readValue(
+                result.getResponse().getContentAsString(),
+                mapper.getTypeFactory().constructCollectionType(ArrayList.class, ProductResponse.class)
+        );
+
+        assertAll(
+                () -> assertEquals(200, result.getResponse().getStatus()),
+                () -> assertThat(resultProducts, containsInAnyOrder(products.toArray())),
+                () -> verify(productService, times(1))
+                        .getUserProducts(
+                                eq(testConfig.getTestUser()),
+                                anyBoolean(),
+                                anyBoolean(),
+                                anyBoolean(),
+                                anyBoolean(),
+                                anyBoolean()
+                        ),
+                () -> verify(productService, times(0))
+                        .getUserProductsInShop(
+                                eq(testConfig.getTestUser()),
+                                anyLong(),
+                                anyBoolean(),
+                                anyBoolean(),
+                                anyBoolean(),
+                                anyBoolean(),
+                                anyBoolean()
+                        )
+        );
+    }
+
+    @Test
+    void getUserProducts_priceChages_listOfProducts() throws Exception {
+        List<ProductResponse> products = List.of(
+                ProductResponse.builder().id(0L).build(),
+                ProductResponse.builder().id(1L).build(),
+                ProductResponse.builder().id(2L).build()
+        );
+
+        when(productService.getUserProducts(
+                any(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean())
+        ).thenReturn(Collections.emptyList());
+        when(productService.getUserProducts(
+                eq(testConfig.getTestUser()), anyBoolean(), anyBoolean(), isNull(), isNull(), eq(true))
+        ).thenReturn(products);
+
+        MvcResult result = mvc.perform(get("/api/products")
+                .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
+                .header("with-price-history", true)
+                .header("only-active", true)
+                .header("monitor-price-changes", true)
+        ).andReturn();
+
+        ArrayList<ProductResponse> resultProducts = mapper.readValue(
+                result.getResponse().getContentAsString(),
+                mapper.getTypeFactory().constructCollectionType(ArrayList.class, ProductResponse.class)
+        );
+
+        assertAll(
+                () -> assertEquals(200, result.getResponse().getStatus()),
+                () -> assertThat(resultProducts, containsInAnyOrder(products.toArray())),
+                () -> verify(productService, times(1))
+                        .getUserProducts(
+                                eq(testConfig.getTestUser()),
+                                anyBoolean(),
+                                anyBoolean(),
+                                isNull(),
+                                isNull(),
+                                anyBoolean()
+                        ),
+                () -> verify(productService, times(0))
+                        .getUserProductsInShop(
+                                eq(testConfig.getTestUser()),
+                                anyLong(),
+                                anyBoolean(),
+                                anyBoolean(),
+                                anyBoolean(),
+                                anyBoolean(),
+                                anyBoolean()
+                        ),
+                () -> verify(productService, times(0))
+                        .getUserProductsInShop(
+                                eq(testConfig.getTestUser()),
+                                anyLong(),
+                                anyBoolean(),
+                                anyBoolean(),
+                                isNull(),
+                                isNull(),
+                                anyBoolean()
+                        )
+        );
+    }
+
+    @Test
+    void getUserProducts_availabilityAndDiscount_listOfProducts() throws Exception {
+        List<ProductResponse> products = List.of(
+                ProductResponse.builder().id(0L).build(),
+                ProductResponse.builder().id(1L).build(),
+                ProductResponse.builder().id(2L).build()
+        );
+
+        when(productService.getUserProducts(
+                any(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean())
+        ).thenReturn(Collections.emptyList());
+        when(productService.getUserProducts(
+                eq(testConfig.getTestUser()), anyBoolean(), anyBoolean(), eq(true), eq(true), isNull())
+        ).thenReturn(products);
+
+        MvcResult result = mvc.perform(get("/api/products")
+                .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
+                .header("with-price-history", true)
+                .header("only-active", true)
+                .header("monitor-availability", true)
+                .header("monitor-discount", true)
+        ).andReturn();
+
+        ArrayList<ProductResponse> resultProducts = mapper.readValue(
+                result.getResponse().getContentAsString(),
+                mapper.getTypeFactory().constructCollectionType(ArrayList.class, ProductResponse.class)
+        );
+
+        assertAll(
+                () -> assertEquals(200, result.getResponse().getStatus()),
+                () -> assertThat(resultProducts, containsInAnyOrder(products.toArray())),
+                () -> verify(productService, times(1))
+                        .getUserProducts(
+                                eq(testConfig.getTestUser()),
+                                anyBoolean(),
+                                anyBoolean(),
+                                anyBoolean(),
+                                anyBoolean(),
+                                isNull()
+                        ),
+                () -> verify(productService, times(0))
+                        .getUserProductsInShop(
+                                eq(testConfig.getTestUser()),
+                                anyLong(),
+                                anyBoolean(),
+                                anyBoolean(),
+                                anyBoolean(),
+                                anyBoolean(),
+                                anyBoolean()
+                        ),
+                () -> verify(productService, times(0))
+                        .getUserProductsInShop(
+                                eq(testConfig.getTestUser()),
+                                anyLong(),
+                                anyBoolean(),
+                                anyBoolean(),
+                                anyBoolean(),
+                                anyBoolean(),
+                                isNull()
+                        )
+        );
+    }
+
+    @Test
+    void getUserProducts_availabilityAndShopId_listOfProducts() throws Exception {
+        List<ProductResponse> products = List.of(
+                ProductResponse.builder().id(0L).build(),
+                ProductResponse.builder().id(1L).build(),
+                ProductResponse.builder().id(2L).build()
+        );
+
+        when(productService.getUserProductsInShop(
+                any(), anyLong(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean())
+        ).thenReturn(Collections.emptyList());
+        when(productService.getUserProductsInShop(
+                eq(testConfig.getTestUser()), eq(1L), anyBoolean(), anyBoolean(),
+                eq(true), isNull(), isNull())
+        ).thenReturn(products);
+
+        MvcResult result = mvc.perform(get("/api/products")
+                .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
+                .header("with-price-history", true)
+                .header("only-active", true)
+                .header("monitor-availability", true)
                 .header("shop-id", 1)
         ).andReturn();
 
@@ -215,10 +428,152 @@ class ProductControllerTest {
         assertAll(
                 () -> assertEquals(200, result.getResponse().getStatus()),
                 () -> assertThat(resultProducts, containsInAnyOrder(products.toArray())),
-                () -> verify(productService, times(0))
-                        .getUserProducts(eq(testConfig.getTestUser()), anyBoolean(), anyBoolean()),
                 () -> verify(productService, times(1))
-                        .getUserProductsInShop(eq(testConfig.getTestUser()), anyLong(), anyBoolean(), anyBoolean())
+                        .getUserProductsInShop(
+                                eq(testConfig.getTestUser()),
+                                anyLong(),
+                                anyBoolean(),
+                                anyBoolean(),
+                                anyBoolean(),
+                                isNull(),
+                                isNull()
+                        )
+        );
+    }
+
+    @Test
+    void getUserProducts_discountAndShopId_listOfProducts() throws Exception {
+        List<ProductResponse> products = List.of(
+                ProductResponse.builder().id(0L).build(),
+                ProductResponse.builder().id(1L).build(),
+                ProductResponse.builder().id(2L).build()
+        );
+
+        when(productService.getUserProductsInShop(
+                any(), anyLong(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean())
+        ).thenReturn(Collections.emptyList());
+        when(productService.getUserProductsInShop(
+                eq(testConfig.getTestUser()), eq(1L), anyBoolean(), anyBoolean(),
+                isNull(), eq(true), isNull())
+        ).thenReturn(products);
+
+        MvcResult result = mvc.perform(get("/api/products")
+                .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
+                .header("with-price-history", true)
+                .header("only-active", true)
+                .header("monitor-discount", true)
+                .header("shop-id", 1)
+        ).andReturn();
+
+        ArrayList<ProductResponse> resultProducts = mapper.readValue(
+                result.getResponse().getContentAsString(),
+                mapper.getTypeFactory().constructCollectionType(ArrayList.class, ProductResponse.class)
+        );
+
+        assertAll(
+                () -> assertEquals(200, result.getResponse().getStatus()),
+                () -> assertThat(resultProducts, containsInAnyOrder(products.toArray())),
+                () -> verify(productService, times(1))
+                        .getUserProductsInShop(
+                                eq(testConfig.getTestUser()),
+                                anyLong(),
+                                anyBoolean(),
+                                anyBoolean(),
+                                isNull(),
+                                anyBoolean(),
+                                isNull()
+                        )
+        );
+    }
+
+    @Test
+    void getUserProducts_priceChangesAndShopId_listOfProducts() throws Exception {
+        List<ProductResponse> products = List.of(
+                ProductResponse.builder().id(0L).build(),
+                ProductResponse.builder().id(1L).build(),
+                ProductResponse.builder().id(2L).build()
+        );
+
+        when(productService.getUserProductsInShop(
+                any(), anyLong(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean())
+        ).thenReturn(Collections.emptyList());
+        when(productService.getUserProductsInShop(
+                eq(testConfig.getTestUser()), eq(1L), anyBoolean(), anyBoolean(),
+                isNull(), isNull(), eq(true))
+        ).thenReturn(products);
+
+        MvcResult result = mvc.perform(get("/api/products")
+                .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
+                .header("with-price-history", true)
+                .header("only-active", true)
+                .header("monitor-price-changes", true)
+                .header("shop-id", 1)
+        ).andReturn();
+
+        ArrayList<ProductResponse> resultProducts = mapper.readValue(
+                result.getResponse().getContentAsString(),
+                mapper.getTypeFactory().constructCollectionType(ArrayList.class, ProductResponse.class)
+        );
+
+        assertAll(
+                () -> assertEquals(200, result.getResponse().getStatus()),
+                () -> assertThat(resultProducts, containsInAnyOrder(products.toArray())),
+                () -> verify(productService, times(1))
+                        .getUserProductsInShop(
+                                eq(testConfig.getTestUser()),
+                                anyLong(),
+                                anyBoolean(),
+                                anyBoolean(),
+                                isNull(),
+                                isNull(),
+                                anyBoolean()
+                        )
+        );
+    }
+
+    @Test
+    void getUserProducts_discountAndpriceChangesAndShopId_listOfProducts() throws Exception {
+        List<ProductResponse> products = List.of(
+                ProductResponse.builder().id(0L).build(),
+                ProductResponse.builder().id(1L).build(),
+                ProductResponse.builder().id(2L).build()
+        );
+
+        when(productService.getUserProductsInShop(
+                any(), anyLong(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean())
+        ).thenReturn(Collections.emptyList());
+        when(productService.getUserProductsInShop(
+                eq(testConfig.getTestUser()), eq(1L), anyBoolean(), anyBoolean(),
+                isNull(), eq(true), eq(true))
+        ).thenReturn(products);
+
+        MvcResult result = mvc.perform(get("/api/products")
+                .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
+                .header("with-price-history", true)
+                .header("only-active", true)
+                .header("monitor-discount", true)
+                .header("monitor-price-changes", true)
+                .header("shop-id", 1)
+        ).andReturn();
+
+        ArrayList<ProductResponse> resultProducts = mapper.readValue(
+                result.getResponse().getContentAsString(),
+                mapper.getTypeFactory().constructCollectionType(ArrayList.class, ProductResponse.class)
+        );
+
+        assertAll(
+                () -> assertEquals(200, result.getResponse().getStatus()),
+                () -> assertThat(resultProducts, containsInAnyOrder(products.toArray())),
+                () -> verify(productService, times(1))
+                        .getUserProductsInShop(
+                                eq(testConfig.getTestUser()),
+                                anyLong(),
+                                anyBoolean(),
+                                anyBoolean(),
+                                isNull(),
+                                anyBoolean(),
+                                anyBoolean()
+                        )
         );
     }
 
@@ -230,9 +585,12 @@ class ProductControllerTest {
                 ProductResponse.builder().id(2L).build()
         );
 
-        when(productService.getUserProducts(any(), anyBoolean(), anyBoolean())).thenReturn(Collections.emptyList());
-        when(productService.getUserProducts(eq(testConfig.getTestUser()), anyBoolean(), anyBoolean()))
-                .thenReturn(products);
+        when(productService.getUserProducts(
+                any(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean())
+        ).thenReturn(Collections.emptyList());
+        when(productService.getUserProducts(
+                eq(testConfig.getTestUser()), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean())
+        ).thenReturn(products);
 
         MvcResult result = mvc.perform(get("/api/products")
                 .header(authHeaderName, "wrong jwt")
@@ -242,21 +600,24 @@ class ProductControllerTest {
         assertAll(
                 () -> assertEquals(401, result.getResponse().getStatus()),
                 () -> verify(productService, times(0))
-                        .getUserProducts(eq(testConfig.getTestUser()), anyBoolean(), anyBoolean())
+                        .getUserProducts(
+                                eq(testConfig.getTestUser()),
+                                anyBoolean(),
+                                anyBoolean(),
+                                anyBoolean(),
+                                anyBoolean(),
+                                anyBoolean()
+                        )
         );
     }
 
     @Test
-    void getUserProducts_withoutWithPriceHistoryHeader_400() throws Exception {
+    void getUserProducts_withoutPriceHistoryHeader_400() throws Exception {
         List<ProductResponse> products = List.of(
                 ProductResponse.builder().id(0L).build(),
                 ProductResponse.builder().id(1L).build(),
                 ProductResponse.builder().id(2L).build()
         );
-
-        when(productService.getUserProducts(any(), anyBoolean(), anyBoolean())).thenReturn(Collections.emptyList());
-        when(productService.getUserProducts(eq(testConfig.getTestUser()), anyBoolean(), anyBoolean()))
-                .thenReturn(products);
 
         MvcResult result = mvc.perform(get("/api/products")
                 .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
@@ -265,7 +626,24 @@ class ProductControllerTest {
         assertAll(
                 () -> assertEquals(400, result.getResponse().getStatus()),
                 () -> verify(productService, times(0))
-                        .getUserProducts(eq(testConfig.getTestUser()), anyBoolean(), anyBoolean())
+                        .getUserProducts(
+                                eq(testConfig.getTestUser()),
+                                anyBoolean(),
+                                anyBoolean(),
+                                anyBoolean(),
+                                anyBoolean(),
+                                anyBoolean()
+                        ),
+                () -> verify(productService, times(0))
+                        .getUserProductsInShop(
+                                eq(testConfig.getTestUser()),
+                                anyLong(),
+                                anyBoolean(),
+                                anyBoolean(),
+                                anyBoolean(),
+                                anyBoolean(),
+                                anyBoolean()
+                        )
         );
     }
 
@@ -307,7 +685,7 @@ class ProductControllerTest {
     }
 
     @Test
-    void getProduct_withoutWithPriceHistoryHeader_http400() throws Exception {
+    void getProduct_withoutPriceHistoryHeader_http400() throws Exception {
         ProductResponse expectedProductResponse = ProductResponse.builder().id(1L).build();
         when(productService.getProduct(anyLong(), anyBoolean())).thenReturn(expectedProductResponse);
 

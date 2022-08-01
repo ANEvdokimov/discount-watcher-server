@@ -22,6 +22,7 @@ import an.evdokimov.discount.watcher.server.parser.ParserFactoryException;
 import an.evdokimov.discount.watcher.server.parser.downloader.PageDownloaderException;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -75,22 +76,22 @@ public class ProductServiceImpl implements ProductService {
     public Collection<ProductResponse> getUserProducts(@NotNull User user,
                                                        boolean withPriceHistory,
                                                        boolean onlyActive,
-                                                       boolean monitorAvailability,
-                                                       boolean monitorDiscount,
-                                                       boolean monitorPriceChanges) {
+                                                       @Nullable Boolean monitorAvailability,
+                                                       @Nullable Boolean monitorDiscount,
+                                                       @Nullable Boolean monitorPriceChanges) {
         Collection<Product> userProducts;
         if (withPriceHistory) {
             if (onlyActive) {
                 throw new UnsupportedOperationException();//todo getting active products
             } else {
-                userProducts = productRepository.findAllActiveUsersProducts(user, monitorAvailability, monitorDiscount,
+                userProducts = productRepository.findAllUsersProducts(user, monitorAvailability, monitorDiscount,
                         monitorPriceChanges);
             }
         } else {
             if (onlyActive) {
                 throw new UnsupportedOperationException();//todo getting active products
             } else {
-                userProducts = productRepository.findAllActiveUsersProductsWithLastPrice(user, monitorAvailability,
+                userProducts = productRepository.findAllUsersProductsWithLastPrice(user, monitorAvailability,
                         monitorDiscount, monitorPriceChanges);
             }
         }
@@ -105,9 +106,9 @@ public class ProductServiceImpl implements ProductService {
                                                              @NotNull Long shopId,
                                                              boolean withPriceHistory,
                                                              boolean onlyActive,
-                                                             boolean monitorAvailability,
-                                                             boolean monitorDiscount,
-                                                             boolean monitorPriceChanges)
+                                                             @Nullable Boolean monitorAvailability,
+                                                             @Nullable Boolean monitorDiscount,
+                                                             @Nullable Boolean monitorPriceChanges)
             throws ServerException {
         Shop shop =
                 shopRepository.findById(shopId).orElseThrow(() -> new ServerException(ServerErrorCode.SHOP_NOT_FOUND));
@@ -117,14 +118,14 @@ public class ProductServiceImpl implements ProductService {
             if (onlyActive) {
                 throw new UnsupportedOperationException();//todo getting active products
             } else {
-                userProducts = productRepository.findAllActiveUsersProductsInShop(user, shop, monitorAvailability,
+                userProducts = productRepository.findAllUsersProductsInShop(user, shop, monitorAvailability,
                         monitorDiscount, monitorPriceChanges);
             }
         } else {
             if (onlyActive) {
                 throw new UnsupportedOperationException();//todo getting active products
             } else {
-                userProducts = productRepository.findAllActiveUserProductsWithLastPriceInShop(user, shop,
+                userProducts = productRepository.findAllUserProductsWithLastPriceInShop(user, shop,
                         monitorAvailability, monitorDiscount, monitorPriceChanges);
             }
         }

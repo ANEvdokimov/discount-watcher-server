@@ -7,6 +7,7 @@ import an.evdokimov.discount.watcher.server.database.user.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
@@ -54,14 +55,14 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("""
             SELECT DISTINCT up.product FROM UserProduct up
                 WHERE up.user = :user
-                  AND up.monitorAvailability = :monitorAvailability
-                  AND up.monitorDiscount = :monitorDiscount
-                  AND up.monitorPriceChanges = :monitorPriceChanges
+                  AND (:monitorAvailability is null OR up.monitorAvailability = :monitorAvailability)
+                  AND (:monitorDiscount is null OR up.monitorDiscount = :monitorDiscount)
+                  AND (:monitorPriceChanges is null OR up.monitorPriceChanges = :monitorPriceChanges)
             """)
-    Collection<Product> findAllActiveUsersProducts(@Param("user") User user,//todo rename
-                                                   @Param("monitorAvailability") boolean monitorAvailability,
-                                                   @Param("monitorDiscount") boolean monitorDiscount,
-                                                   @Param("monitorPriceChanges") boolean monitorPriceChanges
+    Collection<Product> findAllUsersProducts(@Param("user") User user,
+                                             @Param("monitorAvailability") @Nullable Boolean monitorAvailability,
+                                             @Param("monitorDiscount") @Nullable Boolean monitorDiscount,
+                                             @Param("monitorPriceChanges") @Nullable Boolean monitorPriceChanges
     );
 
     @Query("""
@@ -72,29 +73,30 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                 p.id in (
                     SELECT DISTINCT up.product FROM UserProduct up
                         WHERE up.user = :user
-                          AND up.monitorAvailability = :monitorAvailability
-                          AND up.monitorDiscount = :monitorDiscount
-                          AND up.monitorPriceChanges = :monitorPriceChanges
+                          AND (:monitorAvailability is null OR up.monitorAvailability = :monitorAvailability)
+                          AND (:monitorDiscount is null OR up.monitorDiscount = :monitorDiscount)
+                          AND (:monitorPriceChanges is null OR up.monitorPriceChanges = :monitorPriceChanges)
                         )
             """)
-    Collection<Product> findAllActiveUsersProductsWithLastPrice(@Param("user") User user,//todo rename
-                                                                @Param("monitorAvailability") boolean monitorAvailability,
-                                                                @Param("monitorDiscount") boolean monitorDiscount,
-                                                                @Param("monitorPriceChanges") boolean monitorPriceChanges
+    Collection<Product> findAllUsersProductsWithLastPrice(@Param("user") User user,
+                                                          @Param("monitorAvailability") @Nullable Boolean monitorAvailability,
+                                                          @Param("monitorDiscount") @Nullable Boolean monitorDiscount,
+                                                          @Param("monitorPriceChanges") @Nullable Boolean monitorPriceChanges
     );
 
     @Query("""
             SELECT DISTINCT up.product FROM UserProduct up
                 WHERE up.user = :user
-                  AND up.monitorAvailability = :monitorAvailability
-                  AND up.monitorDiscount = :monitorDiscount
-                  AND up.monitorPriceChanges = :monitorPriceChanges
+                  AND up.product.shop = :shop
+                  AND (:monitorAvailability is null OR up.monitorAvailability = :monitorAvailability)
+                  AND (:monitorDiscount is null OR up.monitorDiscount = :monitorDiscount)
+                  AND (:monitorPriceChanges is null OR up.monitorPriceChanges = :monitorPriceChanges)
             """)
-    Collection<Product> findAllActiveUsersProductsInShop(@Param("user") User user,//todo rename
-                                                         @Param("shop") Shop shop,
-                                                         @Param("monitorAvailability") boolean monitorAvailability,
-                                                         @Param("monitorDiscount") boolean monitorDiscount,
-                                                         @Param("monitorPriceChanges") boolean monitorPriceChanges
+    Collection<Product> findAllUsersProductsInShop(@Param("user") User user,
+                                                   @Param("shop") Shop shop,
+                                                   @Param("monitorAvailability") @Nullable Boolean monitorAvailability,
+                                                   @Param("monitorDiscount") @Nullable Boolean monitorDiscount,
+                                                   @Param("monitorPriceChanges") @Nullable Boolean monitorPriceChanges
     );
 
     @Query("""
@@ -106,16 +108,16 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                 p.id in (
                     SELECT DISTINCT up.product FROM UserProduct up
                         WHERE up.user = :user
-                          AND up.monitorAvailability = :monitorAvailability
-                          AND up.monitorDiscount = :monitorDiscount
-                          AND up.monitorPriceChanges = :monitorPriceChanges
+                          AND (:monitorAvailability is null OR up.monitorAvailability = :monitorAvailability)
+                          AND (:monitorDiscount is null OR up.monitorDiscount = :monitorDiscount)
+                          AND (:monitorPriceChanges is null OR up.monitorPriceChanges = :monitorPriceChanges)
                 )
             """)
-    Collection<Product> findAllActiveUserProductsWithLastPriceInShop(@Param("user") User user,//todo rename
-                                                                     @Param("shop") Shop shop,
-                                                                     @Param("monitorAvailability") boolean monitorAvailability,
-                                                                     @Param("monitorDiscount") boolean monitorDiscount,
-                                                                     @Param("monitorPriceChanges") boolean monitorPriceChanges
+    Collection<Product> findAllUserProductsWithLastPriceInShop(@Param("user") User user,
+                                                               @Param("shop") Shop shop,
+                                                               @Param("monitorAvailability") @Nullable Boolean monitorAvailability,
+                                                               @Param("monitorDiscount") @Nullable Boolean monitorDiscount,
+                                                               @Param("monitorPriceChanges") @Nullable Boolean monitorPriceChanges
     );
 
 

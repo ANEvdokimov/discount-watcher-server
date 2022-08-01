@@ -57,9 +57,9 @@ public class ProductController {
                                                        @RequestHeader("with-price-history") boolean withPriceHistory,
                                                        @RequestHeader("only-active") boolean onlyActive,
                                                        @RequestHeader("shop-id") @Nullable Long shopId,
-                                                       @RequestHeader("monitor-availability") boolean monitorAvailability,
-                                                       @RequestHeader("monitor-discount") boolean monitorDiscount,
-                                                       @RequestHeader("monitor-price-changes") boolean monitorPriceChanges
+                                                       @RequestHeader("monitor-availability") @Nullable Boolean monitorAvailability,
+                                                       @RequestHeader("monitor-discount") @Nullable Boolean monitorDiscount,
+                                                       @RequestHeader("monitor-price-changes") @Nullable Boolean monitorPriceChanges
     ) throws ServerException {
         User currentUser = (User) authentication.getPrincipal();
         log.info("Getting products. user={}, price_history={}, only-active={}, shopId={}, monitorAvailability={}," +
