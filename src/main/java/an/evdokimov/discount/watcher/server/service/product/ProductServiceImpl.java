@@ -82,14 +82,16 @@ public class ProductServiceImpl implements ProductService {
         Collection<Product> userProducts;
         if (withPriceHistory) {
             if (onlyActive) {
-                throw new UnsupportedOperationException();//todo getting active products
+                userProducts = productRepository.findActiveUserProducts(user, monitorAvailability, monitorDiscount,
+                        monitorPriceChanges);
             } else {
                 userProducts = productRepository.findAllUserProducts(user, monitorAvailability, monitorDiscount,
                         monitorPriceChanges);
             }
         } else {
             if (onlyActive) {
-                throw new UnsupportedOperationException();//todo getting active products
+                userProducts = productRepository.findActiveUserProductsWithLastPrice(user, monitorAvailability,
+                        monitorDiscount, monitorPriceChanges);
             } else {
                 userProducts = productRepository.findAllUserProductsWithLastPrice(user, monitorAvailability,
                         monitorDiscount, monitorPriceChanges);
@@ -116,14 +118,16 @@ public class ProductServiceImpl implements ProductService {
         Collection<Product> userProducts;
         if (withPriceHistory) {
             if (onlyActive) {
-                throw new UnsupportedOperationException();//todo getting active products
+                userProducts = productRepository.findActiveUserProductsInShop(user, shop, monitorAvailability,
+                        monitorDiscount, monitorPriceChanges);
             } else {
                 userProducts = productRepository.findAllUserProductsInShop(user, shop, monitorAvailability,
                         monitorDiscount, monitorPriceChanges);
             }
         } else {
             if (onlyActive) {
-                throw new UnsupportedOperationException();//todo getting active products
+                userProducts = productRepository.findActiveUserProductsWithLastPriceInShop(user, shop,
+                        monitorAvailability, monitorDiscount, monitorPriceChanges);
             } else {
                 userProducts = productRepository.findAllUserProductsWithLastPriceInShop(user, shop,
                         monitorAvailability, monitorDiscount, monitorPriceChanges);
