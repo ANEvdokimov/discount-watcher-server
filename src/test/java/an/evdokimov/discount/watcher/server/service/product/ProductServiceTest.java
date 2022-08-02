@@ -258,13 +258,13 @@ class ProductServiceTest {
 
 
         User userWithProducts = User.builder().id(666L).build();
-        when(productRepository.findAllUsersProducts(
+        when(productRepository.findAllUserProducts(
                 eq(userWithProducts), anyBoolean(), anyBoolean(), anyBoolean())
         ).thenReturn(List.of(
                 testProduct1WithPriceHistory,
                 testProduct2WithPriceHistory
         ));
-        when(productRepository.findAllUsersProductsWithLastPrice(
+        when(productRepository.findAllUserProductsWithLastPrice(
                 eq(userWithProducts), anyBoolean(), anyBoolean(), anyBoolean())
         ).thenReturn(List.of(
                 testProduct1,
@@ -384,13 +384,13 @@ class ProductServiceTest {
 
 
         User userWithProducts = User.builder().id(666L).build();
-        when(productRepository.findAllUsersProducts(
+        when(productRepository.findAllUserProducts(
                 eq(userWithProducts), anyBoolean(), anyBoolean(), anyBoolean())
         ).thenReturn(List.of(
                 testProduct1WithPriceHistory,
                 testProduct2WithPriceHistory
         ));
-        when(productRepository.findAllUsersProductsWithLastPrice(
+        when(productRepository.findAllUserProductsWithLastPrice(
                 eq(userWithProducts), anyBoolean(), anyBoolean(), anyBoolean())
         ).thenReturn(List.of(
                 testProduct1,
@@ -530,7 +530,7 @@ class ProductServiceTest {
         Shop shop = Shop.builder().id(1L).name("shop").build();
         when(shopRepository.findById(shop.getId())).thenReturn(Optional.of(shop));
 
-        when(productRepository.findAllUsersProductsInShop(
+        when(productRepository.findAllUserProductsInShop(
                 any(), any(), anyBoolean(), anyBoolean(), anyBoolean())
         ).thenReturn(List.of(product1));
         when(productRepository.findAllUserProductsWithLastPriceInShop(
@@ -589,7 +589,7 @@ class ProductServiceTest {
         Shop shop = Shop.builder().id(1L).name("shop").build();
         when(shopRepository.findById(shop.getId())).thenReturn(Optional.of(shop));
 
-        when(productRepository.findAllUsersProductsInShop(
+        when(productRepository.findAllUserProductsInShop(
                 any(), any(), anyBoolean(), anyBoolean(), anyBoolean())
         ).thenReturn(List.of(product1));
         when(productRepository.findAllUserProductsWithLastPriceInShop(

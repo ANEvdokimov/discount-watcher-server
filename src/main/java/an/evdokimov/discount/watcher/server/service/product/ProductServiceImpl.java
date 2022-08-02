@@ -84,14 +84,14 @@ public class ProductServiceImpl implements ProductService {
             if (onlyActive) {
                 throw new UnsupportedOperationException();//todo getting active products
             } else {
-                userProducts = productRepository.findAllUsersProducts(user, monitorAvailability, monitorDiscount,
+                userProducts = productRepository.findAllUserProducts(user, monitorAvailability, monitorDiscount,
                         monitorPriceChanges);
             }
         } else {
             if (onlyActive) {
                 throw new UnsupportedOperationException();//todo getting active products
             } else {
-                userProducts = productRepository.findAllUsersProductsWithLastPrice(user, monitorAvailability,
+                userProducts = productRepository.findAllUserProductsWithLastPrice(user, monitorAvailability,
                         monitorDiscount, monitorPriceChanges);
             }
         }
@@ -118,7 +118,7 @@ public class ProductServiceImpl implements ProductService {
             if (onlyActive) {
                 throw new UnsupportedOperationException();//todo getting active products
             } else {
-                userProducts = productRepository.findAllUsersProductsInShop(user, shop, monitorAvailability,
+                userProducts = productRepository.findAllUserProductsInShop(user, shop, monitorAvailability,
                         monitorDiscount, monitorPriceChanges);
             }
         } else {
