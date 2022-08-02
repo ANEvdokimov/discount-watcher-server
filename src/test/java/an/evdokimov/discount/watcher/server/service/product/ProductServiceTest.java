@@ -258,17 +258,21 @@ class ProductServiceTest {
 
 
         User userWithProducts = User.builder().id(666L).build();
-        when(productRepository.findAllUsersProducts(userWithProducts)).thenReturn(List.of(
+        when(productRepository.findAllUserProducts(
+                eq(userWithProducts), anyBoolean(), anyBoolean(), anyBoolean())
+        ).thenReturn(List.of(
                 testProduct1WithPriceHistory,
                 testProduct2WithPriceHistory
         ));
-        when(productRepository.findAllUsersProductsWithLastPrice(userWithProducts)).thenReturn(List.of(
+        when(productRepository.findAllUserProductsWithLastPrice(
+                eq(userWithProducts), anyBoolean(), anyBoolean(), anyBoolean())
+        ).thenReturn(List.of(
                 testProduct1,
                 testProduct2
         ));
 
         Collection<ProductResponse> returnedProducts =
-                productService.getUserProducts(userWithProducts, true, false);
+                productService.getUserProducts(userWithProducts, true, false, true, true, true);
         assertAll(
                 () -> assertThat(
                         returnedProducts.stream().map(ProductResponse::getId).toList(),
@@ -319,17 +323,30 @@ class ProductServiceTest {
 
 
         User userWithProducts = User.builder().id(666L).build();
-        when(productRepository.findAllActiveUsersProducts(userWithProducts)).thenReturn(List.of(
-                testProduct1WithPriceHistory,
-                testProduct2WithPriceHistory
-        ));
-        when(productRepository.findAllActiveUsersProductsWithLastPrice(userWithProducts)).thenReturn(List.of(
-                testProduct1,
-                testProduct2
-        ));
+        when(productRepository.findActiveUserProducts(userWithProducts, true, true, true))
+                .thenReturn(List.of(
+                        testProduct1WithPriceHistory,
+                        testProduct2WithPriceHistory
+                ));
+        when(productRepository.findActiveUserProductsWithLastPrice(
+                userWithProducts,
+                true,
+                true,
+                true))
+                .thenReturn(List.of(
+                        testProduct1,
+                        testProduct2
+                ));
 
         Collection<ProductResponse> returnedProducts =
-                productService.getUserProducts(userWithProducts, true, true);
+                productService.getUserProducts(
+                        userWithProducts,
+                        true,
+                        true,
+                        true,
+                        true,
+                        true
+                );
         assertAll(
                 () -> assertThat(
                         returnedProducts.stream().map(ProductResponse::getId).toList(),
@@ -380,17 +397,21 @@ class ProductServiceTest {
 
 
         User userWithProducts = User.builder().id(666L).build();
-        when(productRepository.findAllUsersProducts(userWithProducts)).thenReturn(List.of(
+        when(productRepository.findAllUserProducts(
+                eq(userWithProducts), anyBoolean(), anyBoolean(), anyBoolean())
+        ).thenReturn(List.of(
                 testProduct1WithPriceHistory,
                 testProduct2WithPriceHistory
         ));
-        when(productRepository.findAllUsersProductsWithLastPrice(userWithProducts)).thenReturn(List.of(
+        when(productRepository.findAllUserProductsWithLastPrice(
+                eq(userWithProducts), anyBoolean(), anyBoolean(), anyBoolean())
+        ).thenReturn(List.of(
                 testProduct1,
                 testProduct2
         ));
 
         Collection<ProductResponse> returnedProducts =
-                productService.getUserProducts(userWithProducts, false, false);
+                productService.getUserProducts(userWithProducts, false, false, true, true, true);
         assertAll(
                 () -> assertThat(
                         returnedProducts.stream().map(ProductResponse::getId).toList(),
@@ -441,17 +462,34 @@ class ProductServiceTest {
 
 
         User userWithProducts = User.builder().id(666L).build();
-        when(productRepository.findAllActiveUsersProducts(userWithProducts)).thenReturn(List.of(
+        when(productRepository.findActiveUserProducts(
+                userWithProducts,
+                true,
+                true,
+                true
+        )).thenReturn(List.of(
                 testProduct1WithPriceHistory,
                 testProduct2WithPriceHistory
         ));
-        when(productRepository.findAllActiveUsersProductsWithLastPrice(userWithProducts)).thenReturn(List.of(
+        when(productRepository.findActiveUserProductsWithLastPrice(
+                userWithProducts,
+                true,
+                true,
+                true
+        )).thenReturn(List.of(
                 testProduct1,
                 testProduct2
         ));
 
         Collection<ProductResponse> returnedProducts =
-                productService.getUserProducts(userWithProducts, false, true);
+                productService.getUserProducts(
+                        userWithProducts,
+                        false,
+                        true,
+                        true,
+                        true,
+                        true
+                );
         assertAll(
                 () -> assertThat(
                         returnedProducts.stream().map(ProductResponse::getId).toList(),
@@ -522,14 +560,26 @@ class ProductServiceTest {
         Shop shop = Shop.builder().id(1L).name("shop").build();
         when(shopRepository.findById(shop.getId())).thenReturn(Optional.of(shop));
 
-        when(productRepository.findAllUsersProductsInShop(any(), any())).thenReturn(List.of(product1));
-        when(productRepository.findAllUsersProductsWithLastPriceInShop(any(), any())).thenReturn(List.of(product2));
-        when(productRepository.findAllActiveUsersProductsInShop(any(), any())).thenReturn(List.of(product3));
-        when(productRepository.findAllActiveUserProductsWithLastPriceInShop(any(), any()))
-                .thenReturn(List.of(product4));
+        when(productRepository.findAllUserProductsInShop(
+                any(), any(), anyBoolean(), anyBoolean(), anyBoolean())
+        ).thenReturn(List.of(product1));
+        when(productRepository.findAllUserProductsWithLastPriceInShop(
+                any(), any(), anyBoolean(), anyBoolean(), anyBoolean())
+        ).thenReturn(List.of(product2));
+        when(productRepository.findActiveUserProductsInShop(any(), any(), anyBoolean(), anyBoolean(), anyBoolean()))
+                .thenReturn(List.of(product3));
+        when(productRepository.findActiveUserProductsWithLastPriceInShop(any(), any(), anyBoolean(), anyBoolean(),
+                anyBoolean())).thenReturn(List.of(product4));
 
-        Collection<ProductResponse> returnedProducts =
-                productService.getUserProductsInShop(new User(), shop.getId(), true, false);
+        Collection<ProductResponse> returnedProducts = productService.getUserProductsInShop(
+                new User(),
+                shop.getId(),
+                true,
+                false,
+                false,
+                false,
+                false
+        );
 
         assertThat(returnedProducts.stream().map(ProductResponse::getId).toList(), contains(product1.getId()));
     }
@@ -544,14 +594,27 @@ class ProductServiceTest {
         Shop shop = Shop.builder().id(1L).name("shop").build();
         when(shopRepository.findById(shop.getId())).thenReturn(Optional.of(shop));
 
-        when(productRepository.findAllUsersProductsInShop(any(), any())).thenReturn(List.of(product1));
-        when(productRepository.findAllUsersProductsWithLastPriceInShop(any(), any())).thenReturn(List.of(product2));
-        when(productRepository.findAllActiveUsersProductsInShop(any(), any())).thenReturn(List.of(product3));
-        when(productRepository.findAllActiveUserProductsWithLastPriceInShop(any(), any()))
-                .thenReturn(List.of(product4));
+        when(productRepository.findActiveUserProductsInShop(
+                any(), any(), anyBoolean(), anyBoolean(), anyBoolean())
+        ).thenReturn(List.of(product1));
+        when(productRepository.findActiveUserProductsWithLastPriceInShop(
+                any(), any(), anyBoolean(), anyBoolean(), anyBoolean())
+        ).thenReturn(List.of(product2));
+        when(productRepository.findActiveUserProductsInShop(any(), any(), anyBoolean(), anyBoolean(), anyBoolean()))
+                .thenReturn(List.of(product3));
+        when(productRepository.findActiveUserProductsWithLastPriceInShop(any(), any(), anyBoolean(), anyBoolean(),
+                anyBoolean())).thenReturn(List.of(product4));
 
         Collection<ProductResponse> returnedProducts =
-                productService.getUserProductsInShop(new User(), shop.getId(), true, true);
+                productService.getUserProductsInShop(
+                        new User(),
+                        shop.getId(),
+                        true,
+                        true,
+                        true,
+                        true,
+                        true
+                );
 
         assertThat(returnedProducts.stream().map(ProductResponse::getId).toList(), contains(product3.getId()));
     }
@@ -566,14 +629,26 @@ class ProductServiceTest {
         Shop shop = Shop.builder().id(1L).name("shop").build();
         when(shopRepository.findById(shop.getId())).thenReturn(Optional.of(shop));
 
-        when(productRepository.findAllUsersProductsInShop(any(), any())).thenReturn(List.of(product1));
-        when(productRepository.findAllUsersProductsWithLastPriceInShop(any(), any())).thenReturn(List.of(product2));
-        when(productRepository.findAllActiveUsersProductsInShop(any(), any())).thenReturn(List.of(product3));
-        when(productRepository.findAllActiveUserProductsWithLastPriceInShop(any(), any()))
-                .thenReturn(List.of(product4));
+        when(productRepository.findAllUserProductsInShop(
+                any(), any(), anyBoolean(), anyBoolean(), anyBoolean())
+        ).thenReturn(List.of(product1));
+        when(productRepository.findAllUserProductsWithLastPriceInShop(
+                any(), any(), anyBoolean(), anyBoolean(), anyBoolean())
+        ).thenReturn(List.of(product2));
+        when(productRepository.findActiveUserProductsInShop(any(), any(), anyBoolean(), anyBoolean(), anyBoolean()))
+                .thenReturn(List.of(product3));
+        when(productRepository.findActiveUserProductsWithLastPriceInShop(any(), any(), anyBoolean(), anyBoolean(),
+                anyBoolean())).thenReturn(List.of(product4));
 
-        Collection<ProductResponse> returnedProducts =
-                productService.getUserProductsInShop(new User(), shop.getId(), false, false);
+        Collection<ProductResponse> returnedProducts = productService.getUserProductsInShop(
+                new User(),
+                shop.getId(),
+                false,
+                false,
+                false,
+                false,
+                false
+        );
 
         assertThat(returnedProducts.stream().map(ProductResponse::getId).toList(), contains(product2.getId()));
     }
@@ -588,14 +663,27 @@ class ProductServiceTest {
         Shop shop = Shop.builder().id(1L).name("shop").build();
         when(shopRepository.findById(shop.getId())).thenReturn(Optional.of(shop));
 
-        when(productRepository.findAllUsersProductsInShop(any(), any())).thenReturn(List.of(product1));
-        when(productRepository.findAllUsersProductsWithLastPriceInShop(any(), any())).thenReturn(List.of(product2));
-        when(productRepository.findAllActiveUsersProductsInShop(any(), any())).thenReturn(List.of(product3));
-        when(productRepository.findAllActiveUserProductsWithLastPriceInShop(any(), any()))
-                .thenReturn(List.of(product4));
+        when(productRepository.findActiveUserProductsInShop(
+                any(), any(), anyBoolean(), anyBoolean(), anyBoolean())
+        ).thenReturn(List.of(product1));
+        when(productRepository.findActiveUserProductsWithLastPriceInShop(
+                any(), any(), anyBoolean(), anyBoolean(), anyBoolean())
+        ).thenReturn(List.of(product2));
+        when(productRepository.findActiveUserProductsInShop(any(), any(), anyBoolean(), anyBoolean(), anyBoolean()))
+                .thenReturn(List.of(product3));
+        when(productRepository.findActiveUserProductsWithLastPriceInShop(any(), any(), anyBoolean(), anyBoolean(),
+                anyBoolean())).thenReturn(List.of(product4));
 
         Collection<ProductResponse> returnedProducts =
-                productService.getUserProductsInShop(new User(), shop.getId(), false, true);
+                productService.getUserProductsInShop(
+                        new User(),
+                        shop.getId(),
+                        false,
+                        true,
+                        true,
+                        true,
+                        true
+                );
 
         assertThat(returnedProducts.stream().map(ProductResponse::getId).toList(), contains(product4.getId()));
     }
@@ -606,7 +694,15 @@ class ProductServiceTest {
 
         assertThrows(
                 ServerException.class,
-                () -> productService.getUserProductsInShop(new User(), 666L, false, true)
+                () -> productService.getUserProductsInShop(
+                        new User(),
+                        666L,
+                        false,
+                        true,
+                        true,
+                        true,
+                        true
+                )
         );
     }
 }

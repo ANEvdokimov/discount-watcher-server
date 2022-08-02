@@ -6,16 +6,27 @@ import an.evdokimov.discount.watcher.server.api.product.dto.response.ProductResp
 import an.evdokimov.discount.watcher.server.database.product.model.Product;
 import an.evdokimov.discount.watcher.server.database.user.model.User;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.lang.Nullable;
 
 import java.util.Collection;
 
 public interface ProductService {
     ProductResponse getProduct(@NotNull Long id, boolean withPriceHistory) throws ServerException;
 
-    Collection<ProductResponse> getUserProducts(@NotNull User user, boolean withPriceHistory, boolean onlyActive);
+    Collection<ProductResponse> getUserProducts(@NotNull User user,
+                                                boolean withPriceHistory,
+                                                boolean onlyActive,
+                                                @Nullable Boolean monitorAvailability,
+                                                @Nullable Boolean monitorDiscount,
+                                                @Nullable Boolean monitorPriceChanges);
 
-    Collection<ProductResponse> getUserProductsInShop(@NotNull User user, @NotNull Long shopId,
-                                                      boolean withPriceHistory, boolean onlyActive)
+    Collection<ProductResponse> getUserProductsInShop(@NotNull User user,
+                                                      @NotNull Long shopId,
+                                                      boolean withPriceHistory,
+                                                      boolean onlyActive,
+                                                      @Nullable Boolean monitorAvailability,
+                                                      @Nullable Boolean monitorDiscount,
+                                                      @Nullable Boolean monitorPriceChanges)
             throws ServerException;
 
     ProductResponse addProduct(@NotNull User user, @NotNull NewProductRequest newProduct) throws ServerException;
