@@ -121,6 +121,84 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     );
 
 
+    // ------------ Find only active products -----------
+
+    default Collection<Product> findActiveUserProducts(User user,
+                                                       @Nullable Boolean monitorAvailability,
+                                                       @Nullable Boolean monitorDiscount,
+                                                       @Nullable Boolean monitorPriceChanges) {
+        Collection<Product> allUsersProducts =
+                findAllUsersProducts(user, monitorAvailability, monitorDiscount, monitorPriceChanges);
+
+        return allUsersProducts.stream()
+                .filter(product -> monitorAvailability == null || isProductAvailable(product))
+                .filter(product -> monitorDiscount == null || doesProductHaveDiscount(product))
+                .toList();//todo filter for price changes
+    }
+
+    default Collection<Product> findActiveUserProductsWithLastPrice(User user,
+                                                                    @Nullable Boolean monitorAvailability,
+                                                                    @Nullable Boolean monitorDiscount,
+                                                                    @Nullable Boolean monitorPriceChanges) {
+        Collection<Product> allUsersProductsWithLastPrice =
+                findAllUsersProductsWithLastPrice(user, monitorAvailability, monitorDiscount, monitorPriceChanges);
+
+        return allUsersProductsWithLastPrice.stream()
+                .filter(product -> monitorAvailability == null || isProductAvailable(product))
+                .filter(product -> monitorDiscount == null || doesProductHaveDiscount(product))
+                .toList();//todo filter for price changes
+    }
+
+    default Collection<Product> findActiveUserProductsInShop(User user,
+                                                             Shop shop,
+                                                             @Nullable Boolean monitorAvailability,
+                                                             @Nullable Boolean monitorDiscount,
+                                                             @Nullable Boolean monitorPriceChanges) {
+        Collection<Product> allUsersProductsInShop =
+                findAllUsersProductsInShop(user, shop, monitorAvailability, monitorDiscount, monitorPriceChanges);
+
+        return allUsersProductsInShop.stream()
+                .filter(product -> monitorAvailability == null || isProductAvailable(product))
+                .filter(product -> monitorDiscount == null || doesProductHaveDiscount(product))
+                .toList();//todo filter for price changes
+    }
+
+    default Collection<Product> findActiveUserProductsWithLastPriceInShop(User user,
+                                                                          Shop shop,
+                                                                          @Nullable Boolean monitorAvailability,
+                                                                          @Nullable Boolean monitorDiscount,
+                                                                          @Nullable Boolean monitorPriceChanges) {
+        Collection<Product> allUsersProductsWithLastPriceInShop =
+                findAllUserProductsWithLastPriceInShop(
+                        user, shop, monitorAvailability, monitorDiscount, monitorPriceChanges
+                );
+        return allUsersProductsWithLastPriceInShop.stream()
+                .filter(product -> monitorAvailability == null || isProductAvailable(product))
+                .filter(product -> monitorDiscount == null || doesProductHaveDiscount(product))
+                .toList();//todo filter for price changes
+    }
+
+    private boolean isProductAvailable(Product product) {
+        if (product == null) {
+            return false;
+        }
+        if (product.getPrices().isEmpty()) {
+            return false;
+        }
+        return product.getPrices().get(0).getIsInStock();
+    }
+
+    private boolean doesProductHaveDiscount(Product product) {
+        if (product == null) {
+            return false;
+        }
+        if (product.getPrices().isEmpty()) {
+            return false;
+        }
+        return product.getPrices().get(0).getDiscount() != null;
+    }
+
+
     // ---------------- OTHER OPERATIONS ----------------
 
     @Query("SELECT up.product FROM UserProduct up WHERE up.user = :user")

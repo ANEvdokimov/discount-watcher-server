@@ -59,6 +59,7 @@ class ProductRepositoryTest {
         user2 = userRepository.save(User.builder().name("user2").build());
         user3 = userRepository.save(User.builder().name("user3").build());
         user4 = userRepository.save(User.builder().name("user4").build());
+        user5 = userRepository.save(User.builder().name("user5").build());
         userRepository.flush();
 
         ProductInformation productInformation1 =
@@ -83,12 +84,15 @@ class ProductRepositoryTest {
                 .build();
         price1_3 = ProductPrice.builder()
                 .price(new BigDecimal("300.00"))
+                .isInStock(true)
                 .date(LocalDateTime.of(2022, 4, 2, 12, 0))
                 .build();
         productPriceRepository.saveAllAndFlush(List.of(price1_1, price1_2, price1_3));
 
         price2_1 = ProductPrice.builder()
                 .price(new BigDecimal("222.00"))
+                .discount(50.0)
+                .isInStock(true)
                 .date(LocalDateTime.of(2022, 4, 6, 0, 0))
                 .build();
         productPriceRepository.saveAndFlush(price2_1);
@@ -99,6 +103,7 @@ class ProductRepositoryTest {
                 .build());
         price3_2 = productPriceRepository.save(ProductPrice.builder()
                 .price(new BigDecimal("15.00"))
+                .discount(20.0)
                 .date(LocalDateTime.of(2022, 4, 13, 0, 0))
                 .build());
 
@@ -159,6 +164,11 @@ class ProductRepositoryTest {
         userProductRepository.save(UserProduct.builder().user(user4).monitorAvailability(false).monitorDiscount(false)
                 .monitorPriceChanges(true).product(product5).build());
 
+        userProductRepository.save(UserProduct.builder().user(user5).monitorAvailability(true).monitorDiscount(true)
+                .monitorPriceChanges(true).product(product1).build());
+        userProductRepository.save(UserProduct.builder().user(user5).monitorAvailability(true).monitorDiscount(true)
+                .monitorPriceChanges(true).product(product3).build());
+
         userProductRepository.flush();
     }
 
@@ -176,6 +186,7 @@ class ProductRepositoryTest {
     private User user2;
     private User user3;
     private User user4;
+    private User user5;
     private ProductPrice price1_1;
     private ProductPrice price1_2;
     private ProductPrice price1_3;
@@ -491,5 +502,181 @@ class ProductRepositoryTest {
                 () -> assertThat(allUsersProductsInShop, contains(product1)),
                 () -> assertThat(allUsersProductsInShop.stream().findAny().get().getPrices(), contains(price1_3))
         );
+    }
+
+    @Test
+    void findActiveUsersProducts_availability_listOfProductsWithPriceHistory() {
+        ArrayList<Product> products = new ArrayList<>(
+                productRepository.findActiveUserProducts(user1, true, null, null)
+        );
+
+        assertAll(
+                () -> assertThat(products, contains(product1)),
+                () -> assertThat(products.get(0).getPrices(), contains(price1_3, price1_2, price1_1))
+        );
+    }
+
+    @Test
+    void findActiveUsersProducts_discount_listOfProductsWithPriceHistory() {
+        ArrayList<Product> products = new ArrayList<>(
+                productRepository.findActiveUserProducts(user2, null, true, null)
+        );
+
+        assertAll(
+                () -> assertThat(products, contains(product2, product3)),
+                () -> assertThat(products.stream()
+                                .filter(product -> product.getId().equals(product2.getId()))
+                                .findAny()
+                                .get().getPrices(),
+                        contains(price2_1)
+                ),
+                () -> assertThat(products.stream()
+                                .filter(product -> product.getId().equals(product3.getId()))
+                                .findAny()
+                                .get().getPrices(),
+                        contains(price3_2, price3_1)
+                )
+        );
+    }
+
+    @Test
+    void findActiveUsersProducts_availabilityAndDiscount_listOfProductsWithPriceHistory() {
+        ArrayList<Product> products = new ArrayList<>(
+                productRepository.findActiveUserProducts(user2, true, true, null)
+        );
+
+        assertAll(
+                () -> assertThat(products, contains(product2)),
+                () -> assertThat(products.get(0).getPrices(), contains(price2_1))
+        );
+    }
+
+    @Test
+    void findActiveUsersProducts_availability_listOfProductsWithOnlyLastPrice() {
+        ArrayList<Product> products = new ArrayList<>(
+                productRepository.findActiveUserProductsWithLastPrice(user1, true, null, null)
+        );
+
+        assertAll(
+                () -> assertThat(products, contains(product1)),
+                () -> assertThat(products.get(0).getPrices(), contains(price1_3))
+        );
+    }
+
+    @Test
+    void findActiveUsersProducts_discount_listOfProductsWithOnlyLastPrice() {
+        ArrayList<Product> products = new ArrayList<>(
+                productRepository.findActiveUserProductsWithLastPrice(user2, null, true, null)
+        );
+
+        assertAll(
+                () -> assertThat(products, containsInAnyOrder(product2, product3)),
+                () -> assertThat(products.stream()
+                                .filter(product -> product.getId().equals(product2.getId()))
+                                .findAny()
+                                .get().getPrices(),
+                        contains(price2_1)
+                ),
+                () -> assertThat(products.stream()
+                                .filter(product -> product.getId().equals(product3.getId()))
+                                .findAny()
+                                .get().getPrices(),
+                        contains(price3_2)
+                )
+        );
+    }
+
+    @Test
+    void findActiveUsersProducts_availabilityAndDiscount_listOfProductsWithOnlyLastPrice() {
+        ArrayList<Product> products = new ArrayList<>(
+                productRepository.findActiveUserProductsWithLastPrice(user2, true, true, null)
+        );
+
+        assertAll(
+                () -> assertThat(products, contains(product2)),
+                () -> assertThat(products.get(0).getPrices(), contains(price2_1))
+        );
+    }
+
+    ////////////////
+    @Test
+    void findActiveUsersProductsInShop_availability_listOfProductsWithPriceHistory() {
+        ArrayList<Product> products = new ArrayList<>(
+                productRepository.findActiveUserProductsInShop(user1, shop1, true, null, null)
+        );
+
+        assertAll(
+                () -> assertThat(products, contains(product1)),
+                () -> assertThat(products.get(0).getPrices(), contains(price1_3, price1_2, price1_1))
+        );
+    }
+
+    @Test
+    void findActiveUsersProductsInShop_discount_listOfProductsWithPriceHistory() {
+        ArrayList<Product> products = new ArrayList<>(
+                productRepository.findActiveUserProductsInShop(user2, shop2, null, true, null)
+        );
+
+        assertAll(
+                () -> assertThat(products, contains(product2)),
+                () -> assertThat(products.get(0).getPrices(), contains(price2_1))
+        );
+    }
+
+    @Test
+    void findActiveUsersProductsInShop_availabilityAndDiscount_listOfProductsWithPriceHistory() {
+        ArrayList<Product> products = new ArrayList<>(
+                productRepository.findActiveUserProductsInShop(user2, shop2, true, true, null)
+        );
+
+        assertAll(
+                () -> assertThat(products, contains(product2)),
+                () -> assertThat(products.get(0).getPrices(), contains(price2_1))
+        );
+    }
+
+    @Test
+    void findActiveUsersProductsInShop_availability_listOfProductsWithOnlyLastPrice() {
+        ArrayList<Product> products = new ArrayList<>(
+                productRepository.findActiveUserProductsWithLastPriceInShop(user1, shop1, true, null, null)
+        );
+
+        assertAll(
+                () -> assertThat(products, contains(product1)),
+                () -> assertThat(products.get(0).getPrices(), contains(price1_3))
+        );
+    }
+
+    @Test
+    void findActiveUsersProductsInShop_discount_listOfProductsWithOnlyLastPrice() {
+        ArrayList<Product> products = new ArrayList<>(
+                productRepository.findActiveUserProductsInShop(user2, shop2, null, true, null)
+        );
+
+        assertAll(
+                () -> assertThat(products, contains(product2)),
+                () -> assertThat(products.get(0).getPrices(), contains(price2_1))
+        );
+    }
+
+    @Test
+    void findActiveUsersProductsInShop_availabilityAndDiscount_listOfProductsWithOnlyLastPrice() {
+        ArrayList<Product> products = new ArrayList<>(
+                productRepository.findActiveUserProductsWithLastPriceInShop(user2, shop2, true, true, null)
+        );
+
+        assertAll(
+                () -> assertThat(products, contains(product2)),
+                () -> assertThat(products.get(0).getPrices(), contains(price2_1))
+        );
+    }
+
+    @Test
+    void findActiveUsersProductsInShop_availabilityAndDiscount_emptyList() {
+        ArrayList<Product> products = new ArrayList<>(
+                productRepository.findActiveUserProductsWithLastPriceInShop(user5, shop2, true, true, null)
+        );
+
+        assertTrue(products.isEmpty());
     }
 }
