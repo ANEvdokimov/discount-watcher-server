@@ -2,6 +2,7 @@ package an.evdokimov.discount.watcher.server.database.product.repository;
 
 import an.evdokimov.discount.watcher.server.database.product.model.Product;
 import an.evdokimov.discount.watcher.server.database.product.model.ProductInformation;
+import an.evdokimov.discount.watcher.server.database.product.model.ProductPrice;
 import an.evdokimov.discount.watcher.server.database.shop.model.Shop;
 import an.evdokimov.discount.watcher.server.database.user.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -131,9 +132,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                 findAllUserProducts(user, monitorAvailability, monitorDiscount, monitorPriceChanges);
 
         return allUsersProducts.stream()
-                .filter(product -> monitorAvailability == null || isProductAvailable(product))
-                .filter(product -> monitorDiscount == null || doesProductHaveDiscount(product))
-                .toList();//todo filter for price changes
+                .filter(product -> filter(product, monitorAvailability, monitorDiscount, monitorPriceChanges))
+                .toList();
     }
 
     default Collection<Product> findActiveUserProductsWithLastPrice(User user,
@@ -144,9 +144,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                 findAllUserProductsWithLastPrice(user, monitorAvailability, monitorDiscount, monitorPriceChanges);
 
         return allUsersProductsWithLastPrice.stream()
-                .filter(product -> monitorAvailability == null || isProductAvailable(product))
-                .filter(product -> monitorDiscount == null || doesProductHaveDiscount(product))
-                .toList();//todo filter for price changes
+                .filter(product -> filter(product, monitorAvailability, monitorDiscount, monitorPriceChanges))
+                .toList();
     }
 
     default Collection<Product> findActiveUserProductsInShop(User user,
@@ -158,9 +157,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                 findAllUserProductsInShop(user, shop, monitorAvailability, monitorDiscount, monitorPriceChanges);
 
         return allUsersProductsInShop.stream()
-                .filter(product -> monitorAvailability == null || isProductAvailable(product))
-                .filter(product -> monitorDiscount == null || doesProductHaveDiscount(product))
-                .toList();//todo filter for price changes
+                .filter(product -> filter(product, monitorAvailability, monitorDiscount, monitorPriceChanges))
+                .toList();
     }
 
     default Collection<Product> findActiveUserProductsWithLastPriceInShop(User user,
@@ -173,29 +171,24 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                         user, shop, monitorAvailability, monitorDiscount, monitorPriceChanges
                 );
         return allUsersProductsWithLastPriceInShop.stream()
-                .filter(product -> monitorAvailability == null || isProductAvailable(product))
-                .filter(product -> monitorDiscount == null || doesProductHaveDiscount(product))
-                .toList();//todo filter for price changes
+                .filter(product -> filter(product, monitorAvailability, monitorDiscount, monitorPriceChanges))
+                .toList();
     }
 
-    private boolean isProductAvailable(Product product) {
+    private boolean filter(Product product, Boolean isAvailable, Boolean hasDiscount, Boolean isPriceChange) {
         if (product == null) {
             return false;
         }
         if (product.getPrices().isEmpty()) {
             return false;
         }
-        return product.getPrices().get(0).getIsInStock();
-    }
 
-    private boolean doesProductHaveDiscount(Product product) {
-        if (product == null) {
-            return false;
-        }
-        if (product.getPrices().isEmpty()) {
-            return false;
-        }
-        return product.getPrices().get(0).getDiscount() != null;
+        boolean isNoFilter = isAvailable == null && hasDiscount == null && isPriceChange == null;
+        ProductPrice lastPrice = product.getPrices().get(0);
+
+        return (((isAvailable != null || isNoFilter) && lastPrice.getIsInStock()/*todo UserProducts.isMonitor*/) ||
+                ((hasDiscount != null || isNoFilter) && lastPrice.getDiscount() != null));
+        //todo filter for price changes
     }
 
 

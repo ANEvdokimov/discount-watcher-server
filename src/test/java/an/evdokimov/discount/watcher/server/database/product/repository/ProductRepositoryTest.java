@@ -60,6 +60,7 @@ class ProductRepositoryTest {
         user3 = userRepository.save(User.builder().name("user3").build());
         user4 = userRepository.save(User.builder().name("user4").build());
         user5 = userRepository.save(User.builder().name("user5").build());
+        user6 = userRepository.save(User.builder().name("user6").build());
         userRepository.flush();
 
         ProductInformation productInformation1 =
@@ -72,6 +73,10 @@ class ProductRepositoryTest {
                 productInformationRepository.save(ProductInformation.builder().name("product4").build());
         ProductInformation productInformation5 =
                 productInformationRepository.save(ProductInformation.builder().name("product5").build());
+        ProductInformation productInformation6 =
+                productInformationRepository.save(ProductInformation.builder().name("product6").build());
+        ProductInformation productInformation7 =
+                productInformationRepository.save(ProductInformation.builder().name("product7").build());
         productInformationRepository.flush();
 
         price1_1 = ProductPrice.builder()
@@ -111,6 +116,18 @@ class ProductRepositoryTest {
                 .price(new BigDecimal("100.00"))
                 .date(LocalDateTime.of(2022, 4, 13, 0, 0))
                 .build());
+
+        price6_1 = productPriceRepository.save(ProductPrice.builder()
+                .price(new BigDecimal("100.00"))
+                .date(LocalDateTime.of(2022, 4, 13, 0, 0))
+                .isInStock(true)
+                .build());
+        price7_1 = productPriceRepository.save(ProductPrice.builder()
+                .price(new BigDecimal("100.00"))
+                .date(LocalDateTime.of(2022, 4, 13, 0, 0))
+                .discount(100.0)
+                .isInStock(false)
+                .build());
         productPriceRepository.flush();
 
         shop1 = shopRepository.save(Shop.builder().name("shop1").build());
@@ -127,6 +144,10 @@ class ProductRepositoryTest {
                 .prices(new ArrayList<>()).build());
         product5 = productRepository.save(Product.builder().productInformation(productInformation5).shop(shop1)
                 .prices(List.of(price5_1)).build());
+        product6 = productRepository.save(Product.builder().productInformation(productInformation6).shop(shop2)
+                .prices(List.of(price6_1)).build());
+        product7 = productRepository.save(Product.builder().productInformation(productInformation7).shop(shop1)
+                .prices(List.of(price7_1)).build());
         productRepository.flush();
 
         price1_1.setProduct(product1);
@@ -136,6 +157,8 @@ class ProductRepositoryTest {
         price3_1.setProduct(product3);
         price3_2.setProduct(product3);
         price5_1.setProduct(product5);
+        price6_1.setProduct(product6);
+        price7_1.setProduct(product7);
         productPriceRepository.save(price1_1);
         productPriceRepository.save(price1_2);
         productPriceRepository.save(price1_3);
@@ -143,6 +166,8 @@ class ProductRepositoryTest {
         productPriceRepository.save(price3_1);
         productPriceRepository.save(price3_2);
         productPriceRepository.save(price5_1);
+        productPriceRepository.save(price6_1);
+        productPriceRepository.save(price7_1);
         productPriceRepository.flush();
 
         userProductRepository.save(UserProduct.builder().user(user1).monitorAvailability(true).monitorDiscount(false)
@@ -169,6 +194,11 @@ class ProductRepositoryTest {
         userProductRepository.save(UserProduct.builder().user(user5).monitorAvailability(true).monitorDiscount(true)
                 .monitorPriceChanges(true).product(product3).build());
 
+        userProductRepository.save(UserProduct.builder().user(user6).monitorAvailability(false).monitorDiscount(false)
+                .monitorPriceChanges(true).product(product6).build());
+        userProductRepository.save(UserProduct.builder().user(user6).monitorAvailability(false).monitorDiscount(false)
+                .monitorPriceChanges(false).product(product7).build());
+
         userProductRepository.flush();
     }
 
@@ -187,6 +217,7 @@ class ProductRepositoryTest {
     private User user3;
     private User user4;
     private User user5;
+    private User user6;
     private ProductPrice price1_1;
     private ProductPrice price1_2;
     private ProductPrice price1_3;
@@ -194,6 +225,8 @@ class ProductRepositoryTest {
     private ProductPrice price3_1;
     private ProductPrice price3_2;
     private ProductPrice price5_1;
+    private ProductPrice price6_1;
+    private ProductPrice price7_1;
     private Shop shop1;
     private Shop shop2;
     private Product product1;
@@ -201,6 +234,8 @@ class ProductRepositoryTest {
     private Product product3;
     private Product product4;
     private Product product5;
+    private Product product6;
+    private Product product7;
 
     @Test
     void findAllByUser_getProductByUser_productList() {
@@ -211,10 +246,10 @@ class ProductRepositoryTest {
     }
 
     @Test
-    void findAllActiveProducts_Products_listOfActiveProducts() {
+    void findAllTrackedProducts_Products_listOfActiveProducts() {
         assertThat(
                 productRepository.findAllTrackedProducts(),
-                containsInAnyOrder(product1, product2, product3, product5)
+                containsInAnyOrder(product1, product2, product3, product5, product6)
         );
     }
 
@@ -678,5 +713,31 @@ class ProductRepositoryTest {
         );
 
         assertTrue(products.isEmpty());
+    }
+
+    @Test
+    void findActiveUserProductsWithLastPrice_allProducts_listOfProducts() {
+        ArrayList<Product> products = new ArrayList<>(
+                productRepository.findActiveUserProductsWithLastPrice(
+                        user6,
+                        null,
+                        null,
+                        null
+                )
+        );
+
+        assertAll(
+                () -> assertThat(products, containsInAnyOrder(product6, product7)),
+                () -> assertThat(products.stream()
+                                .filter(product -> product.getId().equals(product6.getId()))
+                                .findAny()
+                                .get().getPrices(),
+                        contains(price6_1)),
+                () -> assertThat(products.stream()
+                                .filter(product -> product.getId().equals(product7.getId()))
+                                .findAny()
+                                .get().getPrices(),
+                        contains(price7_1))
+        );
     }
 }
