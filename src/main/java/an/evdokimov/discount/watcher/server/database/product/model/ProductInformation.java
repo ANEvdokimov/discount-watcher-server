@@ -1,9 +1,9 @@
 package an.evdokimov.discount.watcher.server.database.product.model;
 
+import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.Hibernate;
 
-import javax.persistence.*;
 import java.net.URL;
 import java.util.Objects;
 

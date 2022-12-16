@@ -9,16 +9,18 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.util.List;
 
 @Configuration
-public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
+@EnableWebSecurity
+public class SecurityConfiguration {
     private final JwtUtils jwtUtils;
     private final JwtAuthenticationProvider jwtAuthenticationProvider;
     @Value("${springdoc.api-docs.path}")
@@ -31,27 +33,27 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         this.jwtAuthenticationProvider = jwtAuthenticationProvider;
     }
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+        httpSecurity
                 .csrf().disable()
                 .httpBasic().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .authorizeRequests()
-                .antMatchers("/api/users/registration").permitAll()
-                .antMatchers("/api/users/login").permitAll()
-                .antMatchers(docsUrl + "/**").permitAll()
-                .antMatchers(swaggerUiUrl + "/**").permitAll()
-                .anyRequest()
-                .authenticated()
+                .authorizeHttpRequests()
+                .requestMatchers("/api/users/registration", "/api/users/login", docsUrl + "/**", swaggerUiUrl + "/**").permitAll()
+                .anyRequest().authenticated()
                 .and()
                 .addFilterBefore(tokenFilter(), UsernamePasswordAuthenticationFilter.class);
+        return httpSecurity.build();
     }
 
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) {
-        auth.authenticationProvider(jwtAuthenticationProvider);
+    @Bean
+    public AuthenticationManager authManager(HttpSecurity http) throws Exception {
+        AuthenticationManagerBuilder authenticationManagerBuilder =
+                http.getSharedObject(AuthenticationManagerBuilder.class);
+        authenticationManagerBuilder.authenticationProvider(jwtAuthenticationProvider);
+        return authenticationManagerBuilder.build();
     }
 
     @Bean
@@ -60,12 +62,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 "/**",
                 List.of("/api/users/registration", "/api/users/login", docsUrl + "/**", swaggerUiUrl + "/**"),
                 jwtUtils);
-    }
-
-    @Bean
-    @Override
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
     }
 
     @Bean

@@ -1,11 +1,10 @@
 package an.evdokimov.discount.watcher.server.api.user.dto.request;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import javax.validation.constraints.NotBlank;
 
 /**
  * User's credentials.

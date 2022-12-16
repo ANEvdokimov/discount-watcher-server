@@ -1,10 +1,10 @@
 package an.evdokimov.discount.watcher.server.database.product.model;
 
 import an.evdokimov.discount.watcher.server.database.user.model.User;
+import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.Hibernate;
 
-import javax.persistence.*;
 import java.util.Objects;
 
 @Entity

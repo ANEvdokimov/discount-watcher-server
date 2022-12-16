@@ -15,13 +15,13 @@ import an.evdokimov.discount.watcher.server.parser.ParserFactory;
 import an.evdokimov.discount.watcher.server.parser.ParserFactoryException;
 import an.evdokimov.discount.watcher.server.parser.downloader.PageDownloaderException;
 import an.evdokimov.discount.watcher.server.parser.lenta.LentaParser;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;

@@ -4,6 +4,7 @@ import an.evdokimov.discount.watcher.server.api.TestConfig;
 import an.evdokimov.discount.watcher.server.api.user.dto.request.LoginRequest;
 import an.evdokimov.discount.watcher.server.api.user.dto.request.RegisterRequest;
 import an.evdokimov.discount.watcher.server.api.user.dto.response.LoginResponse;
+import an.evdokimov.discount.watcher.server.configuration.SecurityConfiguration;
 import an.evdokimov.discount.watcher.server.security.JwtUtils;
 import an.evdokimov.discount.watcher.server.service.user.UserServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,7 +27,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(UserController.class)
-@Import(TestConfig.class)
+@Import({TestConfig.class, SecurityConfiguration.class})
 class UserControllerTest {
     @Autowired
     private MockMvc mvc;

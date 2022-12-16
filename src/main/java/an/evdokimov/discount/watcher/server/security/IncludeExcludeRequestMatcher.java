@@ -1,8 +1,7 @@
 package an.evdokimov.discount.watcher.server.security;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.web.util.matcher.RequestMatcher;
-
-import javax.servlet.http.HttpServletRequest;
 
 public class IncludeExcludeRequestMatcher implements RequestMatcher {
     private final RequestMatcher include;

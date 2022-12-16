@@ -1,10 +1,10 @@
 package an.evdokimov.discount.watcher.server.database.shop.model;
 
 import an.evdokimov.discount.watcher.server.database.city.model.City;
+import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.Hibernate;
 
-import javax.persistence.*;
 import java.util.Objects;
 
 @Getter

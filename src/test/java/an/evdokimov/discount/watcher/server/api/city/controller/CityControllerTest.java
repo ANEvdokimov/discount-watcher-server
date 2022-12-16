@@ -2,6 +2,7 @@ package an.evdokimov.discount.watcher.server.api.city.controller;
 
 import an.evdokimov.discount.watcher.server.api.TestConfig;
 import an.evdokimov.discount.watcher.server.api.city.dto.response.CityResponse;
+import an.evdokimov.discount.watcher.server.configuration.SecurityConfiguration;
 import an.evdokimov.discount.watcher.server.security.JwtUtils;
 import an.evdokimov.discount.watcher.server.service.city.CityServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -30,7 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(CityController.class)
-@Import({TestConfig.class})
+@Import({TestConfig.class, SecurityConfiguration.class})
 class CityControllerTest {
     @Value("${header.authentication}")
     private String authHeaderName;

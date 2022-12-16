@@ -3,6 +3,7 @@ package an.evdokimov.discount.watcher.server.api.shop.controller;
 import an.evdokimov.discount.watcher.server.api.TestConfig;
 import an.evdokimov.discount.watcher.server.api.shop.dto.response.ShopChainResponse;
 import an.evdokimov.discount.watcher.server.api.shop.dto.response.ShopChainWithShopsResponse;
+import an.evdokimov.discount.watcher.server.configuration.SecurityConfiguration;
 import an.evdokimov.discount.watcher.server.database.city.model.City;
 import an.evdokimov.discount.watcher.server.database.shop.model.Shop;
 import an.evdokimov.discount.watcher.server.database.shop.model.ShopChain;
@@ -35,7 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(ShopChainController.class)
-@Import({TestConfig.class})
+@Import({TestConfig.class, SecurityConfiguration.class})
 class ShopChainControllerTest {
     @Value("${header.authentication}")
     private String authHeaderName;

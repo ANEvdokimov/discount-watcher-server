@@ -4,6 +4,7 @@ import an.evdokimov.discount.watcher.server.api.TestConfig;
 import an.evdokimov.discount.watcher.server.api.error.ServerErrorCode;
 import an.evdokimov.discount.watcher.server.api.error.ServerException;
 import an.evdokimov.discount.watcher.server.api.shop.dto.response.ShopResponse;
+import an.evdokimov.discount.watcher.server.configuration.SecurityConfiguration;
 import an.evdokimov.discount.watcher.server.security.JwtUtils;
 import an.evdokimov.discount.watcher.server.service.shop.ShopServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -30,7 +31,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(ShopController.class)
-@Import({TestConfig.class})
+@Import({TestConfig.class, SecurityConfiguration.class})
 class ShopControllerTest {
     @Value("${header.authentication}")
     private String authHeaderName;
