@@ -190,6 +190,7 @@
                         <annotationProcessorPath>
                             <groupId>org.springframework.boot</groupId>
                             <artifactId>spring-boot-configuration-processor</artifactId>
+                            <version>3.0.0</version>
                         </annotationProcessorPath>
                         <!-- other annotation processors -->
                     </annotationProcessorPaths>
