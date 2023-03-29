@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    @Value("${header.authentication}")
+    @Value("${application.security.header.authentication}")
     private String authorisationHeaderName;
     private final JwtUtils jwtUtils;
 

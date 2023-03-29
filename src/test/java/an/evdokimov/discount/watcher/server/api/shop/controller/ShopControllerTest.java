@@ -33,7 +33,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @WebMvcTest(ShopController.class)
 @Import({TestConfig.class, SecurityConfiguration.class})
 class ShopControllerTest {
-    @Value("${header.authentication}")
+    @Value("${application.security.header.authentication}")
     private String authHeaderName;
 
     @Autowired

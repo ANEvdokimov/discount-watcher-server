@@ -1,0 +1,38 @@
+spring:
+  main:
+    banner-mode: off
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    hibernate:
+      ddl-auto: create
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/discount-watcher-schema-test
+    username: test
+    password: test123321
+
+application:
+  security:
+    jwt:
+      secret: secretsecretsecretsecretsecretsecretsecretsecretsecretsecretsecretsecretsecretsecretsecretsecretsecretsecretsecretsecretsecretsecret
+      expiration-time: 2592000
+    header:
+      authentication: Authorization
+  parser:
+    lenta-user-agent-header: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.114 Safari/537.36 OPR/89.0.4447.48
+    lenta-referer-header: https://lenta.com/
+  schedule:
+    product-update:
+      min-delay: 0
+      max-delay: 1
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui
+
+logging:
+  level:
+    root: error
+    sql: error

@@ -38,7 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(ShopChainController.class)
 @Import({TestConfig.class, SecurityConfiguration.class})
 class ShopChainControllerTest {
-    @Value("${header.authentication}")
+    @Value("${application.security.header.authentication}")
     private String authHeaderName;
 
     @Autowired

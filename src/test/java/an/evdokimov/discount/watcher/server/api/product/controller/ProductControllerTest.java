@@ -40,7 +40,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @WebMvcTest(ProductController.class)
 @Import({TestConfig.class, SecurityConfiguration.class})
 class ProductControllerTest {
-    @Value("${header.authentication}")
+    @Value("${application.security.header.authentication}")
     private String authHeaderName;
 
     @Autowired

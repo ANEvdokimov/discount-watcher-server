@@ -17,10 +17,10 @@ import java.util.Random;
 @RequiredArgsConstructor
 @Slf4j
 public class ProductUpdateScheduler {
-    @Value("${application.product-update.min-delay}")
+    @Value("${application.schedule.product-update.min-delay}")
     private Long minDelay;
 
-    @Value("${application.product-update.max-delay}")
+    @Value("${application.schedule.product-update.max-delay}")
     private Long maxDelay;
 
     private final ProductRepository productRepository;

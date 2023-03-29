@@ -33,7 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(CityController.class)
 @Import({TestConfig.class, SecurityConfiguration.class})
 class CityControllerTest {
-    @Value("${header.authentication}")
+    @Value("${application.security.header.authentication}")
     private String authHeaderName;
 
     @Autowired

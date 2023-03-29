@@ -7,7 +7,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties("application.parser")
 @Getter
 @Setter
-public class ApplicationParserConfiguration {
+public class ParserProperties {
     /**
      * User-Agent header in requests to lenta.com
      */
