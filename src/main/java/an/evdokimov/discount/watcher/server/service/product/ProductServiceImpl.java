@@ -22,7 +22,7 @@ import an.evdokimov.discount.watcher.server.parser.ParserFactoryException;
 import an.evdokimov.discount.watcher.server.parser.downloader.PageDownloaderException;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.lang.Nullable;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;

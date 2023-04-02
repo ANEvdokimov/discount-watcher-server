@@ -5,10 +5,10 @@ import an.evdokimov.discount.watcher.server.database.product.model.ProductInform
 import an.evdokimov.discount.watcher.server.database.product.model.ProductPrice;
 import an.evdokimov.discount.watcher.server.database.shop.model.Shop;
 import an.evdokimov.discount.watcher.server.database.user.model.User;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;

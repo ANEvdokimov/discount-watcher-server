@@ -6,7 +6,7 @@ import an.evdokimov.discount.watcher.server.api.product.dto.response.ProductResp
 import an.evdokimov.discount.watcher.server.database.product.model.Product;
 import an.evdokimov.discount.watcher.server.database.user.model.User;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.lang.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 
