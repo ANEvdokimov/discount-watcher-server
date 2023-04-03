@@ -20,7 +20,15 @@ import java.util.Objects;
 @AllArgsConstructor
 public class ProductPrice {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(
+            strategy = GenerationType.SEQUENCE,
+            generator = "product_price_id_generator"
+    )
+    @SequenceGenerator(
+            name = "product_price_id_generator",
+            sequenceName = "product_price_sequence",
+            allocationSize = 1
+    )
     private Long id;
     @ManyToOne
     @JoinColumn(name = "product_id")

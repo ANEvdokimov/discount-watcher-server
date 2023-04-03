@@ -4,8 +4,8 @@ spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/discount-watcher-schema
-    username: user
-    password: password
+    username: discount_watcher_server
+    password: secret-password
 
 server:
   ssl:
