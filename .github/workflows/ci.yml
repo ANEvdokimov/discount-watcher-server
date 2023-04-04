@@ -12,6 +12,7 @@ jobs:
         env:
           POSTGRES_USER: discount_watcher_server_test
           POSTGRES_PASSWORD: password-for-tests
+          POSTGRES_DB: postgres
         # Set health checks to wait until postgres has started
         options: >-
           --health-cmd pg_isready
