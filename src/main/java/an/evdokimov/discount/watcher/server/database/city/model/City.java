@@ -18,7 +18,15 @@ import java.util.Objects;
 @Table(name = "city")
 public class City {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(
+            strategy = GenerationType.SEQUENCE,
+            generator = "city_id_generator"
+    )
+    @SequenceGenerator(
+            name = "city_id_generator",
+            sequenceName = "city_sequence",
+            allocationSize = 1
+    )
     private Long id;
     private String name;
     private String cyrillicName;

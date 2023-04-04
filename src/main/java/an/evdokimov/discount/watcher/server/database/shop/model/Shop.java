@@ -17,7 +17,15 @@ import java.util.Objects;
 @Table(name = "shop")
 public class Shop {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(
+            strategy = GenerationType.SEQUENCE,
+            generator = "shop_id_generator"
+    )
+    @SequenceGenerator(
+            name = "shop_id_generator",
+            sequenceName = "shop_sequence",
+            allocationSize = 1
+    )
     private Long id;
     @ManyToOne
     @JoinColumn(name = "shop_chain_id")

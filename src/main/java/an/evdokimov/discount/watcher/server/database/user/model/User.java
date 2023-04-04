@@ -11,7 +11,7 @@ import java.util.Collection;
 import java.util.Objects;
 
 @Entity
-@Table(name = "user")
+@Table(name = "`user`")
 @Getter
 @Setter
 @ToString
@@ -20,7 +20,15 @@ import java.util.Objects;
 @AllArgsConstructor
 public class User implements UserDetails {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(
+            strategy = GenerationType.SEQUENCE,
+            generator = "user_id_generator"
+    )
+    @SequenceGenerator(
+            name = "user_id_generator",
+            sequenceName = "user_sequence",
+            allocationSize = 1
+    )
     private Long id;
     private String login;
     private String password;

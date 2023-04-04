@@ -1,0 +1,1 @@
+CREATE SCHEMA IF NOT EXISTS discount_watcher_schema_test;

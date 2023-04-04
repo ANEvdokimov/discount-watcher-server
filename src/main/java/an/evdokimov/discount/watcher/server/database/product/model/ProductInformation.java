@@ -17,7 +17,15 @@ import java.util.Objects;
 @AllArgsConstructor
 public class ProductInformation {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(
+            strategy = GenerationType.SEQUENCE,
+            generator = "product_information_is_generator"
+    )
+    @SequenceGenerator(
+            name = "product_information_id_generator",
+            sequenceName = "product_information_sequence",
+            allocationSize = 1
+    )
     private Long id;
     private String name;
     private URL url;

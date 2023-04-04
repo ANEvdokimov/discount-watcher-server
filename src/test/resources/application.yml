@@ -1,15 +1,20 @@
 spring:
+  sql:
+    init:
+      mode: always
   main:
     banner-mode: off
   jpa:
-    database-platform: org.hibernate.dialect.MySQL8Dialect
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: create
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/discount-watcher-schema-test
-    username: test
-    password: test123321
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: discount_watcher_server_test
+    password: password-for-tests
+    hikari:
+      schema: discount_watcher_schema_test
 
 application:
   security:
