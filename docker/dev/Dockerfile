@@ -1,10 +1,10 @@
-FROM openjdk:18
+FROM openjdk:19
 
 ARG key_store_dir=/usr/keys/
 ARG key_store_name=discount-watcher-server.p12
 
 ENV DB_HOST host.docker.internal
-ENV DB_PORT 3306
+ENV DB_PORT 5432
 ENV KEY_STORE_PATH ${key_store_dir}${key_store_name}
 ENV KEY_STORE_PASSWORD password
 ENV KEY_STORE_ALIAS DWS

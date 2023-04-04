@@ -22,24 +22,15 @@ GRANT USAGE
 
 
 
-CREATE SCHEMA IF NOT EXISTS discount_watcher_schema_test;
-
 DROP OWNED BY discount_watcher_users_test;
+
 DROP ROLE IF EXISTS discount_watcher_users_test;
 CREATE ROLE discount_watcher_users_test;
-
 DROP OWNED BY discount_watcher_server_test;
+GRANT ALL ON DATABASE postgres TO discount_watcher_users_test;
+
 DROP USER IF EXISTS discount_watcher_server_test;
 CREATE USER discount_watcher_server_test PASSWORD 'password-for-tests' IN ROLE discount_watcher_users_test;
 
-GRANT ALL
-    ON SCHEMA discount_watcher_schema_test
-    TO discount_watcher_users_test;
-
-GRANT ALL
-    ON ALL TABLES IN SCHEMA discount_watcher_schema_test
-    TO discount_watcher_users_test;
-
-GRANT ALL
-    ON ALL SEQUENCES IN SCHEMA discount_watcher_schema_test
-    TO discount_watcher_users_test;
+CREATE SCHEMA IF NOT EXISTS discount_watcher_schema_test;
+ALTER SCHEMA discount_watcher_schema_test OWNER TO discount_watcher_server_test;

@@ -11,7 +11,7 @@ import java.util.Collection;
 import java.util.Objects;
 
 @Entity
-@Table(name = "user")
+@Table(name = "`user`")
 @Getter
 @Setter
 @ToString
