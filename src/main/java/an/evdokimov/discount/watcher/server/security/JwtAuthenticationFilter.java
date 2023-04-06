@@ -2,10 +2,6 @@ package an.evdokimov.discount.watcher.server.security;
 
 import an.evdokimov.discount.watcher.server.api.error.dto.response.ServerErrorResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.SignatureException;
-import io.jsonwebtoken.UnsupportedJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,8 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.CredentialsExpiredException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -35,11 +29,9 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
 
     @Value("${application.security.header.authentication}")
     private String authorisationHeaderName;
-    private final JwtUtils jwtUtils;
 
-    public JwtAuthenticationFilter(String baseUrl, List<String> excludeUrls, JwtUtils jwtUtils) {
+    public JwtAuthenticationFilter(String baseUrl, List<String> excludeUrls) {
         super("/**");
-        this.jwtUtils = jwtUtils;
 
         RequestMatcher include = new OrRequestMatcher(new AntPathRequestMatcher(baseUrl));
 
@@ -57,8 +49,8 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
 
     @Override
     @Autowired
-    public void setAuthenticationManager(AuthenticationManager authenticationManager) {
-        super.setAuthenticationManager(authenticationManager);
+    public void setAuthenticationManager(AuthenticationManager jwtAuthenticationManager) {
+        super.setAuthenticationManager(jwtAuthenticationManager);
     }
 
     @Override
@@ -71,7 +63,7 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
-            throws AuthenticationException, IOException, ServletException {
+            throws AuthenticationException {
         log.debug("attempt authentication");
 
         String authorizationHeader = request.getHeader(authorisationHeaderName);
@@ -80,25 +72,12 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
         }
 
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-            log.warn(AuthenticationErrorMessage.BAD_TOKEN.getMessage() + ". token: {}", authorizationHeader);//TODO баг: вызывается при недоступности БД
+            log.info(AuthenticationErrorMessage.BAD_TOKEN.getMessage());
             throw new AuthenticationCredentialsNotFoundException(AuthenticationErrorMessage.BAD_TOKEN.getMessage());
+        } else {
+            String token = authorizationHeader.substring("Bearer".length()).trim();
+            JwtAuthenticationToken authRequest = new JwtAuthenticationToken(token);
+            return getAuthenticationManager().authenticate(authRequest);
         }
-
-        String token = authorizationHeader.substring("Bearer".length()).trim();
-
-        try {
-            jwtUtils.validateToken(token);
-            log.info("token {} is valid", token);
-        } catch (ExpiredJwtException e) {
-            log.warn(e.getMessage());
-            throw new CredentialsExpiredException(e.getMessage(), e);
-        } catch (UnsupportedJwtException | SignatureException | MalformedJwtException e) {
-            log.warn(e.getMessage());
-            throw new BadCredentialsException(e.getMessage(), e);
-        }
-
-        JwtAuthenticationToken authRequest = new JwtAuthenticationToken(jwtUtils.getUserByToken(token), token);
-
-        return getAuthenticationManager().authenticate(authRequest);
     }
 }

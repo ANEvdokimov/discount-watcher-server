@@ -49,7 +49,7 @@ public class JwtUtils {
         return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().getSubject();
     }
 
-    public User getUserByToken(String token) {
+    public User getUserByToken(String token) throws UsernameNotFoundException {
         log.debug("getting user by token: {}", token);
 
         return userRepository.findByLogin(getLoginFromToken(token)).orElseThrow(

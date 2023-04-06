@@ -8,7 +8,6 @@ import an.evdokimov.discount.watcher.server.service.city.CityServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -42,8 +41,6 @@ class CityControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private final ModelMapper modelMapper = new ModelMapper();
-
     @Autowired
     private JwtUtils jwtUtils;
 
@@ -62,15 +59,15 @@ class CityControllerTest {
                         .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user")))
                 .andReturn();
 
-        ArrayList<CityResponse> cityResponses = objectMapper.readValue(
-                result.getResponse().getContentAsString(),
-                objectMapper.getTypeFactory().constructCollectionType(ArrayList.class, CityResponse.class)
-        );
-
         assertAll(
                 () -> assertEquals(200, result.getResponse().getStatus()),
                 () -> verify(cityService, times(1)).getAll(),
-                () -> assertThat(cityResponses, containsInAnyOrder(cities.toArray()))
+                () -> assertThat(
+                        objectMapper.readValue(
+                                result.getResponse().getContentAsString(),
+                                objectMapper.getTypeFactory().constructCollectionType(ArrayList.class, CityResponse.class)
+                        ),
+                        containsInAnyOrder(cities.toArray()))
         );
     }
 

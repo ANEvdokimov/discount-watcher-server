@@ -226,6 +226,23 @@ class ShopControllerTest {
     }
 
     @Test
+    void getShopById_withoutJwt_http401() throws Exception {
+        ShopResponse shop1 = ShopResponse.builder()
+                .id(1L)
+                .name("shop1")
+                .build();
+        when(shopService.getShopById(1L)).thenReturn(shop1);
+
+        MvcResult result = mvc.perform(get("/api/shop/" + shop1.getId()))
+                .andReturn();
+
+        assertAll(
+                () -> assertEquals(401, result.getResponse().getStatus()),
+                () -> verify(shopService, times(0)).getShopById(shop1.getId())
+        );
+    }
+
+    @Test
     void getShopById_nonexistentShop_http400() throws Exception {
         when(shopService.getShopById(anyLong())).thenThrow(new ServerException(ServerErrorCode.SHOP_NOT_FOUND));
 

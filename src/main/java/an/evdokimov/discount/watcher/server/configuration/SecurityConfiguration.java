@@ -2,7 +2,6 @@ package an.evdokimov.discount.watcher.server.configuration;
 
 import an.evdokimov.discount.watcher.server.security.JwtAuthenticationFilter;
 import an.evdokimov.discount.watcher.server.security.JwtAuthenticationProvider;
-import an.evdokimov.discount.watcher.server.security.JwtUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,15 +20,13 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration {
-    private final JwtUtils jwtUtils;
     private final JwtAuthenticationProvider jwtAuthenticationProvider;
     @Value("${springdoc.api-docs.path}")
     private String docsUrl;
     @Value("${springdoc.swagger-ui.path}")
     private String swaggerUiUrl;
 
-    public SecurityConfiguration(JwtUtils jwtUtils, JwtAuthenticationProvider jwtAuthenticationProvider) {
-        this.jwtUtils = jwtUtils;
+    public SecurityConfiguration(JwtAuthenticationProvider jwtAuthenticationProvider) {
         this.jwtAuthenticationProvider = jwtAuthenticationProvider;
     }
 
@@ -49,7 +46,7 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public AuthenticationManager authManager(HttpSecurity http) throws Exception {
+    public AuthenticationManager jwtAuthenticationManager(HttpSecurity http) throws Exception {
         AuthenticationManagerBuilder authenticationManagerBuilder =
                 http.getSharedObject(AuthenticationManagerBuilder.class);
         authenticationManagerBuilder.authenticationProvider(jwtAuthenticationProvider);
@@ -60,8 +57,8 @@ public class SecurityConfiguration {
     public JwtAuthenticationFilter tokenFilter() {
         return new JwtAuthenticationFilter(
                 "/**",
-                List.of("/api/users/registration", "/api/users/login", docsUrl + "/**", swaggerUiUrl + "/**"),
-                jwtUtils);
+                List.of("/api/users/registration", "/api/users/login", docsUrl + "/**", swaggerUiUrl + "/**")
+        );
     }
 
     @Bean
