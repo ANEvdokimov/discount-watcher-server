@@ -7,7 +7,7 @@ spring:
     username: discount_watcher_server
     password: secret-password
     hikari:
-      schema: discount_watcher_schema_test
+      schema: discount_watcher_schema
 
 server:
   ssl:
