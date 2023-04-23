@@ -44,20 +44,20 @@ dependencies {
     implementation 'org.jsoup:jsoup:1.15.3'
     implementation 'org.jetbrains:annotations:23.0.0'
 
-//    Database
+//  Database
     implementation 'org.postgresql:postgresql'
 
-//    Lombok
+//  Lombok
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     testCompileOnly 'org.projectlombok:lombok'
     testAnnotationProcessor 'org.projectlombok:lombok'
 
-//    MapStruct
+//  MapStruct
     implementation 'org.mapstruct:mapstruct:1.5.3.Final'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.3.Final'
 
-//    When.MAYBE warning fix
+//  When.MAYBE warning fix
     implementation 'com.google.code.findbugs:jsr305:3.0.2'
 }
 
