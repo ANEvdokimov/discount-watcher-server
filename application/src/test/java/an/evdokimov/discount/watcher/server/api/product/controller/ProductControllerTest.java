@@ -65,12 +65,6 @@ class ProductControllerTest {
                 .priceWithCard(BigDecimal.valueOf(50))
                 .priceWithDiscount(BigDecimal.valueOf(30))
                 .build();
-        ProductResponse productResponse = ProductResponse.builder()
-                .id(2312312L)
-                .prices(List.of(productPriceResponse))
-                .build();
-
-        when(productService.addProduct(any(), any())).thenReturn(productResponse);
 
         NewProductRequest request = NewProductRequest.builder()
                 .shopId(1L)
@@ -88,9 +82,6 @@ class ProductControllerTest {
 
         assertAll(
                 () -> assertEquals(200, result.getResponse().getStatus()),
-                () -> assertEquals(
-                        mapper.writeValueAsString(productResponse),
-                        result.getResponse().getContentAsString()),
                 () -> verify(productService, times(1))
                         .addProduct(eq(testConfig.getTestUser()), eq(request))
         );

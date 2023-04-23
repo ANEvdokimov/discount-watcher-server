@@ -19,13 +19,15 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     // ---------------- BASIC OPERATIONS ----------------
 
-    default void saveIfAbsent(Product product) {
+    default Product findOrCreateByProductInformationAndShop(ProductInformation productInformation, Shop shop) {
         Optional<Product> productFromDb =
-                findByProductInformationAndShop(product.getProductInformation(), product.getShop());
+                findByProductInformationAndShop(productInformation, shop);
         if (productFromDb.isEmpty()) {
+            Product product = Product.builder().productInformation(productInformation).shop(shop).build();
             save(product);
+            return product;
         } else {
-            product.setId(productFromDb.get().getId());
+            return productFromDb.get();
         }
     }
 

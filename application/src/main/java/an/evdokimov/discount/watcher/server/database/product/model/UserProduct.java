@@ -4,11 +4,13 @@ import an.evdokimov.discount.watcher.server.database.user.model.User;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.Hibernate;
+import org.hibernate.annotations.DynamicUpdate;
 
 import java.util.Objects;
 
 @Entity
 @Table(name = "user_product")
+@DynamicUpdate
 @Getter
 @Setter
 @ToString

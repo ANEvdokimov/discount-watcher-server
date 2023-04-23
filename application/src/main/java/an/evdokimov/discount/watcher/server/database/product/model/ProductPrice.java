@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.Hibernate;
+import org.hibernate.annotations.DynamicUpdate;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -12,6 +13,7 @@ import java.util.Objects;
 @Entity
 @Table(name = "product_price")
 @Inheritance(strategy = InheritanceType.JOINED)
+@DynamicUpdate
 @Getter
 @Setter
 @ToString
@@ -39,6 +41,8 @@ public class ProductPrice {
     private Boolean isInStock;
     private String availabilityInformation;
     private LocalDateTime date;
+    @Enumerated(EnumType.STRING)
+    private ParsingStatus parsingStatus;
 
     @Override
     public boolean equals(Object o) {

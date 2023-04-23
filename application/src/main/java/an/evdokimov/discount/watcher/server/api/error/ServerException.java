@@ -13,9 +13,13 @@ public class ServerException extends Exception {
         this.errorCode = errorCode;
     }
 
-    public ServerException(ServerErrorCode errorCode, Throwable cause, boolean enableSuppression,
-                           boolean writableStackTrace) {
-        super(errorCode.getMessage(), cause, enableSuppression, writableStackTrace);
+    public ServerException(ServerErrorCode errorCode, String details) {
+        super(errorCode.getMessage() + " Details: " + details);
+        this.errorCode = errorCode;
+    }
+
+    public ServerException(ServerErrorCode errorCode, String details, Throwable cause) {
+        super(errorCode.getMessage() + " Details: " + details, cause);
         this.errorCode = errorCode;
     }
 }

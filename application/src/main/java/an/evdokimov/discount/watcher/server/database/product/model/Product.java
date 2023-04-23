@@ -38,24 +38,26 @@ public class Product {
     @OneToMany(mappedBy = "product")
     @OrderBy("date DESC")
     @ToString.Exclude
-    private List<ProductPrice> prices;
+    @Builder.Default
+    private List<ProductPrice> prices = new ArrayList<>();
 
     public void addPrice(ProductPrice price) {
-        ArrayList<ProductPrice> newPrices = new ArrayList<>(getPrices());
-        newPrices.add(price);
-        setPrices(newPrices);
+        prices.add(price);
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        Product product = (Product) o;
-        return id != null && Objects.equals(id, product.id);
+        Product that = (Product) o;
+        return id != null
+                && Objects.equals(getId(), that.getId())
+                && Objects.equals(getProductInformation().getId(), that.getProductInformation().getId())
+                && Objects.equals(getShop().getId(), that.getShop().getId());
     }
 
     @Override
     public int hashCode() {
-        return getClass().hashCode();
+        return Objects.hash(getId(), getProductInformation().getId(), getShop().getId());
     }
 }

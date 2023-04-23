@@ -3,6 +3,8 @@ package an.evdokimov.discount.watcher.server.mapper.product;
 import an.evdokimov.discount.watcher.server.api.product.dto.response.LentaProductPriceResponse;
 import an.evdokimov.discount.watcher.server.api.product.dto.response.ProductPriceResponse;
 import an.evdokimov.discount.watcher.server.database.product.model.LentaProductPrice;
+import an.evdokimov.discount.watcher.server.database.product.model.ParsingStatus;
+import an.evdokimov.discount.watcher.server.database.product.model.Product;
 import an.evdokimov.discount.watcher.server.database.product.model.ProductPrice;
 import org.mapstruct.Mapper;
 
@@ -20,15 +22,29 @@ public abstract class ProductPriceMapper {
         );
     }
 
-    public ProductPriceResponse map(ProductPrice productPrice){
+    public ProductPriceResponse map(ProductPrice productPrice) {
         return productMappers.get(productPrice.getClass()).apply(productPrice);
     }
 
     abstract ProductPriceResponse mapProductPrice(ProductPrice productPrice);
 
-    private LentaProductPriceResponse mapLentaProductPrice(ProductPrice productPrice){
+    private LentaProductPriceResponse mapLentaProductPrice(ProductPrice productPrice) {
         return mapLentaProductPrice((LentaProductPrice) productPrice);
     }
 
     abstract LentaProductPriceResponse mapLentaProductPrice(LentaProductPrice productPrice);
+
+    public ProductPrice mapNewPrice(Product product) { //todo refactor
+        if (product.getProductInformation().getUrl().getHost().equals("lenta.com")) {
+            return LentaProductPrice.builder()
+                    .product(product)
+                    .parsingStatus(ParsingStatus.PROCESSING)
+                    .build();
+        } else {
+            return ProductPrice.builder()
+                    .product(product)
+                    .parsingStatus(ParsingStatus.PROCESSING)
+                    .build();
+        }
+    }
 }

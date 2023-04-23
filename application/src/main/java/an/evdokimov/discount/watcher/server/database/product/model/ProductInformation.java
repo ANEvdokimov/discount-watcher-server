@@ -3,12 +3,14 @@ package an.evdokimov.discount.watcher.server.database.product.model;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.Hibernate;
+import org.hibernate.annotations.DynamicUpdate;
 
 import java.net.URL;
 import java.util.Objects;
 
 @Entity
 @Table(name = "product_information")
+@DynamicUpdate
 @Getter
 @Setter
 @ToString
@@ -19,7 +21,7 @@ public class ProductInformation {
     @Id
     @GeneratedValue(
             strategy = GenerationType.SEQUENCE,
-            generator = "product_information_is_generator"
+            generator = "product_information_id_generator"
     )
     @SequenceGenerator(
             name = "product_information_id_generator",
@@ -29,17 +31,23 @@ public class ProductInformation {
     private Long id;
     private String name;
     private URL url;
+    @Enumerated(EnumType.STRING)
+    private ParsingStatus parsingStatus;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
         ProductInformation that = (ProductInformation) o;
-        return id != null && Objects.equals(id, that.id);
+        return id != null
+                && Objects.equals(getId(), that.getId())
+                && Objects.equals(getName(), that.getName())
+                && Objects.equals(getUrl(), that.getUrl())
+                && Objects.equals(getParsingStatus(), that.getParsingStatus());
     }
 
     @Override
     public int hashCode() {
-        return getClass().hashCode();
+        return Objects.hash(getId(), getName(), getUrl(), getParsingStatus());
     }
 }

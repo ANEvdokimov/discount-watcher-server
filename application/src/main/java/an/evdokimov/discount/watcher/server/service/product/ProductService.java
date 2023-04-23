@@ -29,7 +29,7 @@ public interface ProductService {
                                                       @Nullable Boolean monitorPriceChanges)
             throws ServerException;
 
-    ProductResponse addProduct(@NotNull User user, @NotNull NewProductRequest newProduct) throws ServerException;
+    void addProduct(@NotNull User user, @NotNull NewProductRequest newProduct) throws ServerException;
 
-    Product updateProduct(@NotNull Product product) throws ServerException;
+    void updateProduct(@NotNull Product product);
 }

@@ -5,12 +5,14 @@ import jakarta.persistence.Table;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.Hibernate;
+import org.hibernate.annotations.DynamicUpdate;
 
 import java.math.BigDecimal;
 import java.util.Objects;
 
 @Entity
 @Table(name = "product_price_lenta")
+@DynamicUpdate
 @Getter
 @Setter
 @ToString

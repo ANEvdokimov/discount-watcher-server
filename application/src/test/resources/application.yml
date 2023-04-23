@@ -8,13 +8,14 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: create
+    properties:
+      hibernate:
+        default_schema: discount_watcher_schema_test
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/postgres
     username: discount_watcher_server_test
     password: password-for-tests
-    hikari:
-      schema: discount_watcher_schema_test
 
 application:
   security:
@@ -23,13 +24,10 @@ application:
       expiration-time: 2592000
     header:
       authentication: Authorization
-  parser:
-    lenta-user-agent-header: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.114 Safari/537.36 OPR/89.0.4447.48
-    lenta-referer-header: https://lenta.com/
-  schedule:
-    product-update:
-      min-delay: 0
-      max-delay: 1
+  mq:
+    input-queue-name: "dw-parser-input"
+    output-queue-name: "dw-parser-output"
+    output-error-queue-name: "dw-parser-error"
 
 springdoc:
   api-docs:

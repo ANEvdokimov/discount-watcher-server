@@ -1,13 +1,16 @@
 spring:
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+    properties:
+      hibernate:
+        default_schema: discount_watcher_schema
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/postgres
     username: discount_watcher_server
     password: secret-password
-    hikari:
-      schema: discount_watcher_schema
+  rabbitmq:
+    host: ${RABBIT_HOST}
 
 server:
   ssl:
@@ -24,13 +27,10 @@ application:
       expiration-time: 2592000
     header:
       authentication: Authorization
-  parser:
-    lenta-user-agent-header: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.114 Safari/537.36 OPR/89.0.4447.48
-    lenta-referer-header: https://lenta.com/
-  schedule:
-    product-update:
-      min-delay: 1000
-      max-delay: 3000
+  mq:
+    input-queue-name: "dw-parser-input"
+    output-queue-name: "dw-parser-output"
+    output-error-queue-name: "dw-parser-error"
 
 logging:
   level:

@@ -1,10 +1,13 @@
 package an.evdokimov.discount.watcher.server.service.product;
 
+import an.evdokimov.discount.watcher.server.amqp.dto.ProductForParsing;
+import an.evdokimov.discount.watcher.server.amqp.repository.ParserService;
 import an.evdokimov.discount.watcher.server.api.error.ServerErrorCode;
 import an.evdokimov.discount.watcher.server.api.error.ServerException;
 import an.evdokimov.discount.watcher.server.api.product.dto.request.NewProductRequest;
 import an.evdokimov.discount.watcher.server.api.product.dto.response.ProductResponse;
 import an.evdokimov.discount.watcher.server.database.product.model.Product;
+import an.evdokimov.discount.watcher.server.database.product.model.ProductInformation;
 import an.evdokimov.discount.watcher.server.database.product.model.ProductPrice;
 import an.evdokimov.discount.watcher.server.database.product.repository.ProductInformationRepository;
 import an.evdokimov.discount.watcher.server.database.product.repository.ProductPriceRepository;
@@ -14,49 +17,31 @@ import an.evdokimov.discount.watcher.server.database.shop.model.Shop;
 import an.evdokimov.discount.watcher.server.database.shop.repository.ShopRepository;
 import an.evdokimov.discount.watcher.server.database.user.model.User;
 import an.evdokimov.discount.watcher.server.mapper.product.ProductMapper;
+import an.evdokimov.discount.watcher.server.mapper.product.ProductPriceMapper;
 import an.evdokimov.discount.watcher.server.mapper.product.UserProductMapper;
-import an.evdokimov.discount.watcher.server.parser.Parser;
-import an.evdokimov.discount.watcher.server.parser.ParserException;
-import an.evdokimov.discount.watcher.server.parser.ParserFactory;
-import an.evdokimov.discount.watcher.server.parser.ParserFactoryException;
-import an.evdokimov.discount.watcher.server.parser.downloader.PageDownloaderException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.stream.Collectors;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
-    private final ParserFactory parserFactory;
     private final ProductRepository productRepository;
     private final UserProductRepository userProductRepository;
     private final ProductPriceRepository productPriceRepository;
     private final ProductInformationRepository productInformationRepository;
     private final ShopRepository shopRepository;
     private final ProductMapper productMapper;
+    private final ProductPriceMapper productPriceMapper;
     private final UserProductMapper userProductMapper;
-
-    public ProductServiceImpl(ParserFactory parserFactory,
-                              ProductRepository productRepository,
-                              UserProductRepository userProductRepository,
-                              ProductPriceRepository productPriceRepository,
-                              ProductInformationRepository productInformationRepository,
-                              ShopRepository shopRepository,
-                              ProductMapper productMapper,
-                              UserProductMapper userProductMapper) {
-        this.parserFactory = parserFactory;
-        this.productRepository = productRepository;
-        this.userProductRepository = userProductRepository;
-        this.productPriceRepository = productPriceRepository;
-        this.productInformationRepository = productInformationRepository;
-        this.shopRepository = shopRepository;
-        this.productMapper = productMapper;
-        this.userProductMapper = userProductMapper;
-    }
+    private final ParserService parserService;
 
     @Override
     public ProductResponse getProduct(@NotNull Long id, boolean withPriceHistory) throws ServerException {
@@ -140,55 +125,46 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResponse addProduct(@NotNull User user, @NotNull NewProductRequest newProduct)
+    @Transactional
+    public void addProduct(@NotNull User user, @NotNull NewProductRequest newProduct)
             throws ServerException {
         Shop shop = shopRepository.findById(newProduct.getShopId())
                 .orElseThrow(() -> new ServerException(ServerErrorCode.SHOP_NOT_FOUND));
 
-        Parser parser;
-        try {
-            parser = parserFactory.getParser(newProduct.getUrl());
-        } catch (ParserFactoryException e) {
-            throw new ServerException(ServerErrorCode.UNSUPPORTED_SHOP, e);
-        }
+        ProductInformation information = productInformationRepository.findOrCreateByUrl(newProduct.getUrl());
+        Product product = productRepository.findOrCreateByProductInformationAndShop(information, shop);
 
-        Product parsedProduct;
-        try {
-            parsedProduct = parser.parse(newProduct.getUrl(), shop);
-        } catch (PageDownloaderException e) {
-            throw new ServerException(ServerErrorCode.PAGE_DOWNLOAD_ERROR, e);
-        } catch (ParserException e) {
-            throw new ServerException(ServerErrorCode.PARSE_PAGE_ERROR, e);
-        }
+        ProductPrice price = productPriceMapper.mapNewPrice(product);
+        productPriceRepository.save(price);
+        product.addPrice(price);
 
-        productInformationRepository.saveIfAbsent(parsedProduct.getProductInformation());
-        productRepository.saveIfAbsent(parsedProduct);
-        productPriceRepository.saveAll(parsedProduct.getPrices());
-        userProductRepository.saveOrUpdate(userProductMapper.map(newProduct, user, parsedProduct));
+        userProductRepository.saveOrUpdate(userProductMapper.map(newProduct, user, product));
 
-        return productMapper.map(parsedProduct);
+        parserService.parseProduct(
+                new ProductForParsing(
+                        information.getId(),
+                        price.getId(),
+                        information.getUrl(),
+                        shop.getCookie()
+                )
+        );
     }
 
     @Override
-    public Product updateProduct(@NotNull Product product) throws ServerException {
-        Parser parser;
-        try {
-            parser = parserFactory.getParser(product.getProductInformation().getUrl());
-        } catch (ParserFactoryException e) {
-            throw new ServerException(ServerErrorCode.UNSUPPORTED_SHOP, e);
-        }
+    @Transactional
+    public void updateProduct(@NotNull Product product) {
+        ProductPrice productPrice = productPriceMapper.mapNewPrice(product);
 
-        ProductPrice parsedProductPrice;
-        try {
-            parsedProductPrice = parser.parse(product);
-        } catch (PageDownloaderException e) {
-            throw new ServerException(ServerErrorCode.PAGE_DOWNLOAD_ERROR, e);
-        } catch (ParserException e) {
-            throw new ServerException(ServerErrorCode.PARSE_PAGE_ERROR, e);
-        }
+        productPriceRepository.save(productPrice);
+        product.addPrice(productPrice);
 
-        productPriceRepository.save(parsedProductPrice);
-        product.addPrice(parsedProductPrice);
-        return product;
+        parserService.parseProduct(
+                new ProductForParsing(
+                        product.getProductInformation().getId(),
+                        productPrice.getId(),
+                        product.getProductInformation().getUrl(),
+                        product.getShop().getCookie()
+                )
+        );
     }
 }

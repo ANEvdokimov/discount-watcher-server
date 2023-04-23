@@ -7,7 +7,10 @@ public enum ServerErrorCode {
     UNSUPPORTED_SHOP("The url is incorrect or unsupported shop"),
     PAGE_DOWNLOAD_ERROR("Unable to download page."),
     PARSE_PAGE_ERROR("Error in parsing page"),
-    PRODUCT_NOT_FOUND("A product with this id not found.");
+    PRODUCT_NOT_FOUND("A product with this id not found."),
+    PRODUCT_PRICE_NOT_FOUND("Product price with this id not found"),
+    PRODUCT_INFORMATION_NOT_FOUND("Product information with this id not found"),
+    PARSE_RESPONSE_ID_ERROR("ProductInformationId and ProductPriceId can not be null.");
 
     private final String message;
 
@@ -17,5 +20,13 @@ public enum ServerErrorCode {
 
     public String getMessage() {
         return message;
+    }
+
+    public void throwException() throws ServerException {
+        throw new ServerException(this);
+    }
+
+    public void throwException(String details) throws ServerException {
+        throw new ServerException(this, details);
     }
 }

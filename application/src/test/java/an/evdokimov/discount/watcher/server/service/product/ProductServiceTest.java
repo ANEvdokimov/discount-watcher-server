@@ -1,14 +1,12 @@
 package an.evdokimov.discount.watcher.server.service.product;
 
+import an.evdokimov.discount.watcher.server.amqp.dto.ProductForParsing;
+import an.evdokimov.discount.watcher.server.amqp.repository.ParserService;
 import an.evdokimov.discount.watcher.server.api.error.ServerException;
 import an.evdokimov.discount.watcher.server.api.product.dto.request.NewProductRequest;
-import an.evdokimov.discount.watcher.server.api.product.dto.response.LentaProductPriceResponse;
 import an.evdokimov.discount.watcher.server.api.product.dto.response.ProductPriceResponse;
 import an.evdokimov.discount.watcher.server.api.product.dto.response.ProductResponse;
-import an.evdokimov.discount.watcher.server.database.product.model.LentaProductPrice;
-import an.evdokimov.discount.watcher.server.database.product.model.Product;
-import an.evdokimov.discount.watcher.server.database.product.model.ProductInformation;
-import an.evdokimov.discount.watcher.server.database.product.model.ProductPrice;
+import an.evdokimov.discount.watcher.server.database.product.model.*;
 import an.evdokimov.discount.watcher.server.database.product.repository.ProductInformationRepository;
 import an.evdokimov.discount.watcher.server.database.product.repository.ProductPriceRepository;
 import an.evdokimov.discount.watcher.server.database.product.repository.ProductRepository;
@@ -16,21 +14,19 @@ import an.evdokimov.discount.watcher.server.database.product.repository.UserProd
 import an.evdokimov.discount.watcher.server.database.shop.model.Shop;
 import an.evdokimov.discount.watcher.server.database.shop.repository.ShopRepository;
 import an.evdokimov.discount.watcher.server.database.user.model.User;
-import an.evdokimov.discount.watcher.server.parser.ParserException;
-import an.evdokimov.discount.watcher.server.parser.ParserFactory;
-import an.evdokimov.discount.watcher.server.parser.ParserFactoryException;
-import an.evdokimov.discount.watcher.server.parser.downloader.PageDownloaderException;
-import an.evdokimov.discount.watcher.server.parser.lenta.LentaParser;
+import an.evdokimov.discount.watcher.server.mapper.product.ProductPriceMapper;
+import an.evdokimov.discount.watcher.server.mapper.product.UserProductMapper;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -39,19 +35,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.AdditionalMatchers.not;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest
 class ProductServiceTest {
-    @MockBean
-    private LentaParser lentaParser;
-
-    @MockBean
-    private ParserFactory parserFactory;
-
     @MockBean
     private ProductRepository productRepository;
 
@@ -67,88 +56,74 @@ class ProductServiceTest {
     @MockBean
     private ShopRepository shopRepository;
 
+    @MockBean
+    private ParserService parserService;
+
+    @SpyBean
+    private ProductPriceMapper productPriceMapper;
+
+    @MockBean
+    private UserProductMapper userProductMapper;
+
     @Autowired
     private ProductServiceImpl productService;
 
-    @BeforeEach
-    public void mockFactory() throws MalformedURLException, ParserFactoryException {
-        URL urlLenta = new URL("https://lenta.com");
-        when(parserFactory.getParser(urlLenta)).thenReturn(lentaParser);
-        when(parserFactory.getParser(not(eq(urlLenta)))).thenThrow(new ParserFactoryException());
-    }
-
     @Test
-    void addProduct_LentaProduct_LentaProductResponse() throws ParserException, PageDownloaderException, MalformedURLException, ServerException {
-        LentaProductPrice productPrice = LentaProductPrice.builder()
-                .price(BigDecimal.valueOf(100))
-                .priceWithDiscount(BigDecimal.valueOf(50))
-                .priceWithCard(BigDecimal.valueOf(50))
-                .build();
-        Product product = Product.builder()
-                .prices(List.of(productPrice))
-                .build();
-        productPrice.setProduct(product);
-
-        User user = User.builder().id(66L).build();
-
-        LentaProductPriceResponse expectedProductPrice = LentaProductPriceResponse.builder()
-                .price(BigDecimal.valueOf(100))
-                .priceWithDiscount(BigDecimal.valueOf(50))
-                .priceWithCard(BigDecimal.valueOf(50))
-                .build();
-        ProductResponse expectedProduct = ProductResponse.builder()
-                .prices(List.of(expectedProductPrice))
-                .build();
-
-        when(shopRepository.findById(666L)).thenReturn(Optional.of(new Shop()));
-        when(lentaParser.parse(any(URL.class), any())).thenReturn(product);
-
-        ProductResponse result = productService.addProduct(
-                user,
-                new NewProductRequest(
-                        new URL("https://lenta.com"),
-                        666L,
-                        true,
-                        false,
-                        false
-                )
+    void addProduct_LentaProduct_LentaProductResponse() throws MalformedURLException, ServerException {
+        NewProductRequest request = new NewProductRequest(
+                new URL("https://lenta.com"),
+                666L,
+                true,
+                false,
+                false
         );
 
+        User mockedUser = User.builder().id(66L).build();
+        Shop mockedShop = Shop.builder().id(666L).build();
+        ProductInformation mockedInformation = ProductInformation.builder()
+                .id(11L)
+                .url(request.getUrl())
+                .parsingStatus(ParsingStatus.PROCESSING)
+                .build();
+        Product mockedProduct = Product.builder()
+                .id(11L)
+                .productInformation(mockedInformation)
+                .shop(mockedShop)
+                .build();
+        LentaProductPrice mockedPrice = LentaProductPrice.builder()
+                .id(11L)
+                .parsingStatus(ParsingStatus.PROCESSING)
+                .build();
+        UserProduct mockedUserProduct = UserProduct.builder()
+                .id(11L)
+                .product(mockedProduct)
+                .user(mockedUser)
+                .monitorDiscount(request.getMonitorDiscount())
+                .monitorAvailability(request.getMonitorAvailability())
+                .monitorPriceChanges(request.getMonitorPriceChanges())
+                .build();
+
+        when(shopRepository.findById(mockedShop.getId())).thenReturn(Optional.of(mockedShop));
+        when(productInformationRepository.findOrCreateByUrl(request.getUrl())).thenReturn(mockedInformation);
+        when(productRepository.findOrCreateByProductInformationAndShop(mockedInformation, mockedShop))
+                .thenReturn(mockedProduct);
+        when(productPriceMapper.mapNewPrice(mockedProduct)).thenReturn(mockedPrice);
+        when(userProductMapper.map(request, mockedUser, mockedProduct)).thenReturn(mockedUserProduct);
+
+
+        ProductForParsing expectedResult = ProductForParsing.builder()
+                .productInformationId(mockedInformation.getId())
+                .productPriceId(mockedPrice.getId())
+                .url(mockedInformation.getUrl())
+                .cookie(mockedShop.getCookie())
+                .build();
+
+        productService.addProduct(mockedUser, request);
+
         assertAll(
-                () -> assertEquals(expectedProduct, result),
-                () -> verify(productRepository, times(1)).saveIfAbsent(product)
-        );
-    }
-
-    @Test
-    void addProduct_LentaProduct_PageDownloaderException() throws ParserException, PageDownloaderException {
-        when(shopRepository.findById(666L)).thenReturn(Optional.of(new Shop()));
-        when(lentaParser.parse(any(URL.class), any(Shop.class))).thenThrow(PageDownloaderException.class);
-
-        assertAll(
-                () -> assertThrows(
-                        ServerException.class,
-                        () -> productService.addProduct(
-                                User.builder().id(66L).build(),
-                                new NewProductRequest(new URL("https://lenta.com"), 666L, true, true, true))
-                ),
-                () -> verify(productRepository, times(0)).save(any(Product.class))
-        );
-    }
-
-    @Test
-    void addProduct_LentaProduct_ParserException() throws ParserException, PageDownloaderException {
-        when(shopRepository.findById(666L)).thenReturn(Optional.of(new Shop()));
-        when(lentaParser.parse(any(URL.class), any(Shop.class))).thenThrow(ParserException.class);
-
-        assertAll(
-                () -> assertThrows(
-                        ServerException.class,
-                        () -> productService.addProduct(
-                                User.builder().id(66L).build(),
-                                new NewProductRequest(new URL("https://lenta.com"), 666L, true, true, true))
-                ),
-                () -> verify(productRepository, times(0)).save(any(Product.class))
+                () -> verify(productPriceRepository).save(mockedPrice),
+                () -> verify(userProductRepository).saveOrUpdate(mockedUserProduct),
+                () -> verify(parserService).parseProduct(expectedResult)
         );
     }
 
@@ -513,41 +488,35 @@ class ProductServiceTest {
     }
 
     @Test
-    void updateProduct_validProduct_updatedProducts() throws ParserException, PageDownloaderException, ServerException,
-            MalformedURLException {
+    void updateProduct_validProduct_updatedProducts() throws MalformedURLException {
         ProductPrice oldPrice = ProductPrice.builder().id(1L).price(BigDecimal.valueOf(100)).build();
-        Product product = Product.builder()
+        Product mockedProduct = Product.builder()
                 .id(666L)
                 .shop(Shop.builder().id(1L).build())
                 .productInformation(ProductInformation.builder().id(1L).name("product")
                         .url(new URL("https://lenta.com")).build())
-                .prices(List.of(oldPrice))
+                .prices(new ArrayList<>(List.of(oldPrice)))
+                .build();
+        ProductPrice mockedPrice = ProductPrice.builder()
+                .product(mockedProduct)
+                .parsingStatus(ParsingStatus.PROCESSING)
                 .build();
 
-        LentaProductPrice parsedProductPrice = LentaProductPrice.builder().price(BigDecimal.valueOf(5000)).build();
-        Product parsedProduct = Product.builder()
-                .id(666L)
-                .shop(Shop.builder().id(1L).build())
-                .productInformation(ProductInformation.builder().id(1L).name("product")
-                        .url(new URL("https://lenta.com")).build())
-                .prices(List.of(oldPrice, parsedProductPrice))
-                .build();
+        when(productPriceMapper.mapNewPrice(mockedProduct)).thenReturn(mockedPrice);
 
-        when(lentaParser.parse(product)).thenReturn(parsedProductPrice);
+        ProductForParsing expectedResult = new ProductForParsing(
+                mockedProduct.getProductInformation().getId(),
+                mockedPrice.getId(),
+                mockedProduct.getProductInformation().getUrl(),
+                mockedProduct.getShop().getCookie()
+        );
 
-        assertEquals(parsedProduct, productService.updateProduct(product));
-    }
+        productService.updateProduct(mockedProduct);
 
-    @Test
-    void updateProduct_wrongUrl_ServerException() throws MalformedURLException {
-        Product product = Product.builder()
-                .shop(Shop.builder().id(1L).build())
-                .productInformation(ProductInformation.builder().id(1L).name("product")
-                        .url(new URL("https://not-lenta.com")).build())
-                .prices(List.of(ProductPrice.builder().id(1L).price(BigDecimal.valueOf(100)).build()))
-                .build();
-
-        assertThrows(ServerException.class, () -> productService.updateProduct(product));
+        assertAll(
+                () -> verify(productPriceRepository).save(mockedPrice),
+                () -> verify(parserService).parseProduct(expectedResult)
+        );
     }
 
     @Test

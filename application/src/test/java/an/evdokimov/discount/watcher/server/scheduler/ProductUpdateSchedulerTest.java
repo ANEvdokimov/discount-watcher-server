@@ -51,7 +51,7 @@ class ProductUpdateSchedulerTest {
 
         when(productRepository.findAllTrackedProducts()).thenReturn(List.of(product1, product2, product3));
 
-        productUpdateScheduler.updateProduct();
+        productUpdateScheduler.updateProducts();
         assertAll(
                 () -> verify(productService, times(1)).updateProduct(product1),
                 () -> verify(productService, times(1)).updateProduct(product2),

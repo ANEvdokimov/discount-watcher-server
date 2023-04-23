@@ -3,6 +3,10 @@ CREATE SCHEMA discount_watcher_schema;
 SET search_path TO discount_watcher_schema;
 
 CREATE TYPE user_role AS ENUM ('ROLE_USER');
+CREATE TYPE parsing_status AS ENUM ('PROCESSING', 'COMPLETE', 'ERROR');
+
+CREATE CAST (character varying as user_role) WITH INOUT AS IMPLICIT;
+CREATE CAST (character varying as parsing_status) WITH INOUT AS IMPLICIT;
 
 CREATE SEQUENCE user_sequence;
 
@@ -10,9 +14,10 @@ CREATE TABLE "user"
 (
     id            BIGINT PRIMARY KEY,
     login         VARCHAR(256) NOT NULL UNIQUE,
+    password      VARCHAR(255) NOT NULL,
     name          VARCHAR(256) NOT NULL,
     register_date TIMESTAMP    NOT NULL,
-    role          user_role    NOT NULL DEFAULT 'ROLE_USER',
+    role          USER_ROLE    NOT NULL DEFAULT 'ROLE_USER',
     enabled       BOOLEAN      NOT NULL DEFAULT TRUE
 );
 
@@ -48,9 +53,10 @@ CREATE TABLE shop
 CREATE SEQUENCE product_information_sequence;
 CREATE TABLE product_information
 (
-    id   BIGINT PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    url  VARCHAR(512) NOT NULL UNIQUE
+    id             BIGINT PRIMARY KEY,
+    name           VARCHAR(255),
+    url            VARCHAR(512)   NOT NULL UNIQUE,
+    parsing_status PARSING_STATUS NOT NULL
 );
 CREATE INDEX ON product_information (url);
 
@@ -71,12 +77,13 @@ CREATE TABLE product_price
 (
     id                       BIGINT PRIMARY KEY,
     product_id               BIGINT         NOT NULL,
-    price                    DECIMAL(10, 2) NOT NULL,--TODO money
+    price                    DECIMAL(10, 2),--TODO money
     discount                 DOUBLE PRECISION,
     price_with_discount      DECIMAL(10, 2),
-    is_in_stock              BOOLEAN        NOT NULL,
+    is_in_stock              BOOLEAN,
     availability_information VARCHAR(255),
-    date                     TIMESTAMP      NOT NULL,
+    date                     TIMESTAMP,
+    parsing_status           PARSING_STATUS NOT NULL,
     FOREIGN KEY (product_id) REFERENCES product (id) ON UPDATE CASCADE ON DELETE RESTRICT
 );
 
@@ -101,3 +108,12 @@ CREATE TABLE user_product
     UNIQUE (user_id, product_id)
 );
 CREATE INDEX ON user_product (user_id, product_id);
+
+CREATE SEQUENCE parsing_error_sequence;
+CREATE TABLE parsing_error
+(
+    id                     BIGINT PRIMARY KEY,
+    product_price_id       BIGINT REFERENCES product_price (id),
+    product_information_id BIGINT REFERENCES product_information (id) ON UPDATE CASCADE ON DELETE RESTRICT,
+    message                VARCHAR(102400)
+);
