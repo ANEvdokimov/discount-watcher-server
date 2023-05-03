@@ -7,6 +7,7 @@ import an.evdokimov.discount.watcher.server.mapper.shop.ShopMapper;
 import org.mapstruct.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,7 +38,7 @@ public abstract class ProductMapper {
                     .map(productPrice -> productPriceMapper.map(productPrice))
                     .collect(Collectors.toList());
         } else {
-            productPriceResponses = null;
+            productPriceResponses = new ArrayList<>();
         }
 
         return ProductResponse.builder()
