@@ -1,8 +1,9 @@
 package an.evdokimov.discount.watcher.server.database.product.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.Hibernate;
 
@@ -12,7 +13,8 @@ import java.util.Objects;
 @Table(name = "parsing_error")
 @Getter
 @Setter
-@RequiredArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
 public class ParsingError {
     @Id
     @GeneratedValue(
@@ -41,12 +43,18 @@ public class ParsingError {
         return getId() != null
                 && Objects.equals(getId(), that.getId())
                 && Objects.equals(getMessage(), that.getMessage())
-                && Objects.equals(getProductPrice().getId(), that.getProductPrice().getId());
+                && Objects.equals(
+                getProductPrice() != null ? getProductPrice().getId() : null,
+                that.getProductPrice() != null ? that.getProductPrice().getId() : null);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getMessage(), getProductPrice().getId());
+        return Objects.hash(getId(),
+                getMessage(),
+                getProductPrice() != null ? getProductPrice().getId() : null,
+                getProductInformation() != null ? getProductInformation().getId() : null
+        );
     }
 
     @Override
@@ -54,8 +62,8 @@ public class ParsingError {
         return "ParsingError{" +
                 "id=" + id +
                 ", message='" + message + '\'' +
-                ", productPriceId=" + productPrice.getId() +
-                ", productInformationId=" + productInformation.getId() +
+                ", productPriceId=" + (productPrice != null ? productPrice.getId() : "null") +
+                ", productInformationId=" + (productInformation != null ? productInformation.getId() : "null") +
                 '}';
     }
 }

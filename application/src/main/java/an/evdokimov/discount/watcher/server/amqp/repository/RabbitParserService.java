@@ -29,7 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class RabbitParserService implements ParserService { //TODO write tests
+public class RabbitParserService implements ParserService {
     private final RabbitTemplate rabbitTemplate;
     private final RabbitProperties rabbitProperties;
     private final ProductPriceRepository priceRepository;
