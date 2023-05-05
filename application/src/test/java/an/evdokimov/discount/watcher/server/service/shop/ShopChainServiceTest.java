@@ -22,16 +22,16 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest
+@SpringBootTest(classes = {ShopChainServiceImpl.class, ModelMapper.class})
 class ShopChainServiceTest {
-    @Autowired
-    private ShopChainServiceImpl service;
+    @MockBean
+    private ShopChainRepository repository;
 
     @Autowired
     private ModelMapper modelMapper;
 
-    @MockBean
-    private ShopChainRepository repository;
+    @Autowired
+    private ShopChainServiceImpl testedService;
 
     private static ShopChain cnInCity1;
     private static ShopChain cnInCities1And17;
@@ -61,7 +61,7 @@ class ShopChainServiceTest {
 
     @Test
     void getAllCommercialNetworks_viewShopsFalseCityNull_listOfCn() {
-        Collection<ShopChainResponse> result = service.getShopChains(false, null);
+        Collection<ShopChainResponse> result = testedService.getShopChains(false, null);
 
         List<ShopChainResponse> expectedResult = modelMapper.map(
                 List.of(cnInCity1, cnInCities1And17, cnInCity17),
@@ -73,7 +73,7 @@ class ShopChainServiceTest {
 
     @Test
     void getAllCommercialNetworks_viewShopsTrueCityNull_listOfCn() {
-        Collection<ShopChainResponse> result = service.getShopChains(true, null);
+        Collection<ShopChainResponse> result = testedService.getShopChains(true, null);
 
         List<ShopChainResponse> expectedResult = modelMapper.map(
                 List.of(cnInCity1, cnInCities1And17, cnInCity17),
@@ -85,7 +85,7 @@ class ShopChainServiceTest {
 
     @Test
     void getAllCommercialNetworks_viewShopsFalseCity1_listOfCn() {
-        Collection<ShopChainResponse> result = service.getShopChains(false, 1L);
+        Collection<ShopChainResponse> result = testedService.getShopChains(false, 1L);
 
         List<ShopChainResponse> expectedResult = modelMapper.map(
                 List.of(cnInCity1, cnInCities1And17),
@@ -97,7 +97,7 @@ class ShopChainServiceTest {
 
     @Test
     void getAllCommercialNetworks_viewShopsTrueCity17_listOfCn() {
-        Collection<ShopChainResponse> result = service.getShopChains(true, 17L);
+        Collection<ShopChainResponse> result = testedService.getShopChains(true, 17L);
 
         List<ShopChainResponse> expectedResult = modelMapper.map(
                 List.of(cnInCities1And17, cnInCity17),

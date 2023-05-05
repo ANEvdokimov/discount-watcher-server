@@ -17,16 +17,15 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest
+@SpringBootTest(classes = ProductUpdateScheduler.class)
 class ProductUpdateSchedulerTest {
-    @Autowired
-    private ProductUpdateScheduler productUpdateScheduler;
-
     @MockBean
     private ProductServiceImpl productService;
-
     @MockBean
     private ProductRepository productRepository;
+
+    @Autowired
+    private ProductUpdateScheduler testedProductUpdateScheduler;
 
     @Test
     void updateProduct_3Products_updatedProducts() {
@@ -51,7 +50,7 @@ class ProductUpdateSchedulerTest {
 
         when(productRepository.findAllTrackedProducts()).thenReturn(List.of(product1, product2, product3));
 
-        productUpdateScheduler.updateProducts();
+        testedProductUpdateScheduler.updateProducts();
         assertAll(
                 () -> verify(productService, times(1)).updateProduct(product1),
                 () -> verify(productService, times(1)).updateProduct(product2),

@@ -20,16 +20,15 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest
+@SpringBootTest(classes = ShopServiceImpl.class)
 class ShopServiceTest {
     @MockBean
     private ShopRepository shopRepository;
-
-    @Autowired
-    private ShopServiceImpl shopService;
-
-    @Autowired
+    @MockBean
     private ShopMapper shopMapper;
+
+    @Autowired
+    private ShopServiceImpl testedShopService;
 
     @Test
     void getShopById_existingShop_ShopResponse() throws ServerException {
@@ -37,12 +36,17 @@ class ShopServiceTest {
                 .id(1L)
                 .name("shop1")
                 .build();
+        ShopResponse shopResponse = ShopResponse.builder()
+                .id(shopInDb.getId())
+                .name(shopInDb.getName())
+                .build();
+
         when(shopRepository.findById(shopInDb.getId())).thenReturn(Optional.of(shopInDb));
+        when(shopMapper.map(shopInDb)).thenReturn(shopResponse);
 
-        ShopResponse expectedShop = shopMapper.map(shopInDb);
-        ShopResponse returnedShopResponse = shopService.getShopById(1L);
+        ShopResponse returnedShopResponse = testedShopService.getShopById(1L);
 
-        assertEquals(expectedShop, returnedShopResponse);
+        assertEquals(shopResponse, returnedShopResponse);
     }
 
     @Test
@@ -51,7 +55,7 @@ class ShopServiceTest {
 
         assertThrows(
                 ServerException.class,
-                () -> shopService.getShopById(1111L)
+                () -> testedShopService.getShopById(1111L)
         );
     }
 
@@ -69,16 +73,29 @@ class ShopServiceTest {
                 .id(3L)
                 .name("shop3")
                 .build();
-        when(shopRepository.findAll()).thenReturn(List.of(shopInDb1, shopInDb2, shopInDb3));
 
-        Collection<ShopResponse> returnedShops = shopService.getAllShops();
+        ShopResponse shopResponse1 = ShopResponse.builder()
+                .id(shopInDb1.getId())
+                .name(shopInDb1.getName())
+                .build();
+        ShopResponse shopResponse2 = ShopResponse.builder()
+                .id(shopInDb2.getId())
+                .name(shopInDb2.getName())
+                .build();
+        ShopResponse shopResponse3 = ShopResponse.builder()
+                .id(shopInDb3.getId())
+                .name(shopInDb3.getName())
+                .build();
+
+        when(shopRepository.findAll()).thenReturn(List.of(shopInDb1, shopInDb2, shopInDb3));
+        when(shopMapper.map(shopInDb1)).thenReturn(shopResponse1);
+        when(shopMapper.map(shopInDb2)).thenReturn(shopResponse2);
+        when(shopMapper.map(shopInDb3)).thenReturn(shopResponse3);
+
+        Collection<ShopResponse> returnedShops = testedShopService.getAllShops();
         assertThat(
                 returnedShops,
-                containsInAnyOrder(
-                        shopMapper.map(shopInDb1),
-                        shopMapper.map(shopInDb2),
-                        shopMapper.map(shopInDb3)
-                )
+                containsInAnyOrder(shopResponse1, shopResponse2, shopResponse3)
         );
     }
 
@@ -86,7 +103,7 @@ class ShopServiceTest {
     void getAllShops_nonexistentShops_emptyList() {
         when(shopRepository.findAll()).thenReturn(List.of());
 
-        Collection<ShopResponse> returnedShops = shopService.getAllShops();
+        Collection<ShopResponse> returnedShops = testedShopService.getAllShops();
         assertTrue(returnedShops.isEmpty());
     }
 }

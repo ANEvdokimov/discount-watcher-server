@@ -1,11 +1,10 @@
-package an.evdokimov.discount.watcher.server.service;
+package an.evdokimov.discount.watcher.server.service.user;
 
 import an.evdokimov.discount.watcher.server.api.error.ServerException;
 import an.evdokimov.discount.watcher.server.api.user.dto.request.LoginRequest;
 import an.evdokimov.discount.watcher.server.api.user.dto.request.RegisterRequest;
 import an.evdokimov.discount.watcher.server.database.user.model.User;
 import an.evdokimov.discount.watcher.server.database.user.repository.UserRepository;
-import an.evdokimov.discount.watcher.server.service.user.UserServiceImpl;
 import an.evdokimov.securitystarter.security.authentication.jwt.JwtUtils;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
@@ -20,22 +19,19 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest
+@SpringBootTest(classes = UserServiceImpl.class)
 class UserServiceTest {
-    @Autowired
-    private UserServiceImpl userService;
-
     @MockBean
     private UserRepository userRepository;
-
     @MockBean
     private ModelMapper mapper;
-
     @MockBean
     private PasswordEncoder passwordEncoder;
-
     @MockBean
     private JwtUtils jwtUtils;
+
+    @Autowired
+    private UserServiceImpl testesUserService;
 
     @Test
     void register_validDto_logInDtoResponse() throws ServerException {
@@ -48,7 +44,7 @@ class UserServiceTest {
         when(mapper.map(newUserDto, User.class)).thenReturn(User.builder().password("123123").build());
         when(userRepository.findByLogin(newUserDto.getLogin())).thenReturn(Optional.empty());
 
-        userService.register(newUserDto);
+        testesUserService.register(newUserDto);
 
         assertAll(
                 () -> verify(userRepository, times(1)).findByLogin(newUserDto.getLogin()),
@@ -68,7 +64,7 @@ class UserServiceTest {
         when(userRepository.findByLogin(newUserDto.getLogin())).thenReturn(Optional.of(new User()));
 
         assertAll(
-                () -> assertThrows(ServerException.class, () -> userService.register(newUserDto)),
+                () -> assertThrows(ServerException.class, () -> testesUserService.register(newUserDto)),
                 () -> verify(userRepository, times(1)).findByLogin(newUserDto.getLogin()),
                 () -> verify(userRepository, times(0)).save(any())
         );
@@ -91,7 +87,7 @@ class UserServiceTest {
         when(jwtUtils.generateToken(userFromDb.getLogin())).thenReturn("token");
 
         assertAll(
-                () -> assertEquals("token", userService.login(request).getToken()),
+                () -> assertEquals("token", testesUserService.login(request).getToken()),
                 () -> verify(passwordEncoder, times(1))
                         .matches(request.getPassword(), userFromDb.getPassword()),
                 () -> verify(userRepository, times(1)).findByLogin(userFromDb.getLogin()),
@@ -109,7 +105,7 @@ class UserServiceTest {
         when(userRepository.findByLogin(request.getLogin())).thenReturn(Optional.empty());
 
         assertAll(
-                () -> assertThrows(ServerException.class, () -> userService.login(request)),
+                () -> assertThrows(ServerException.class, () -> testesUserService.login(request)),
                 () -> verify(userRepository, times(1)).findByLogin(request.getLogin())
         );
     }
@@ -130,7 +126,7 @@ class UserServiceTest {
         when(passwordEncoder.matches(request.getPassword(), userFromDb.getPassword())).thenReturn(false);
 
         assertAll(
-                () -> assertThrows(ServerException.class, () -> userService.login(request)),
+                () -> assertThrows(ServerException.class, () -> testesUserService.login(request)),
                 () -> verify(passwordEncoder, times(1))
                         .matches(request.getPassword(), userFromDb.getPassword()),
                 () -> verify(userRepository, times(1)).findByLogin(request.getLogin())

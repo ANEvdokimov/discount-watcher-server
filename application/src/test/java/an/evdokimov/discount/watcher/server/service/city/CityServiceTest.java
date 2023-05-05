@@ -19,16 +19,15 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest
+@SpringBootTest(classes = {CityServiceImpl.class, ModelMapper.class})
 class CityServiceTest {
-    @Autowired
-    private final ModelMapper mapper = new ModelMapper();
-
-    @Autowired
-    private CityServiceImpl cityService;
-
     @MockBean
     private CityRepository repository;
+    @Autowired
+    private ModelMapper mapper;
+
+    @Autowired
+    private CityServiceImpl testedCityService;
 
     @Test
     void getAll_3Cities_listOfCityResponse() {
@@ -42,7 +41,7 @@ class CityServiceTest {
                 mapper.map(cities, new TypeToken<ArrayList<CityResponse>>() {
                 }.getType());
 
-        Collection<CityResponse> result = cityService.getAll();
+        Collection<CityResponse> result = testedCityService.getAll();
 
         assertThat(result, containsInAnyOrder(expectedCityResponses.toArray()));
     }
@@ -51,7 +50,7 @@ class CityServiceTest {
     void getAll_noCities_emptyList() {
         when(repository.findAll()).thenReturn(new ArrayList<>());
 
-        Collection<CityResponse> result = cityService.getAll();
+        Collection<CityResponse> result = testedCityService.getAll();
 
         assertEquals(0, result.size());
     }
