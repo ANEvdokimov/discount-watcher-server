@@ -1,6 +1,7 @@
 package an.evdokimov.discount.watcher.server.database.product.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.DynamicUpdate;
@@ -30,8 +31,10 @@ public class ProductInformation {
     )
     private Long id;
     private String name;
+    @NotNull
     private URL url;
     @Enumerated(EnumType.STRING)
+    @NotNull
     private ParsingStatus parsingStatus;
 
     @Override

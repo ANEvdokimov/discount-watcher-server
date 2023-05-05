@@ -2,6 +2,7 @@ package an.evdokimov.discount.watcher.server.database.product.model;
 
 import an.evdokimov.discount.watcher.server.database.user.model.User;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.DynamicUpdate;
@@ -29,11 +30,15 @@ public class UserProduct {
             allocationSize = 1
     )
     private Long id;
-    @ManyToOne
+    @NotNull
+    @ManyToOne(optional = false)
     @JoinColumn(name = "user_id")
+    @ToString.Exclude
     private User user;
-    @ManyToOne
+    @NotNull
+    @ManyToOne(optional = false)
     @JoinColumn(name = "product_id")
+    @ToString.Exclude
     private Product product;
     private boolean monitorDiscount;
     private boolean monitorAvailability;
@@ -44,11 +49,28 @@ public class UserProduct {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
         UserProduct that = (UserProduct) o;
-        return id != null && Objects.equals(id, that.id);
+        return isMonitorDiscount() == that.isMonitorDiscount()
+                && isMonitorAvailability() == that.isMonitorAvailability()
+                && isMonitorPriceChanges() == that.isMonitorPriceChanges()
+                && Objects.equals(getId(), that.getId())
+                && Objects.equals(getUser().getId(), that.getUser().getId())
+                && Objects.equals(getProduct().getId(), that.getProduct().getId());
     }
 
     @Override
     public int hashCode() {
-        return getClass().hashCode();
+        return Objects.hash(getId(), getUser().getId(), getProduct().getId(), isMonitorDiscount(),
+                isMonitorAvailability(), isMonitorPriceChanges());
+    }
+
+    // toString parameters for lombok
+    @ToString.Include(name = "UserId")
+    private Long getUserId() {
+        return getUser().getId();
+    }
+
+    @ToString.Include(name = "ProductId")
+    private Long getProductId() {
+        return getProduct().getId();
     }
 }

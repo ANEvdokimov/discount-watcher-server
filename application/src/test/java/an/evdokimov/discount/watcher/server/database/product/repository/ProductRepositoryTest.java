@@ -1,12 +1,14 @@
 package an.evdokimov.discount.watcher.server.database.product.repository;
 
-import an.evdokimov.discount.watcher.server.database.product.model.Product;
-import an.evdokimov.discount.watcher.server.database.product.model.ProductInformation;
-import an.evdokimov.discount.watcher.server.database.product.model.ProductPrice;
-import an.evdokimov.discount.watcher.server.database.product.model.UserProduct;
+import an.evdokimov.discount.watcher.server.database.city.model.City;
+import an.evdokimov.discount.watcher.server.database.city.repository.CityRepository;
+import an.evdokimov.discount.watcher.server.database.product.model.*;
 import an.evdokimov.discount.watcher.server.database.shop.model.Shop;
+import an.evdokimov.discount.watcher.server.database.shop.model.ShopChain;
+import an.evdokimov.discount.watcher.server.database.shop.repository.ShopChainRepository;
 import an.evdokimov.discount.watcher.server.database.shop.repository.ShopRepository;
 import an.evdokimov.discount.watcher.server.database.user.model.User;
+import an.evdokimov.discount.watcher.server.database.user.model.UserRole;
 import an.evdokimov.discount.watcher.server.database.user.repository.UserRepository;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -17,6 +19,8 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.math.BigDecimal;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -36,139 +40,150 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ProductRepositoryTest {
     @Autowired
-    private ProductRepository productRepository;
+    private ProductRepository testedProductRepository;
 
     @Autowired
     private UserRepository userRepository;
-
     @Autowired
     private UserProductRepository userProductRepository;
-
     @Autowired
-    private ProductInformationRepository productInformationRepository;
-
+    private ProductInformationRepository informationRepository;
     @Autowired
-    private ProductPriceRepository productPriceRepository;
-
+    private ProductPriceRepository priceRepository;
     @Autowired
     private ShopRepository shopRepository;
+    @Autowired
+    private CityRepository cityRepository;
+    @Autowired
+    private ShopChainRepository shopChainRepository;
 
     @BeforeAll
-    public void fillDb() {
-        user1 = userRepository.save(User.builder().name("user1").build());
-        user2 = userRepository.save(User.builder().name("user2").build());
-        user3 = userRepository.save(User.builder().name("user3").build());
-        user4 = userRepository.save(User.builder().name("user4").build());
-        user5 = userRepository.save(User.builder().name("user5").build());
-        user6 = userRepository.save(User.builder().name("user6").build());
-        userRepository.flush();
+    public void fillDb() throws MalformedURLException {
+        user1 = userRepository.save(User.builder().name("user1").login("login1").password("pass")
+                .role(UserRole.ROLE_USER).enabled(true).registerDate(LocalDateTime.now()).build());
+        user2 = userRepository.save(User.builder().name("user2").login("login2").password("pass")
+                .role(UserRole.ROLE_USER).enabled(true).registerDate(LocalDateTime.now()).build());
+        user3 = userRepository.save(User.builder().name("user3").login("login3").password("pass")
+                .role(UserRole.ROLE_USER).enabled(true).registerDate(LocalDateTime.now()).build());
+        user4 = userRepository.save(User.builder().name("user4").login("login4").password("pass")
+                .role(UserRole.ROLE_USER).enabled(true).registerDate(LocalDateTime.now()).build());
+        user5 = userRepository.save(User.builder().name("user5").login("login5").password("pass")
+                .role(UserRole.ROLE_USER).enabled(true).registerDate(LocalDateTime.now()).build());
+        user6 = userRepository.save(User.builder().name("user6").login("login6").password("pass")
+                .role(UserRole.ROLE_USER).enabled(true).registerDate(LocalDateTime.now()).build());
 
-        ProductInformation productInformation1 =
-                productInformationRepository.save(ProductInformation.builder().name("product1").build());
-        ProductInformation productInformation2 =
-                productInformationRepository.save(ProductInformation.builder().name("product2").build());
-        ProductInformation productInformation3 =
-                productInformationRepository.save(ProductInformation.builder().name("product3").build());
-        ProductInformation productInformation4 =
-                productInformationRepository.save(ProductInformation.builder().name("product4").build());
-        ProductInformation productInformation5 =
-                productInformationRepository.save(ProductInformation.builder().name("product5").build());
-        ProductInformation productInformation6 =
-                productInformationRepository.save(ProductInformation.builder().name("product6").build());
-        ProductInformation productInformation7 =
-                productInformationRepository.save(ProductInformation.builder().name("product7").build());
-        productInformationRepository.flush();
+        City city17 = cityRepository.save(City.builder().name("city-17").cyrillicName("city-17").build());
 
-        price1_1 = ProductPrice.builder()
+        ShopChain shopChain = shopChainRepository.save(ShopChain.builder().name("shop-chain-1").build());
+
+        shop1 = shopRepository.save(Shop.builder().name("shop1").address("adr").shopChain(shopChain)
+                .city(city17).build());
+        shop2 = shopRepository.save(Shop.builder().name("shop2").address("adr").shopChain(shopChain)
+                .city(city17).build());
+
+        ProductInformation productInformation1 = informationRepository.save(ProductInformation.builder()
+                .name("product1").parsingStatus(ParsingStatus.COMPLETE).url(new URL("http://url.test")).build());
+        ProductInformation productInformation2 = informationRepository.save(ProductInformation.builder()
+                .name("product2").parsingStatus(ParsingStatus.COMPLETE).url(new URL("http://url.test")).build());
+        ProductInformation productInformation3 = informationRepository.save(ProductInformation.builder()
+                .name("product3").parsingStatus(ParsingStatus.COMPLETE).url(new URL("http://url.test")).build());
+        ProductInformation productInformation4 = informationRepository.save(ProductInformation.builder()
+                .name("product4").parsingStatus(ParsingStatus.COMPLETE).url(new URL("http://url.test")).build());
+        ProductInformation productInformation5 = informationRepository.save(ProductInformation.builder()
+                .name("product5").parsingStatus(ParsingStatus.COMPLETE).url(new URL("http://url.test")).build());
+        ProductInformation productInformation6 = informationRepository.save(ProductInformation.builder()
+                .name("product6").parsingStatus(ParsingStatus.COMPLETE).url(new URL("http://url.test")).build());
+        ProductInformation productInformation7 = informationRepository.save(ProductInformation.builder()
+                .name("product7").parsingStatus(ParsingStatus.COMPLETE).url(new URL("http://url.test")).build());
+
+        product1 = testedProductRepository.save(Product.builder().productInformation(productInformation1).shop(shop1)
+                .build());
+        product2 = testedProductRepository.save(Product.builder().productInformation(productInformation2).shop(shop2)
+                .build());
+        product3 = testedProductRepository.save(Product.builder().productInformation(productInformation3).shop(shop1)
+                .build());
+        product4 = testedProductRepository.save(Product.builder().productInformation(productInformation4).shop(shop2)
+                .build());
+        product5 = testedProductRepository.save(Product.builder().productInformation(productInformation5).shop(shop1)
+                .build());
+        product6 = testedProductRepository.save(Product.builder().productInformation(productInformation6).shop(shop2)
+                .build());
+        product7 = testedProductRepository.save(Product.builder().productInformation(productInformation7).shop(shop1)
+                .build());
+
+        price1_1 = priceRepository.save(ProductPrice.builder()
+                .product(product1)
+                .parsingStatus(ParsingStatus.COMPLETE)
                 .price(new BigDecimal("100.00"))
                 .date(LocalDateTime.of(2022, 4, 1, 0, 0))
-                .build();
-        price1_2 = ProductPrice.builder()
+                .build());
+        price1_2 = priceRepository.save(ProductPrice.builder()
+                .product(product1)
+                .parsingStatus(ParsingStatus.COMPLETE)
                 .price(new BigDecimal("200.00"))
                 .date(LocalDateTime.of(2022, 4, 2, 0, 0))
-                .build();
-        price1_3 = ProductPrice.builder()
+                .build());
+        price1_3 = priceRepository.save(ProductPrice.builder()
+                .product(product1)
+                .parsingStatus(ParsingStatus.COMPLETE)
                 .price(new BigDecimal("300.00"))
                 .isInStock(true)
                 .date(LocalDateTime.of(2022, 4, 2, 12, 0))
-                .build();
-        productPriceRepository.saveAllAndFlush(List.of(price1_1, price1_2, price1_3));
+                .build());
 
-        price2_1 = ProductPrice.builder()
+        price2_1 = priceRepository.save(ProductPrice.builder()
+                .product(product2)
+                .parsingStatus(ParsingStatus.COMPLETE)
                 .price(new BigDecimal("222.00"))
                 .discount(50.0)
                 .isInStock(true)
                 .date(LocalDateTime.of(2022, 4, 6, 0, 0))
-                .build();
-        productPriceRepository.saveAndFlush(price2_1);
+                .build());
 
-        price3_1 = productPriceRepository.save(ProductPrice.builder()
+        price3_1 = priceRepository.save(ProductPrice.builder()
+                .product(product3)
+                .parsingStatus(ParsingStatus.COMPLETE)
                 .price(new BigDecimal("10.00"))
                 .date(LocalDateTime.of(2022, 4, 12, 0, 0))
                 .build());
-        price3_2 = productPriceRepository.save(ProductPrice.builder()
+        price3_2 = priceRepository.save(ProductPrice.builder()
+                .product(product3)
+                .parsingStatus(ParsingStatus.COMPLETE)
                 .price(new BigDecimal("15.00"))
                 .discount(20.0)
                 .date(LocalDateTime.of(2022, 4, 13, 0, 0))
                 .build());
 
-        price5_1 = productPriceRepository.save(ProductPrice.builder()
+        price5_1 = priceRepository.save(ProductPrice.builder()
+                .product(product5)
+                .parsingStatus(ParsingStatus.COMPLETE)
                 .price(new BigDecimal("100.00"))
                 .date(LocalDateTime.of(2022, 4, 13, 0, 0))
                 .build());
 
-        price6_1 = productPriceRepository.save(ProductPrice.builder()
+        price6_1 = priceRepository.save(ProductPrice.builder()
+                .product(product6)
+                .parsingStatus(ParsingStatus.COMPLETE)
                 .price(new BigDecimal("100.00"))
                 .date(LocalDateTime.of(2022, 4, 13, 0, 0))
                 .isInStock(true)
                 .build());
-        price7_1 = productPriceRepository.save(ProductPrice.builder()
+
+        price7_1 = priceRepository.save(ProductPrice.builder()
+                .product(product7)
+                .parsingStatus(ParsingStatus.COMPLETE)
                 .price(new BigDecimal("100.00"))
                 .date(LocalDateTime.of(2022, 4, 13, 0, 0))
                 .discount(100.0)
                 .isInStock(false)
                 .build());
-        productPriceRepository.flush();
 
-        shop1 = shopRepository.save(Shop.builder().name("shop1").build());
-        shop2 = shopRepository.save(Shop.builder().name("shop2").build());
-        shopRepository.flush();
-
-        product1 = productRepository.save(Product.builder().productInformation(productInformation1).shop(shop1)
-                .prices(List.of(price1_1, price1_2, price1_3)).build());
-        product2 = productRepository.save(Product.builder().productInformation(productInformation2).shop(shop2)
-                .prices(List.of(price2_1)).build());
-        product3 = productRepository.save(Product.builder().productInformation(productInformation3).shop(shop1)
-                .prices(List.of(price3_1, price3_2)).build());
-        product4 = productRepository.save(Product.builder().productInformation(productInformation4).shop(shop2)
-                .prices(new ArrayList<>()).build());
-        product5 = productRepository.save(Product.builder().productInformation(productInformation5).shop(shop1)
-                .prices(List.of(price5_1)).build());
-        product6 = productRepository.save(Product.builder().productInformation(productInformation6).shop(shop2)
-                .prices(List.of(price6_1)).build());
-        product7 = productRepository.save(Product.builder().productInformation(productInformation7).shop(shop1)
-                .prices(List.of(price7_1)).build());
-        productRepository.flush();
-
-        price1_1.setProduct(product1);
-        price1_2.setProduct(product1);
-        price1_3.setProduct(product1);
-        price2_1.setProduct(product2);
-        price3_1.setProduct(product3);
-        price3_2.setProduct(product3);
-        price5_1.setProduct(product5);
-        price6_1.setProduct(product6);
-        price7_1.setProduct(product7);
-        productPriceRepository.save(price1_1);
-        productPriceRepository.save(price1_2);
-        productPriceRepository.save(price1_3);
-        productPriceRepository.save(price2_1);
-        productPriceRepository.save(price3_1);
-        productPriceRepository.save(price3_2);
-        productPriceRepository.save(price5_1);
-        productPriceRepository.save(price6_1);
-        productPriceRepository.save(price7_1);
-        productPriceRepository.flush();
+        product1.setPrices(List.of(price1_1, price1_2, price1_3));
+        product2.setPrices(List.of(price2_1));
+        product3.setPrices(List.of(price3_1, price3_2));
+        product5.setPrices(List.of(price5_1));
+        product6.setPrices(List.of(price6_1));
+        product7.setPrices(List.of(price7_1));
 
         userProductRepository.save(UserProduct.builder().user(user1).monitorAvailability(true).monitorDiscount(false)
                 .monitorPriceChanges(false).product(product1).build());
@@ -198,17 +213,17 @@ class ProductRepositoryTest {
                 .monitorPriceChanges(true).product(product6).build());
         userProductRepository.save(UserProduct.builder().user(user6).monitorAvailability(false).monitorDiscount(false)
                 .monitorPriceChanges(false).product(product7).build());
-
-        userProductRepository.flush();
     }
 
     @AfterAll
     public void afterAll() {
         userProductRepository.deleteAll();
-        productPriceRepository.deleteAll();
-        productRepository.deleteAll();
-        productInformationRepository.deleteAll();
+        priceRepository.deleteAll();
+        testedProductRepository.deleteAll();
+        informationRepository.deleteAll();
         shopRepository.deleteAll();
+        shopChainRepository.deleteAll();
+        cityRepository.deleteAll();
         userRepository.deleteAll();
     }
 
@@ -240,7 +255,7 @@ class ProductRepositoryTest {
     @Test
     void findAllByUser_getProductByUser_productList() {
         assertThat(
-                productRepository.findAllUserProducts(user1),
+                testedProductRepository.findAllUserProducts(user1),
                 containsInAnyOrder(product1, product2)
         );
     }
@@ -248,7 +263,7 @@ class ProductRepositoryTest {
     @Test
     void findAllTrackedProducts_Products_listOfActiveProducts() {
         assertThat(
-                productRepository.findAllTrackedProducts(),
+                testedProductRepository.findAllTrackedProducts(),
                 containsInAnyOrder(product1, product2, product3, product5, product6)
         );
     }
@@ -256,14 +271,14 @@ class ProductRepositoryTest {
     @Test
     void findByIdWithLastPrice_productWith3Prices_productWithLastPrice() {
         assertThat(
-                productRepository.findByIdWithLastPrice(product1.getId()).get().getPrices(),
+                testedProductRepository.findByIdWithLastPrice(product1.getId()).get().getPrices(),
                 contains(price1_3)
         );
     }
 
     @Test
     void findAllUsersProductWithLastPrice_products_usersProductsWithLastPrice() {
-        Collection<Product> allUsersProducts = productRepository.findAllUserProductsWithLastPrice(user1);
+        Collection<Product> allUsersProducts = testedProductRepository.findAllUserProductsWithLastPrice(user1);
 
         assertAll(
                 () -> assertThat(
@@ -286,7 +301,7 @@ class ProductRepositoryTest {
     @Test
     void findAllUsersProductsWithLastPrice_monitorAvailability_emptyList() {
         ArrayList<Product> products =
-                new ArrayList<>(productRepository.findAllUserProductsWithLastPrice(user4, true, null, null));
+                new ArrayList<>(testedProductRepository.findAllUserProductsWithLastPrice(user4, true, null, null));
 
         assertTrue(products.isEmpty());
     }
@@ -294,7 +309,7 @@ class ProductRepositoryTest {
     @Test
     void findAllUsersProductsWithLastPrice_monitorAvailability_productsWithLastPrice() {
         ArrayList<Product> products =
-                new ArrayList<>(productRepository.findAllUserProductsWithLastPrice(user1, true, null, null));
+                new ArrayList<>(testedProductRepository.findAllUserProductsWithLastPrice(user1, true, null, null));
 
         assertAll(
                 () -> assertThat(products, contains(product1)),
@@ -305,7 +320,7 @@ class ProductRepositoryTest {
     @Test
     void findAllUsersProductsWithLastPrice_monitorDiscount_emptyList() {
         ArrayList<Product> products =
-                new ArrayList<>(productRepository.findAllUserProductsWithLastPrice(user1, null, true, null));
+                new ArrayList<>(testedProductRepository.findAllUserProductsWithLastPrice(user1, null, true, null));
 
         assertTrue(products.isEmpty());
     }
@@ -313,7 +328,7 @@ class ProductRepositoryTest {
     @Test
     void findAllUsersProductsWithLastPrice_monitorDiscount_productsWithLastPrice() {
         ArrayList<Product> products =
-                new ArrayList<>(productRepository.findAllUserProductsWithLastPrice(user2, null, true, null));
+                new ArrayList<>(testedProductRepository.findAllUserProductsWithLastPrice(user2, null, true, null));
 
         assertAll(
                 () -> assertThat(products, containsInAnyOrder(product2, product3)),
@@ -324,7 +339,7 @@ class ProductRepositoryTest {
     @Test
     void findAllUsersProductsWithLastPrice_monitorPriceChanges_emptyList() {
         ArrayList<Product> products =
-                new ArrayList<>(productRepository.findAllUserProductsWithLastPrice(user1, null, null, true));
+                new ArrayList<>(testedProductRepository.findAllUserProductsWithLastPrice(user1, null, null, true));
 
         assertTrue(products.isEmpty());
     }
@@ -332,7 +347,7 @@ class ProductRepositoryTest {
     @Test
     void findAllUsersProductsWithLastPrice_monitorPriceChanges_productsWithLastPrice() {
         ArrayList<Product> products =
-                new ArrayList<>(productRepository.findAllUserProductsWithLastPrice(user2, null, null, true));
+                new ArrayList<>(testedProductRepository.findAllUserProductsWithLastPrice(user2, null, null, true));
 
         assertAll(
                 () -> assertThat(products, containsInAnyOrder(product2, product5)),
@@ -352,7 +367,7 @@ class ProductRepositoryTest {
     @Test
     void findAllUsersProductsWithLastPrice_monitorAvailabilityAndDiscountAndPriceChanges_productsWithLastPrice() {
         ArrayList<Product> products =
-                new ArrayList<>(productRepository.findAllUserProductsWithLastPrice(user2, true, true, true));
+                new ArrayList<>(testedProductRepository.findAllUserProductsWithLastPrice(user2, true, true, true));
 
         assertAll(
                 () -> assertThat(products, contains(product2)),
@@ -363,7 +378,7 @@ class ProductRepositoryTest {
     @Test
     void findAllUsersProductsWithLastPrice_onlyDiscount_productsWithLastPrice() {
         ArrayList<Product> products =
-                new ArrayList<>(productRepository.findAllUserProductsWithLastPrice(user2, false, true, false));
+                new ArrayList<>(testedProductRepository.findAllUserProductsWithLastPrice(user2, false, true, false));
 
         assertAll(
                 () -> assertThat(products, containsInAnyOrder(product3)),
@@ -374,7 +389,7 @@ class ProductRepositoryTest {
     @Test
     void findAllUsersProducts_monitorAvailability_emptyList() {
         ArrayList<Product> products =
-                new ArrayList<>(productRepository.findAllUserProducts(user4, true, null, null));
+                new ArrayList<>(testedProductRepository.findAllUserProducts(user4, true, null, null));
 
         assertTrue(products.isEmpty());
     }
@@ -382,7 +397,7 @@ class ProductRepositoryTest {
     @Test
     void findAllUsersProducts_monitorAvailability_productsWithPriceHistory() {
         ArrayList<Product> products =
-                new ArrayList<>(productRepository.findAllUserProducts(user1, true, null, null));
+                new ArrayList<>(testedProductRepository.findAllUserProducts(user1, true, null, null));
 
         assertAll(
                 () -> assertThat(products, contains(product1)),
@@ -393,7 +408,7 @@ class ProductRepositoryTest {
     @Test
     void findAllUsersProducts_monitorDiscount_emptyList() {
         ArrayList<Product> products =
-                new ArrayList<>(productRepository.findAllUserProducts(user1, null, true, null));
+                new ArrayList<>(testedProductRepository.findAllUserProducts(user1, null, true, null));
 
         assertTrue(products.isEmpty());
     }
@@ -401,7 +416,7 @@ class ProductRepositoryTest {
     @Test
     void findAllUsersProducts_monitorDiscount_productsWithPriceHistory() {
         ArrayList<Product> products =
-                new ArrayList<>(productRepository.findAllUserProducts(user2, null, true, null));
+                new ArrayList<>(testedProductRepository.findAllUserProducts(user2, null, true, null));
 
         assertAll(
                 () -> assertThat(products, containsInAnyOrder(product2, product3)),
@@ -422,7 +437,7 @@ class ProductRepositoryTest {
     @Test
     void findAllUsersProducts_onlyDiscount_productsWithPriceHistory() {
         ArrayList<Product> products =
-                new ArrayList<>(productRepository.findAllUserProducts(user2, false, true, false));
+                new ArrayList<>(testedProductRepository.findAllUserProducts(user2, false, true, false));
 
         assertAll(
                 () -> assertThat(products, contains(product3)),
@@ -433,7 +448,7 @@ class ProductRepositoryTest {
     @Test
     void findAllUsersProducts_monitorPriceChanges_emptyList() {
         ArrayList<Product> products =
-                new ArrayList<>(productRepository.findAllUserProducts(user1, null, null, true));
+                new ArrayList<>(testedProductRepository.findAllUserProducts(user1, null, null, true));
 
         assertTrue(products.isEmpty());
     }
@@ -441,7 +456,7 @@ class ProductRepositoryTest {
     @Test
     void findAllUsersProducts_monitorPriceChanges_productsWithPriceHistory() {
         ArrayList<Product> products =
-                new ArrayList<>(productRepository.findAllUserProducts(user2, null, true, null));
+                new ArrayList<>(testedProductRepository.findAllUserProducts(user2, null, true, null));
 
         Map<Long, Product> productMap = products.stream().collect(Collectors.toMap(Product::getId, product -> product));
 
@@ -455,7 +470,7 @@ class ProductRepositoryTest {
     @Test
     void findAllUsersProducts_monitorAvailabilityAndDiscountAndPriceChanges_productsWithPriceHistory() {
         ArrayList<Product> products =
-                new ArrayList<>(productRepository.findAllUserProducts(user2, true, true, true));
+                new ArrayList<>(testedProductRepository.findAllUserProducts(user2, true, true, true));
 
         assertAll(
                 () -> assertThat(products, contains(product2)),
@@ -465,7 +480,7 @@ class ProductRepositoryTest {
 
     @Test
     void findAllUsersProductsInShop_user1AndShop1_listOfProductsWithPriceHistory() {
-        ArrayList<Product> products = new ArrayList<>(productRepository
+        ArrayList<Product> products = new ArrayList<>(testedProductRepository
                 .findAllUserProductsInShop(user1, shop1, true, null, null));
 
         assertAll(
@@ -476,7 +491,7 @@ class ProductRepositoryTest {
 
     @Test
     void findAllUsersProductsInShop_user1AndShop1_emptyList() {
-        ArrayList<Product> products = new ArrayList<>(productRepository
+        ArrayList<Product> products = new ArrayList<>(testedProductRepository
                 .findAllUserProductsInShop(user1, shop1, null, true, null));
 
         assertTrue(products.isEmpty());
@@ -484,7 +499,7 @@ class ProductRepositoryTest {
 
     @Test
     void findAllUsersProductsInShop_user4AndShop1_listOfProductsWithPriceHistory() {
-        ArrayList<Product> products = new ArrayList<>(productRepository
+        ArrayList<Product> products = new ArrayList<>(testedProductRepository
                 .findAllUserProductsInShop(user4, shop1, null, null, true));
 
         assertAll(
@@ -506,7 +521,7 @@ class ProductRepositoryTest {
 
     @Test
     void findAllUserProductsWithLastPriceInShop_user1AndShop1_listOfProductsWithLastPrice() {
-        ArrayList<Product> products = new ArrayList<>(productRepository
+        ArrayList<Product> products = new ArrayList<>(testedProductRepository
                 .findAllUserProductsWithLastPriceInShop(user1, shop1, true, null, null));
 
         assertAll(
@@ -517,7 +532,7 @@ class ProductRepositoryTest {
 
     @Test
     void findAllUsersProductsInShop_user1AndShop1_listOfProducts() {
-        Collection<Product> allUsersProductsInShop = productRepository.findAllUserProductsInShop(user1, shop1);
+        Collection<Product> allUsersProductsInShop = testedProductRepository.findAllUserProductsInShop(user1, shop1);
 
         assertAll(
                 () -> assertThat(allUsersProductsInShop, contains(product1)),
@@ -531,7 +546,7 @@ class ProductRepositoryTest {
     @Test
     void findAllUsersProductsWithLastPriceInShop_user1AndShop1_listOfProducts() {
         Collection<Product> allUsersProductsInShop =
-                productRepository.findAllUserProductsWithLastPriceInShop(user1, shop1);
+                testedProductRepository.findAllUserProductsWithLastPriceInShop(user1, shop1);
 
         assertAll(
                 () -> assertThat(allUsersProductsInShop, contains(product1)),
@@ -542,7 +557,7 @@ class ProductRepositoryTest {
     @Test
     void findActiveUsersProducts_availability_listOfProductsWithPriceHistory() {
         ArrayList<Product> products = new ArrayList<>(
-                productRepository.findActiveUserProducts(user1, true, null, null)
+                testedProductRepository.findActiveUserProducts(user1, true, null, null)
         );
 
         assertAll(
@@ -554,7 +569,7 @@ class ProductRepositoryTest {
     @Test
     void findActiveUsersProducts_discount_listOfProductsWithPriceHistory() {
         ArrayList<Product> products = new ArrayList<>(
-                productRepository.findActiveUserProducts(user2, null, true, null)
+                testedProductRepository.findActiveUserProducts(user2, null, true, null)
         );
 
         assertAll(
@@ -577,7 +592,7 @@ class ProductRepositoryTest {
     @Test
     void findActiveUsersProducts_availabilityAndDiscount_listOfProductsWithPriceHistory() {
         ArrayList<Product> products = new ArrayList<>(
-                productRepository.findActiveUserProducts(user2, true, true, null)
+                testedProductRepository.findActiveUserProducts(user2, true, true, null)
         );
 
         assertAll(
@@ -589,7 +604,7 @@ class ProductRepositoryTest {
     @Test
     void findActiveUsersProducts_availability_listOfProductsWithOnlyLastPrice() {
         ArrayList<Product> products = new ArrayList<>(
-                productRepository.findActiveUserProductsWithLastPrice(user1, true, null, null)
+                testedProductRepository.findActiveUserProductsWithLastPrice(user1, true, null, null)
         );
 
         assertAll(
@@ -601,7 +616,7 @@ class ProductRepositoryTest {
     @Test
     void findActiveUsersProducts_discount_listOfProductsWithOnlyLastPrice() {
         ArrayList<Product> products = new ArrayList<>(
-                productRepository.findActiveUserProductsWithLastPrice(user2, null, true, null)
+                testedProductRepository.findActiveUserProductsWithLastPrice(user2, null, true, null)
         );
 
         assertAll(
@@ -624,7 +639,7 @@ class ProductRepositoryTest {
     @Test
     void findActiveUsersProducts_availabilityAndDiscount_listOfProductsWithOnlyLastPrice() {
         ArrayList<Product> products = new ArrayList<>(
-                productRepository.findActiveUserProductsWithLastPrice(user2, true, true, null)
+                testedProductRepository.findActiveUserProductsWithLastPrice(user2, true, true, null)
         );
 
         assertAll(
@@ -637,7 +652,7 @@ class ProductRepositoryTest {
     @Test
     void findActiveUsersProductsInShop_availability_listOfProductsWithPriceHistory() {
         ArrayList<Product> products = new ArrayList<>(
-                productRepository.findActiveUserProductsInShop(user1, shop1, true, null, null)
+                testedProductRepository.findActiveUserProductsInShop(user1, shop1, true, null, null)
         );
 
         assertAll(
@@ -649,7 +664,7 @@ class ProductRepositoryTest {
     @Test
     void findActiveUsersProductsInShop_discount_listOfProductsWithPriceHistory() {
         ArrayList<Product> products = new ArrayList<>(
-                productRepository.findActiveUserProductsInShop(user2, shop2, null, true, null)
+                testedProductRepository.findActiveUserProductsInShop(user2, shop2, null, true, null)
         );
 
         assertAll(
@@ -661,7 +676,7 @@ class ProductRepositoryTest {
     @Test
     void findActiveUsersProductsInShop_availabilityAndDiscount_listOfProductsWithPriceHistory() {
         ArrayList<Product> products = new ArrayList<>(
-                productRepository.findActiveUserProductsInShop(user2, shop2, true, true, null)
+                testedProductRepository.findActiveUserProductsInShop(user2, shop2, true, true, null)
         );
 
         assertAll(
@@ -673,7 +688,7 @@ class ProductRepositoryTest {
     @Test
     void findActiveUsersProductsInShop_availability_listOfProductsWithOnlyLastPrice() {
         ArrayList<Product> products = new ArrayList<>(
-                productRepository.findActiveUserProductsWithLastPriceInShop(user1, shop1, true, null, null)
+                testedProductRepository.findActiveUserProductsWithLastPriceInShop(user1, shop1, true, null, null)
         );
 
         assertAll(
@@ -685,7 +700,7 @@ class ProductRepositoryTest {
     @Test
     void findActiveUsersProductsInShop_discount_listOfProductsWithOnlyLastPrice() {
         ArrayList<Product> products = new ArrayList<>(
-                productRepository.findActiveUserProductsInShop(user2, shop2, null, true, null)
+                testedProductRepository.findActiveUserProductsInShop(user2, shop2, null, true, null)
         );
 
         assertAll(
@@ -697,7 +712,7 @@ class ProductRepositoryTest {
     @Test
     void findActiveUsersProductsInShop_availabilityAndDiscount_listOfProductsWithOnlyLastPrice() {
         ArrayList<Product> products = new ArrayList<>(
-                productRepository.findActiveUserProductsWithLastPriceInShop(user2, shop2, true, true, null)
+                testedProductRepository.findActiveUserProductsWithLastPriceInShop(user2, shop2, true, true, null)
         );
 
         assertAll(
@@ -709,7 +724,7 @@ class ProductRepositoryTest {
     @Test
     void findActiveUsersProductsInShop_availabilityAndDiscount_emptyList() {
         ArrayList<Product> products = new ArrayList<>(
-                productRepository.findActiveUserProductsWithLastPriceInShop(user5, shop2, true, true, null)
+                testedProductRepository.findActiveUserProductsWithLastPriceInShop(user5, shop2, true, true, null)
         );
 
         assertTrue(products.isEmpty());
@@ -718,7 +733,7 @@ class ProductRepositoryTest {
     @Test
     void findActiveUserProductsWithLastPrice_allProducts_listOfProducts() {
         ArrayList<Product> products = new ArrayList<>(
-                productRepository.findActiveUserProductsWithLastPrice(
+                testedProductRepository.findActiveUserProductsWithLastPrice(
                         user6,
                         null,
                         null,

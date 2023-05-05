@@ -1,10 +1,7 @@
 package an.evdokimov.discount.watcher.server.api.shop.dto.response;
 
 import an.evdokimov.discount.watcher.server.api.city.dto.response.CityResponse;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.util.List;
@@ -14,6 +11,7 @@ import java.util.List;
  */
 
 @Data
+@ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder
 @NoArgsConstructor

@@ -34,7 +34,7 @@ CREATE TABLE shop_chain
 (
     id            BIGINT PRIMARY KEY,
     name          VARCHAR(255) NOT NULL,
-    cyrillic_name VARCHAR(255) NOT NULL
+    cyrillic_name VARCHAR(255)
 );
 
 CREATE SEQUENCE shop_sequence;
@@ -43,9 +43,10 @@ CREATE TABLE shop
     id            BIGINT PRIMARY KEY,
     shop_chain_id BIGINT       NOT NULL,
     name          VARCHAR(255) NOT NULL,
+    cyrillic_name VARCHAR(255),
     city_id       BIGINT       NOT NULL,
     address       VARCHAR(255) NOT NULL,
-    cookie        VARCHAR(255) NOT NULL,
+    cookie        VARCHAR(255),
     FOREIGN KEY (shop_chain_id) REFERENCES shop_chain (id) ON UPDATE CASCADE ON DELETE RESTRICT,
     FOREIGN KEY (city_id) REFERENCES city (id) ON UPDATE CASCADE ON DELETE RESTRICT
 );

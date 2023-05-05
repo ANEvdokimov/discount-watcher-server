@@ -2,6 +2,7 @@ package an.evdokimov.discount.watcher.server.database.product.model;
 
 import an.evdokimov.discount.watcher.server.database.shop.model.Shop;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.Hibernate;
 
@@ -31,12 +32,17 @@ public class Product {
     private Long id;
     @ManyToOne
     @JoinColumn(name = "product_information_id")
+    @NotNull
+    @ToString.Exclude
     private ProductInformation productInformation;
     @ManyToOne
     @JoinColumn(name = "shop_id")
+    @NotNull
+    @ToString.Exclude
     private Shop shop;
     @OneToMany(mappedBy = "product")
     @OrderBy("date DESC")
+    @NotNull
     @ToString.Exclude
     @Builder.Default
     private List<ProductPrice> prices = new ArrayList<>();
@@ -59,5 +65,16 @@ public class Product {
     @Override
     public int hashCode() {
         return Objects.hash(getId(), getProductInformation().getId(), getShop().getId());
+    }
+
+    // toString parameters for lombok
+    @ToString.Include(name = "productInformationId")
+    private Long getProductInformationId() {
+        return getProductInformation().getId();
+    }
+
+    @ToString.Include(name = "shopId")
+    private Long getShopId() {
+        return getShop().getId();
     }
 }

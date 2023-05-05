@@ -2,20 +2,23 @@ package an.evdokimov.discount.watcher.server.database.city.model;
 
 import an.evdokimov.discount.watcher.server.database.shop.model.Shop;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.Hibernate;
+import org.hibernate.annotations.Immutable;
 
 import java.util.List;
 import java.util.Objects;
 
+@Entity
+@Table(name = "city")
+@Immutable
 @Getter
 @Setter
 @ToString
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name = "city")
 public class City {
     @Id
     @GeneratedValue(
@@ -28,7 +31,9 @@ public class City {
             allocationSize = 1
     )
     private Long id;
+    @NotNull
     private String name;
+    @NotNull
     private String cyrillicName;
     @OneToMany(mappedBy = "city")
     @ToString.Exclude
@@ -38,12 +43,15 @@ public class City {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        City city = (City) o;
-        return id != null && Objects.equals(id, city.id);
+        City that = (City) o;
+        return getId() != null
+                && Objects.equals(getId(), that.getId())
+                && Objects.equals(getName(), that.getCyrillicName())
+                && Objects.equals(getCyrillicName(), that.getCyrillicName());
     }
 
     @Override
     public int hashCode() {
-        return getClass().hashCode();
+        return Objects.hash(getId(), getName(), getCyrillicName());
     }
 }

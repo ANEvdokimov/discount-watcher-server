@@ -15,7 +15,7 @@ import java.util.Objects;
 @DynamicUpdate
 @Getter
 @Setter
-@ToString
+@ToString(callSuper = true)
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -27,11 +27,12 @@ public class LentaProductPrice extends ProductPrice {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
         LentaProductPrice that = (LentaProductPrice) o;
-        return getId() != null && Objects.equals(getId(), that.getId());
+        return super.equals(that)
+                && Objects.equals(getPriceWithCard(), that.getPriceWithCard());
     }
 
     @Override
     public int hashCode() {
-        return getClass().hashCode();
+        return Objects.hash(super.hashCode(), getPriceWithCard());
     }
 }

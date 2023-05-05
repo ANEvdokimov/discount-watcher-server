@@ -1,6 +1,7 @@
 package an.evdokimov.discount.watcher.server.database.user.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.Hibernate;
 import org.springframework.security.core.GrantedAuthority;
@@ -30,23 +31,29 @@ public class User implements UserDetails {
             allocationSize = 1
     )
     private Long id;
+    @NotNull
     private String login;
+    @NotNull
     private String password;
+    @NotNull
     private String name;
+    @NotNull
     private LocalDateTime registerDate;
     @Enumerated(EnumType.STRING)
+    @NotNull
     private UserRole role;
     @Builder.Default
+    @NotNull
     private boolean enabled = true;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return role.getAuthorities();
+        return getRole().getAuthorities();
     }
 
     @Override
     public String getUsername() {
-        return login;
+        return getLogin();
     }
 
     @Override
@@ -68,12 +75,19 @@ public class User implements UserDetails {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        User user = (User) o;
-        return id != null && Objects.equals(id, user.id);
+        User that = (User) o;
+        return getId() != null
+                && Objects.equals(getId(), that.getId())
+                && Objects.equals(getLogin(), that.getLogin())
+                && Objects.equals(getPassword(), that.getPassword())
+                && Objects.equals(getName(), that.getName())
+                && Objects.equals(getRegisterDate(), that.getRegisterDate())
+                && Objects.equals(getRole(), that.getRole())
+                && Objects.equals(isEnabled(), that.isEnabled());
     }
 
     @Override
     public int hashCode() {
-        return getClass().hashCode();
+        return Objects.hash(getId(), getLogin(), getPassword(), getName(), getRegisterDate(), getRole(), isEnabled());
     }
 }

@@ -1,10 +1,7 @@
 package an.evdokimov.discount.watcher.server.database.product.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.Hibernate;
 
 import java.util.Objects;
@@ -13,6 +10,7 @@ import java.util.Objects;
 @Table(name = "parsing_error")
 @Getter
 @Setter
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 public class ParsingError {
@@ -30,9 +28,11 @@ public class ParsingError {
     private String message;
     @OneToOne
     @JoinColumn(name = "product_price_id")
+    @ToString.Exclude
     private ProductPrice productPrice;
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne
     @JoinColumn(name = "product_information_id")
+    @ToString.Exclude
     private ProductInformation productInformation;
 
     @Override
@@ -45,7 +45,10 @@ public class ParsingError {
                 && Objects.equals(getMessage(), that.getMessage())
                 && Objects.equals(
                 getProductPrice() != null ? getProductPrice().getId() : null,
-                that.getProductPrice() != null ? that.getProductPrice().getId() : null);
+                that.getProductPrice() != null ? that.getProductPrice().getId() : null)
+                && Objects.equals(
+                getProductInformation() != null ? getProductInformation().getId() : null,
+                that.getProductInformation() != null ? that.getProductInformation().getId() : null);
     }
 
     @Override
@@ -57,13 +60,14 @@ public class ParsingError {
         );
     }
 
-    @Override
-    public String toString() {
-        return "ParsingError{" +
-                "id=" + id +
-                ", message='" + message + '\'' +
-                ", productPriceId=" + (productPrice != null ? productPrice.getId() : "null") +
-                ", productInformationId=" + (productInformation != null ? productInformation.getId() : "null") +
-                '}';
+    // toString parameters for lombok
+    @ToString.Include(name = "productPriceId")
+    private Long getProductPriceId() {
+        return getProductPrice().getId();
+    }
+
+    @ToString.Include(name = "productInformationId")
+    private Long getProductInformationId() {
+        return getProductInformation().getId();
     }
 }

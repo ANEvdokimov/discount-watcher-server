@@ -1,12 +1,14 @@
 package an.evdokimov.discount.watcher.server.database.product.repository;
 
-import an.evdokimov.discount.watcher.server.database.product.model.Product;
-import an.evdokimov.discount.watcher.server.database.product.model.ProductInformation;
-import an.evdokimov.discount.watcher.server.database.product.model.ProductPrice;
-import an.evdokimov.discount.watcher.server.database.product.model.UserProduct;
+import an.evdokimov.discount.watcher.server.database.city.model.City;
+import an.evdokimov.discount.watcher.server.database.city.repository.CityRepository;
+import an.evdokimov.discount.watcher.server.database.product.model.*;
 import an.evdokimov.discount.watcher.server.database.shop.model.Shop;
+import an.evdokimov.discount.watcher.server.database.shop.model.ShopChain;
+import an.evdokimov.discount.watcher.server.database.shop.repository.ShopChainRepository;
 import an.evdokimov.discount.watcher.server.database.shop.repository.ShopRepository;
 import an.evdokimov.discount.watcher.server.database.user.model.User;
+import an.evdokimov.discount.watcher.server.database.user.model.UserRole;
 import an.evdokimov.discount.watcher.server.database.user.repository.UserRepository;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -17,13 +19,15 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.math.BigDecimal;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataJpaTest
@@ -31,114 +35,155 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ShopRepositoryTest {
     @Autowired
-    private ProductRepository productRepository;
+    private ShopRepository testedShopRepository;
 
+    @Autowired
+    private ProductRepository productRepository;
     @Autowired
     private UserRepository userRepository;
-
     @Autowired
     private UserProductRepository userProductRepository;
-
     @Autowired
-    private ProductInformationRepository productInformationRepository;
-
+    private ProductInformationRepository informationRepository;
     @Autowired
-    private ProductPriceRepository productPriceRepository;
-
+    private ProductPriceRepository priceRepository;
     @Autowired
-    private ShopRepository shopRepository;
+    private CityRepository cityRepository;
+    @Autowired
+    private ShopChainRepository shopChainRepository;
 
     @BeforeAll
-    public void fillDb() {
-        user1 = userRepository.save(User.builder().name("user1").build());
-        user2 = userRepository.save(User.builder().name("user2").build());
-        user3 = userRepository.save(User.builder().name("user3").build());
-        user4 = userRepository.save(User.builder().name("user4").build());
-        userRepository.flush();
+    public void fillDb() throws MalformedURLException {
+        user1 = userRepository.save(User.builder().name("user1").login("login1").password("pass")
+                .role(UserRole.ROLE_USER).enabled(true).registerDate(LocalDateTime.now()).build());
+        user2 = userRepository.save(User.builder().name("user2").login("login2").password("pass")
+                .role(UserRole.ROLE_USER).enabled(true).registerDate(LocalDateTime.now()).build());
+        user3 = userRepository.save(User.builder().name("user3").login("login3").password("pass")
+                .role(UserRole.ROLE_USER).enabled(true).registerDate(LocalDateTime.now()).build());
+        user4 = userRepository.save(User.builder().name("user4").login("login4").password("pass")
+                .role(UserRole.ROLE_USER).enabled(true).registerDate(LocalDateTime.now()).build());
+        user5 = userRepository.save(User.builder().name("user5").login("login5").password("pass")
+                .role(UserRole.ROLE_USER).enabled(true).registerDate(LocalDateTime.now()).build());
+        user6 = userRepository.save(User.builder().name("user6").login("login6").password("pass")
+                .role(UserRole.ROLE_USER).enabled(true).registerDate(LocalDateTime.now()).build());
 
-        ProductInformation productInformation1 =
-                productInformationRepository.save(ProductInformation.builder().name("product1").build());
-        ProductInformation productInformation2 =
-                productInformationRepository.save(ProductInformation.builder().name("product2").build());
-        ProductInformation productInformation3 =
-                productInformationRepository.save(ProductInformation.builder().name("product3").build());
-        ProductInformation productInformation4 =
-                productInformationRepository.save(ProductInformation.builder().name("product4").build());
-        ProductInformation productInformation5 =
-                productInformationRepository.save(ProductInformation.builder().name("product5").build());
-        productInformationRepository.flush();
+        City city17 = cityRepository.save(City.builder().name("city-17").cyrillicName("city-17").build());
 
-        price1 = ProductPrice.builder()
+        ShopChain shopChain = shopChainRepository.save(ShopChain.builder().name("shop-chain-1").build());
+
+        shop1 = testedShopRepository.save(Shop.builder().name("shop1").address("adr").shopChain(shopChain)
+                .city(city17).build());
+        shop2 = testedShopRepository.save(Shop.builder().name("shop2").address("adr").shopChain(shopChain)
+                .city(city17).build());
+
+        ProductInformation productInformation1 = informationRepository.save(ProductInformation.builder()
+                .name("product1").parsingStatus(ParsingStatus.COMPLETE).url(new URL("http://url.test")).build());
+        ProductInformation productInformation2 = informationRepository.save(ProductInformation.builder()
+                .name("product2").parsingStatus(ParsingStatus.COMPLETE).url(new URL("http://url.test")).build());
+        ProductInformation productInformation3 = informationRepository.save(ProductInformation.builder()
+                .name("product3").parsingStatus(ParsingStatus.COMPLETE).url(new URL("http://url.test")).build());
+        ProductInformation productInformation4 = informationRepository.save(ProductInformation.builder()
+                .name("product4").parsingStatus(ParsingStatus.COMPLETE).url(new URL("http://url.test")).build());
+        ProductInformation productInformation5 = informationRepository.save(ProductInformation.builder()
+                .name("product5").parsingStatus(ParsingStatus.COMPLETE).url(new URL("http://url.test")).build());
+        ProductInformation productInformation6 = informationRepository.save(ProductInformation.builder()
+                .name("product6").parsingStatus(ParsingStatus.COMPLETE).url(new URL("http://url.test")).build());
+        ProductInformation productInformation7 = informationRepository.save(ProductInformation.builder()
+                .name("product7").parsingStatus(ParsingStatus.COMPLETE).url(new URL("http://url.test")).build());
+
+        product1 = productRepository.save(Product.builder().productInformation(productInformation1).shop(shop1)
+                .build());
+        product2 = productRepository.save(Product.builder().productInformation(productInformation2).shop(shop2)
+                .build());
+        product3 = productRepository.save(Product.builder().productInformation(productInformation3).shop(shop1)
+                .build());
+        product4 = productRepository.save(Product.builder().productInformation(productInformation4).shop(shop2)
+                .build());
+        product5 = productRepository.save(Product.builder().productInformation(productInformation5).shop(shop1)
+                .build());
+        product6 = productRepository.save(Product.builder().productInformation(productInformation6).shop(shop2)
+                .build());
+        product7 = productRepository.save(Product.builder().productInformation(productInformation7).shop(shop1)
+                .build());
+
+        price1_1 = priceRepository.save(ProductPrice.builder()
+                .product(product1)
+                .parsingStatus(ParsingStatus.COMPLETE)
                 .price(new BigDecimal("100.00"))
                 .date(LocalDateTime.of(2022, 4, 1, 0, 0))
-                .build();
-        price2 = ProductPrice.builder()
+                .build());
+        price1_2 = priceRepository.save(ProductPrice.builder()
+                .product(product1)
+                .parsingStatus(ParsingStatus.COMPLETE)
                 .price(new BigDecimal("200.00"))
                 .date(LocalDateTime.of(2022, 4, 2, 0, 0))
-                .build();
-        price3 = ProductPrice.builder()
+                .build());
+        price1_3 = priceRepository.save(ProductPrice.builder()
+                .product(product1)
+                .parsingStatus(ParsingStatus.COMPLETE)
                 .price(new BigDecimal("300.00"))
+                .isInStock(true)
                 .date(LocalDateTime.of(2022, 4, 2, 12, 0))
-                .build();
-        productPriceRepository.saveAllAndFlush(List.of(price1, price2, price3));
+                .build());
 
-        price4 = ProductPrice.builder()
+        price2_1 = priceRepository.save(ProductPrice.builder()
+                .product(product2)
+                .parsingStatus(ParsingStatus.COMPLETE)
                 .price(new BigDecimal("222.00"))
+                .discount(50.0)
+                .isInStock(true)
                 .date(LocalDateTime.of(2022, 4, 6, 0, 0))
-                .build();
-        productPriceRepository.saveAndFlush(price4);
+                .build());
 
-        price3_1 = productPriceRepository.save(ProductPrice.builder()
+        price3_1 = priceRepository.save(ProductPrice.builder()
+                .product(product3)
+                .parsingStatus(ParsingStatus.COMPLETE)
                 .price(new BigDecimal("10.00"))
                 .date(LocalDateTime.of(2022, 4, 12, 0, 0))
                 .build());
-        price3_2 = productPriceRepository.save(ProductPrice.builder()
+        price3_2 = priceRepository.save(ProductPrice.builder()
+                .product(product3)
+                .parsingStatus(ParsingStatus.COMPLETE)
                 .price(new BigDecimal("15.00"))
+                .discount(20.0)
                 .date(LocalDateTime.of(2022, 4, 13, 0, 0))
                 .build());
 
-        price5_1 = productPriceRepository.save(ProductPrice.builder()
+        price5_1 = priceRepository.save(ProductPrice.builder()
+                .product(product5)
+                .parsingStatus(ParsingStatus.COMPLETE)
                 .price(new BigDecimal("100.00"))
                 .date(LocalDateTime.of(2022, 4, 13, 0, 0))
                 .build());
-        productPriceRepository.flush();
 
-        shop1 = shopRepository.save(Shop.builder().name("shop1").build());
-        shop2 = shopRepository.save(Shop.builder().name("shop2").build());
-        shopRepository.flush();
+        price6_1 = priceRepository.save(ProductPrice.builder()
+                .product(product6)
+                .parsingStatus(ParsingStatus.COMPLETE)
+                .price(new BigDecimal("100.00"))
+                .date(LocalDateTime.of(2022, 4, 13, 0, 0))
+                .isInStock(true)
+                .build());
 
-        product1 = productRepository.save(Product.builder().productInformation(productInformation1).shop(shop1)
-                .prices(List.of(price1, price2, price3)).build());
-        product2 = productRepository.save(Product.builder().productInformation(productInformation2).shop(shop2)
-                .prices(List.of(price4)).build());
-        product3 = productRepository.save(Product.builder().productInformation(productInformation3).shop(shop1)
-                .prices(List.of(price3_1, price3_2)).build());
-        product4 = productRepository.save(Product.builder().productInformation(productInformation4).shop(shop2)
-                .prices(new ArrayList<>()).build());
-        product5 = productRepository.save(Product.builder().productInformation(productInformation5).shop(shop1)
-                .prices(List.of(price5_1)).build());
-        productRepository.flush();
+        price7_1 = priceRepository.save(ProductPrice.builder()
+                .product(product7)
+                .parsingStatus(ParsingStatus.COMPLETE)
+                .price(new BigDecimal("100.00"))
+                .date(LocalDateTime.of(2022, 4, 13, 0, 0))
+                .discount(100.0)
+                .isInStock(false)
+                .build());
 
-        price1.setProduct(product1);
-        price2.setProduct(product1);
-        price3.setProduct(product1);
-        price4.setProduct(product2);
-        price3_1.setProduct(product3);
-        price3_2.setProduct(product3);
-        price5_1.setProduct(product5);
-        productPriceRepository.save(price1);
-        productPriceRepository.save(price2);
-        productPriceRepository.save(price3);
-        productPriceRepository.save(price4);
-        productPriceRepository.save(price3_1);
-        productPriceRepository.save(price3_2);
-        productPriceRepository.save(price5_1);
-        productPriceRepository.flush();
+        product1.setPrices(List.of(price1_1, price1_2, price1_3));
+        product2.setPrices(List.of(price2_1));
+        product3.setPrices(List.of(price3_1, price3_2));
+        product5.setPrices(List.of(price5_1));
+        product6.setPrices(List.of(price6_1));
+        product7.setPrices(List.of(price7_1));
 
         userProductRepository.save(UserProduct.builder().user(user1).monitorAvailability(true).monitorDiscount(false)
                 .monitorPriceChanges(false).product(product1).build());
         userProductRepository.save(UserProduct.builder().user(user1).monitorAvailability(false).monitorDiscount(false)
-                .monitorPriceChanges(false).product(product3).build());
+                .monitorPriceChanges(false).product(product2).build());
 
         userProductRepository.save(UserProduct.builder().user(user2).monitorAvailability(true).monitorDiscount(true)
                 .monitorPriceChanges(true).product(product2).build());
@@ -150,19 +195,30 @@ public class ShopRepositoryTest {
                 .monitorPriceChanges(true).product(product5).build());
 
         userProductRepository.save(UserProduct.builder().user(user4).monitorAvailability(false).monitorDiscount(false)
-                .monitorPriceChanges(false).product(product1).build());
+                .monitorPriceChanges(true).product(product3).build());
         userProductRepository.save(UserProduct.builder().user(user4).monitorAvailability(false).monitorDiscount(false)
-                .monitorPriceChanges(false).product(product2).build());
-        userProductRepository.flush();
+                .monitorPriceChanges(true).product(product5).build());
+
+        userProductRepository.save(UserProduct.builder().user(user5).monitorAvailability(true).monitorDiscount(true)
+                .monitorPriceChanges(true).product(product1).build());
+        userProductRepository.save(UserProduct.builder().user(user5).monitorAvailability(true).monitorDiscount(true)
+                .monitorPriceChanges(true).product(product3).build());
+
+        userProductRepository.save(UserProduct.builder().user(user6).monitorAvailability(false).monitorDiscount(false)
+                .monitorPriceChanges(true).product(product6).build());
+        userProductRepository.save(UserProduct.builder().user(user6).monitorAvailability(false).monitorDiscount(false)
+                .monitorPriceChanges(false).product(product7).build());
     }
 
     @AfterAll
     public void afterAll() {
         userProductRepository.deleteAll();
-        productPriceRepository.deleteAll();
+        priceRepository.deleteAll();
         productRepository.deleteAll();
-        productInformationRepository.deleteAll();
-        shopRepository.deleteAll();
+        informationRepository.deleteAll();
+        testedShopRepository.deleteAll();
+        shopChainRepository.deleteAll();
+        cityRepository.deleteAll();
         userRepository.deleteAll();
     }
 
@@ -170,13 +226,17 @@ public class ShopRepositoryTest {
     private User user2;
     private User user3;
     private User user4;
-    private ProductPrice price1;
-    private ProductPrice price2;
-    private ProductPrice price3;
-    private ProductPrice price4;
+    private User user5;
+    private User user6;
+    private ProductPrice price1_1;
+    private ProductPrice price1_2;
+    private ProductPrice price1_3;
+    private ProductPrice price2_1;
     private ProductPrice price3_1;
     private ProductPrice price3_2;
     private ProductPrice price5_1;
+    private ProductPrice price6_1;
+    private ProductPrice price7_1;
     private Shop shop1;
     private Shop shop2;
     private Product product1;
@@ -184,11 +244,14 @@ public class ShopRepositoryTest {
     private Product product3;
     private Product product4;
     private Product product5;
+    private Product product6;
+    private Product product7;
+
 
     @Test
     void findAllUserShops_user1_shop1() {
         assertThat(
-                shopRepository.findAllUserShops(user1),
+                testedShopRepository.findAllUserShops(user1),
                 contains(shop1)
         );
     }
@@ -196,18 +259,18 @@ public class ShopRepositoryTest {
     @Test
     void findAllUserShops_user2_listOfShops() {
         assertThat(
-                shopRepository.findAllUserShops(user2),
+                testedShopRepository.findAllUserShops(user2),
                 containsInAnyOrder(shop1, shop2)
         );
     }
 
     @Test
     void findAllUserShops_user3_emptyList() {
-        assertTrue(shopRepository.findAllUserShops(user3).isEmpty());
+        assertTrue(testedShopRepository.findAllUserShops(user3).isEmpty());
     }
 
     @Test
-    void findAllUserShops_user4_emptyList() {
-        assertTrue(shopRepository.findAllUserShops(user4).isEmpty());
+    void findAllUserShops_user4_listOfShops() {
+        assertFalse(testedShopRepository.findAllUserShops(user4).isEmpty());
     }
 }

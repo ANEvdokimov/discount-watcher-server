@@ -1,6 +1,7 @@
 package an.evdokimov.discount.watcher.server.database.product.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.Hibernate;
@@ -34,6 +35,8 @@ public class ProductPrice {
     private Long id;
     @ManyToOne
     @JoinColumn(name = "product_id")
+    @NotNull
+    @ToString.Exclude
     private Product product;
     private BigDecimal price;
     private Double discount;
@@ -42,18 +45,34 @@ public class ProductPrice {
     private String availabilityInformation;
     private LocalDateTime date;
     @Enumerated(EnumType.STRING)
+    @NotNull
     private ParsingStatus parsingStatus;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        ProductPrice that = (ProductPrice) o;
-        return id != null && Objects.equals(id, that.id);
+        ProductPrice price1 = (ProductPrice) o;
+        return Objects.equals(getId(), price1.getId())
+                && Objects.equals(getProduct().getId(), price1.getProduct().getId())
+                && Objects.equals(getPrice(), price1.getPrice())
+                && Objects.equals(getDiscount(), price1.getDiscount())
+                && Objects.equals(getPriceWithDiscount(), price1.getPriceWithDiscount())
+                && Objects.equals(getIsInStock(), price1.getIsInStock())
+                && Objects.equals(getAvailabilityInformation(), price1.getAvailabilityInformation())
+                && Objects.equals(getDate(), price1.getDate())
+                && getParsingStatus() == price1.getParsingStatus();
     }
 
     @Override
     public int hashCode() {
-        return getClass().hashCode();
+        return Objects.hash(getId(), getProduct().getId(), getPrice(), getDiscount(), getPriceWithDiscount(),
+                getIsInStock(), getAvailabilityInformation(), getDate(), getParsingStatus());
+    }
+
+    // toString parameters for lombok
+    @ToString.Include(name = "productId")
+    private Long getProductId() {
+        return getProduct().getId();
     }
 }
