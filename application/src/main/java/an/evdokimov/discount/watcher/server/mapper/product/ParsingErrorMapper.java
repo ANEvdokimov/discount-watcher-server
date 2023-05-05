@@ -11,5 +11,6 @@ import static org.mapstruct.MappingConstants.ComponentModel.SPRING;
 @Mapper(componentModel = SPRING)
 public interface ParsingErrorMapper {
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "version", ignore = true)
     ParsingError map(String message, ProductInformation productInformation, ProductPrice productPrice);
 }

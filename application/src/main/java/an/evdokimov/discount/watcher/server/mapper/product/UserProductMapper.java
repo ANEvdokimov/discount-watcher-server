@@ -10,5 +10,6 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface UserProductMapper {
     @Mapping(target = "id", expression = "java(null)")
+    @Mapping(target = "version", ignore = true)
     UserProduct map(NewProductRequest request, User user, Product product);
 }
