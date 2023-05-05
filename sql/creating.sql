@@ -80,7 +80,7 @@ CREATE TABLE product_price
 (
     id                       BIGINT PRIMARY KEY,
     product_id               BIGINT         NOT NULL REFERENCES product (id) ON UPDATE CASCADE ON DELETE RESTRICT,
-    price                    DECIMAL(10, 2),--TODO money
+    price                    DECIMAL(10, 2),
     discount                 DOUBLE PRECISION,
     price_with_discount      DECIMAL(10, 2),
     is_in_stock              BOOLEAN,
@@ -93,7 +93,7 @@ CREATE TABLE product_price
 CREATE TABLE product_price_lenta
 (
     id              BIGINT PRIMARY KEY REFERENCES product_price (id) ON UPDATE CASCADE ON DELETE CASCADE,
-    price_with_card DECIMAL(10, 2)--TODO money
+    price_with_card DECIMAL(10, 2)
 );
 
 CREATE SEQUENCE user_product_sequence;
