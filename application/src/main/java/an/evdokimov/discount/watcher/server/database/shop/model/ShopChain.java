@@ -34,6 +34,15 @@ public class ShopChain {
     @OneToMany(mappedBy = "shopChain")
     @ToString.Exclude
     private List<Shop> shops;
+    @Version
+    private Long version;
+
+    public ShopChain(Long id, String name, String cyrillicName, List<Shop> shops) {
+        this.id = id;
+        this.name = name;
+        this.cyrillicName = cyrillicName;
+        this.shops = shops;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -43,11 +52,12 @@ public class ShopChain {
         return Objects.equals(getId(), shopChain.getId())
                 && Objects.equals(getName(), shopChain.getName())
                 && Objects.equals(getCyrillicName(), shopChain.getCyrillicName())
-                && Objects.equals(getShops(), shopChain.getShops());
+                && Objects.equals(getShops(), shopChain.getShops())
+                && Objects.equals(getVersion(), shopChain.getVersion());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getName(), getCyrillicName(), getShops());
+        return Objects.hash(getId(), getName(), getCyrillicName(), getShops(), getVersion());
     }
 }

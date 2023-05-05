@@ -43,6 +43,18 @@ public class UserProduct {
     private boolean monitorDiscount;
     private boolean monitorAvailability;
     private boolean monitorPriceChanges;
+    @Version
+    private Long version;
+
+    public UserProduct(Long id, User user, Product product, boolean monitorDiscount, boolean monitorAvailability,
+                       boolean monitorPriceChanges) {
+        this.id = id;
+        this.user = user;
+        this.product = product;
+        this.monitorDiscount = monitorDiscount;
+        this.monitorAvailability = monitorAvailability;
+        this.monitorPriceChanges = monitorPriceChanges;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -54,13 +66,14 @@ public class UserProduct {
                 && isMonitorPriceChanges() == that.isMonitorPriceChanges()
                 && Objects.equals(getId(), that.getId())
                 && Objects.equals(getUser().getId(), that.getUser().getId())
-                && Objects.equals(getProduct().getId(), that.getProduct().getId());
+                && Objects.equals(getProduct().getId(), that.getProduct().getId())
+                && Objects.equals(getVersion(), that.getVersion());
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(getId(), getUser().getId(), getProduct().getId(), isMonitorDiscount(),
-                isMonitorAvailability(), isMonitorPriceChanges());
+                isMonitorAvailability(), isMonitorPriceChanges(), getVersion());
     }
 
     // toString parameters for lombok

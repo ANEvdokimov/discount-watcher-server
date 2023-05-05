@@ -8,6 +8,7 @@ import org.hibernate.Hibernate;
 import org.hibernate.annotations.DynamicUpdate;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
@@ -21,6 +22,13 @@ import java.util.Objects;
 @AllArgsConstructor
 public class LentaProductPrice extends ProductPrice {
     private BigDecimal priceWithCard;
+
+    public LentaProductPrice(Long id, Product product, BigDecimal price, Double discount, BigDecimal priceWithDiscount,
+                             Boolean isInStock, String availabilityInformation, LocalDateTime date,
+                             ParsingStatus parsingStatus, BigDecimal priceWithCard) {
+        super(id, product, price, discount, priceWithDiscount, isInStock, availabilityInformation, date, parsingStatus);
+        this.priceWithCard = priceWithCard;
+    }
 
     @Override
     public boolean equals(Object o) {

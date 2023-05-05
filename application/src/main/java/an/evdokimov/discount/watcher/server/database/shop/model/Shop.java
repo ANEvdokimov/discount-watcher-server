@@ -44,6 +44,19 @@ public class Shop {
     @NotNull
     private String address;
     private String cookie;
+    @Version
+    private Long version;
+
+    public Shop(Long id, ShopChain shopChain, String name, String cyrillicName, City city, String address,
+                String cookie) {
+        this.id = id;
+        this.shopChain = shopChain;
+        this.name = name;
+        this.cyrillicName = cyrillicName;
+        this.city = city;
+        this.address = address;
+        this.cookie = cookie;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -56,13 +69,14 @@ public class Shop {
                 && Objects.equals(getCyrillicName(), shop.getCyrillicName())
                 && Objects.equals(getCity().getId(), shop.getCity().getId())
                 && Objects.equals(getAddress(), shop.getAddress())
-                && Objects.equals(getCookie(), shop.getCookie());
+                && Objects.equals(getCookie(), shop.getCookie())
+                && Objects.equals(getVersion(), shop.getVersion());
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(getId(), getShopChain().getId(), getName(), getCyrillicName(), getCity().getId(),
-                getAddress(), getCookie());
+                getAddress(), getCookie(), getVersion());
     }
 
     // toString parameters for lombok

@@ -46,6 +46,15 @@ public class Product {
     @ToString.Exclude
     @Builder.Default
     private List<ProductPrice> prices = new ArrayList<>();
+    @Version
+    private Long version;
+
+    public Product(Long id, ProductInformation productInformation, Shop shop, List<ProductPrice> prices) {
+        this.id = id;
+        this.productInformation = productInformation;
+        this.shop = shop;
+        this.prices = prices;
+    }
 
     public void addPrice(ProductPrice price) {
         prices.add(price);
@@ -59,12 +68,13 @@ public class Product {
         return id != null
                 && Objects.equals(getId(), that.getId())
                 && Objects.equals(getProductInformation().getId(), that.getProductInformation().getId())
-                && Objects.equals(getShop().getId(), that.getShop().getId());
+                && Objects.equals(getShop().getId(), that.getShop().getId())
+                && Objects.equals(getVersion(), that.getVersion());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getProductInformation().getId(), getShop().getId());
+        return Objects.hash(getId(), getProductInformation().getId(), getShop().getId(), getVersion());
     }
 
     // toString parameters for lombok

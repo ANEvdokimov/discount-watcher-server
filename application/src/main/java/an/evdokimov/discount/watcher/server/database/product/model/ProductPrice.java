@@ -47,6 +47,22 @@ public class ProductPrice {
     @Enumerated(EnumType.STRING)
     @NotNull
     private ParsingStatus parsingStatus;
+    @Version
+    private Long version;
+
+    public ProductPrice(Long id, Product product, BigDecimal price, Double discount, BigDecimal priceWithDiscount,
+                        Boolean isInStock, String availabilityInformation, LocalDateTime date,
+                        ParsingStatus parsingStatus) {
+        this.id = id;
+        this.product = product;
+        this.price = price;
+        this.discount = discount;
+        this.priceWithDiscount = priceWithDiscount;
+        this.isInStock = isInStock;
+        this.availabilityInformation = availabilityInformation;
+        this.date = date;
+        this.parsingStatus = parsingStatus;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -61,13 +77,14 @@ public class ProductPrice {
                 && Objects.equals(getIsInStock(), price1.getIsInStock())
                 && Objects.equals(getAvailabilityInformation(), price1.getAvailabilityInformation())
                 && Objects.equals(getDate(), price1.getDate())
-                && getParsingStatus() == price1.getParsingStatus();
+                && getParsingStatus() == price1.getParsingStatus()
+                && Objects.equals(getVersion(), price1.getVersion());
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(getId(), getProduct().getId(), getPrice(), getDiscount(), getPriceWithDiscount(),
-                getIsInStock(), getAvailabilityInformation(), getDate(), getParsingStatus());
+                getIsInStock(), getAvailabilityInformation(), getDate(), getParsingStatus(), getVersion());
     }
 
     // toString parameters for lombok

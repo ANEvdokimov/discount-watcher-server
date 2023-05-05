@@ -38,6 +38,15 @@ public class City {
     @OneToMany(mappedBy = "city")
     @ToString.Exclude
     private List<Shop> shops;
+    @Version
+    private Long version;
+
+    public City(Long id, String name, String cyrillicName, List<Shop> shops) {
+        this.id = id;
+        this.name = name;
+        this.cyrillicName = cyrillicName;
+        this.shops = shops;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -47,11 +56,12 @@ public class City {
         return getId() != null
                 && Objects.equals(getId(), that.getId())
                 && Objects.equals(getName(), that.getCyrillicName())
-                && Objects.equals(getCyrillicName(), that.getCyrillicName());
+                && Objects.equals(getCyrillicName(), that.getCyrillicName())
+                && Objects.equals(getVersion(), that.getVersion());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getName(), getCyrillicName());
+        return Objects.hash(getId(), getName(), getCyrillicName(), getVersion());
     }
 }

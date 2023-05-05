@@ -34,6 +34,15 @@ public class ParsingError {
     @JoinColumn(name = "product_information_id")
     @ToString.Exclude
     private ProductInformation productInformation;
+    @Version
+    private Long version;
+
+    public ParsingError(Long id, String message, ProductPrice productPrice, ProductInformation productInformation) {
+        this.id = id;
+        this.message = message;
+        this.productPrice = productPrice;
+        this.productInformation = productInformation;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -48,7 +57,8 @@ public class ParsingError {
                 that.getProductPrice() != null ? that.getProductPrice().getId() : null)
                 && Objects.equals(
                 getProductInformation() != null ? getProductInformation().getId() : null,
-                that.getProductInformation() != null ? that.getProductInformation().getId() : null);
+                that.getProductInformation() != null ? that.getProductInformation().getId() : null)
+                && Objects.equals(getVersion(), that.getVersion());
     }
 
     @Override
@@ -56,7 +66,8 @@ public class ParsingError {
         return Objects.hash(getId(),
                 getMessage(),
                 getProductPrice() != null ? getProductPrice().getId() : null,
-                getProductInformation() != null ? getProductInformation().getId() : null
+                getProductInformation() != null ? getProductInformation().getId() : null,
+                getVersion()
         );
     }
 

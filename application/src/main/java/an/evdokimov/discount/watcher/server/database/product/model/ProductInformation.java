@@ -36,6 +36,15 @@ public class ProductInformation {
     @Enumerated(EnumType.STRING)
     @NotNull
     private ParsingStatus parsingStatus;
+    @Version
+    private Long version;
+
+    public ProductInformation(Long id, String name, URL url, ParsingStatus parsingStatus) {
+        this.id = id;
+        this.name = name;
+        this.url = url;
+        this.parsingStatus = parsingStatus;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -46,11 +55,12 @@ public class ProductInformation {
                 && Objects.equals(getId(), that.getId())
                 && Objects.equals(getName(), that.getName())
                 && Objects.equals(getUrl(), that.getUrl())
-                && Objects.equals(getParsingStatus(), that.getParsingStatus());
+                && Objects.equals(getParsingStatus(), that.getParsingStatus())
+                && Objects.equals(getVersion(), that.getVersion());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getName(), getUrl(), getParsingStatus());
+        return Objects.hash(getId(), getName(), getUrl(), getParsingStatus(), getVersion());
     }
 }

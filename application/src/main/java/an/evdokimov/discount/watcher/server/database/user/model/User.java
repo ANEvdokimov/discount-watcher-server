@@ -45,6 +45,19 @@ public class User implements UserDetails {
     @Builder.Default
     @NotNull
     private boolean enabled = true;
+    @Version
+    private Long version;
+
+    public User(Long id, String login, String password, String name, LocalDateTime registerDate, UserRole role,
+                boolean enabled) {
+        this.id = id;
+        this.login = login;
+        this.password = password;
+        this.name = name;
+        this.registerDate = registerDate;
+        this.role = role;
+        this.enabled = enabled;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -83,11 +96,13 @@ public class User implements UserDetails {
                 && Objects.equals(getName(), that.getName())
                 && Objects.equals(getRegisterDate(), that.getRegisterDate())
                 && Objects.equals(getRole(), that.getRole())
-                && Objects.equals(isEnabled(), that.isEnabled());
+                && Objects.equals(isEnabled(), that.isEnabled())
+                && Objects.equals(getVersion(), that.getVersion());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getLogin(), getPassword(), getName(), getRegisterDate(), getRole(), isEnabled());
+        return Objects.hash(getId(), getLogin(), getPassword(), getName(), getRegisterDate(), getRole(), isEnabled(),
+                getVersion());
     }
 }
