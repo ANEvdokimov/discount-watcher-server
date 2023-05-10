@@ -72,3 +72,12 @@ tasks.withType(JavaCompile).configureEach {
 tasks.withType(Javadoc).configureEach {
     options.encoding = 'UTF-8'
 }
+
+clean.doLast {
+    file("src/main/generated").deleteDir()
+    println "src/main/generated"
+    file("src/test/generated_tests").deleteDir()
+    println "src/test/generated_tests"
+    file("${project.projectDir}/out").deleteDir()
+    println "${project.projectDir}/out"
+}
