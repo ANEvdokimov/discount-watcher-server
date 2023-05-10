@@ -17,6 +17,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -28,6 +29,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final JwtUtils jwtUtils;
     private final PasswordEncoder encoder;
+    private final Clock clock;
 
     @Override
     public LoginResponse register(RegisterRequest request) throws ServerException {
@@ -42,7 +44,7 @@ public class UserServiceImpl implements UserService {
         User newUser = mapper.fromDto(request);
         newUser.setRole(UserRole.ROLE_USER);
         newUser.setPassword(encoder.encode(newUser.getPassword()));
-        newUser.setRegisterDate(LocalDateTime.now());
+        newUser.setRegisterDate(LocalDateTime.now(clock));
         userRepository.save(newUser);
 
         return new LoginResponse(jwtUtils.generateToken(newUser.getLogin()));

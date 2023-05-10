@@ -7,12 +7,16 @@ import an.evdokimov.discount.watcher.server.database.user.model.User;
 import an.evdokimov.discount.watcher.server.database.user.repository.UserRepository;
 import an.evdokimov.discount.watcher.server.mapper.user.UserMapper;
 import an.evdokimov.securitystarter.security.authentication.jwt.JwtUtils;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.Clock;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -29,9 +33,18 @@ class UserServiceTest {
     private PasswordEncoder passwordEncoder;
     @MockBean
     private JwtUtils jwtUtils;
+    @MockBean
+    private Clock clock;
 
     @Autowired
     private UserServiceImpl testesUserService;
+
+    @BeforeEach
+    public void initClock() {
+        Clock fixedClock = Clock.fixed(LocalDate.of(2023, 5, 10).atStartOfDay(ZoneOffset.UTC).toInstant(), ZoneOffset.UTC);
+        when(clock.instant()).thenReturn(fixedClock.instant());
+        when(clock.getZone()).thenReturn(fixedClock.getZone());
+    }
 
     @Test
     void register_validDto_logInDtoResponse() throws ServerException {
