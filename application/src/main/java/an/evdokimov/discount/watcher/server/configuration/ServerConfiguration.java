@@ -1,6 +1,5 @@
 package an.evdokimov.discount.watcher.server.configuration;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,11 +11,6 @@ import java.time.Clock;
 @EnableScheduling
 @ConfigurationPropertiesScan
 public class ServerConfiguration {
-    @Bean
-    public ModelMapper modelMapper() {
-        return new ModelMapper();
-    }
-
     @Bean
     public Clock clock() {
         return Clock.systemUTC();

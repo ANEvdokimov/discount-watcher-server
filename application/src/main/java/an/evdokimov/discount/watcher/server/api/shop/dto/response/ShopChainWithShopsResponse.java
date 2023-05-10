@@ -26,7 +26,10 @@ public class ShopChainWithShopsResponse extends ShopChainResponse {
      * Information about shop.
      */
     @Data
-    static class ShopResponse {
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ShopResponse {
         private Long id;
 
         /**

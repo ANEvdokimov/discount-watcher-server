@@ -8,10 +8,10 @@ import an.evdokimov.discount.watcher.server.api.user.dto.response.LoginResponse;
 import an.evdokimov.discount.watcher.server.database.user.model.User;
 import an.evdokimov.discount.watcher.server.database.user.model.UserRole;
 import an.evdokimov.discount.watcher.server.database.user.repository.UserRepository;
+import an.evdokimov.discount.watcher.server.mapper.user.UserMapper;
 import an.evdokimov.securitystarter.security.authentication.jwt.JwtUtils;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,21 +22,12 @@ import java.util.Optional;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-    private final ModelMapper mapper;
+    private final UserMapper mapper;
     private final UserRepository userRepository;
     private final JwtUtils jwtUtils;
     private final PasswordEncoder encoder;
-
-    public UserServiceImpl(ModelMapper mapper,
-                           UserRepository userRepository,
-                           @Lazy JwtUtils jwtUtils,
-                           PasswordEncoder encoder) {
-        this.mapper = mapper;
-        this.userRepository = userRepository;
-        this.jwtUtils = jwtUtils;
-        this.encoder = encoder;
-    }
 
     @Override
     public LoginResponse register(RegisterRequest request) throws ServerException {
@@ -48,7 +39,7 @@ public class UserServiceImpl implements UserService {
             throw new ServerException(ServerErrorCode.USER_ALREADY_EXISTS);
         }
 
-        User newUser = mapper.map(request, User.class);
+        User newUser = mapper.fromDto(request);
         newUser.setRole(UserRole.ROLE_USER);
         newUser.setPassword(encoder.encode(newUser.getPassword()));
         newUser.setRegisterDate(LocalDateTime.now());

@@ -3,9 +3,8 @@ package an.evdokimov.discount.watcher.server.service.city;
 import an.evdokimov.discount.watcher.server.api.city.dto.response.CityResponse;
 import an.evdokimov.discount.watcher.server.database.city.model.City;
 import an.evdokimov.discount.watcher.server.database.city.repository.CityRepository;
+import an.evdokimov.discount.watcher.server.mapper.city.CityMapper;
 import org.junit.jupiter.api.Test;
-import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -14,17 +13,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest(classes = {CityServiceImpl.class, ModelMapper.class})
+@SpringBootTest(classes = CityServiceImpl.class)
 class CityServiceTest {
     @MockBean
     private CityRepository repository;
-    @Autowired
-    private ModelMapper mapper;
+    @MockBean
+    private CityMapper mapper;
 
     @Autowired
     private CityServiceImpl testedCityService;
@@ -37,18 +34,24 @@ class CityServiceTest {
                 City.builder().name("city 17").build());
         when(repository.findAll()).thenReturn(cities);
 
-        ArrayList<CityResponse> expectedCityResponses =
-                mapper.map(cities, new TypeToken<ArrayList<CityResponse>>() {
-                }.getType());
+        List<CityResponse> expectedCityResponses = List.of(
+                CityResponse.builder().name("city 1").build(),
+                CityResponse.builder().name("city 2").build(),
+                CityResponse.builder().name("city 17").build()
+        );
+
+        when(mapper.toDto(cities)).thenReturn(expectedCityResponses);
+
 
         Collection<CityResponse> result = testedCityService.getAll();
 
-        assertThat(result, containsInAnyOrder(expectedCityResponses.toArray()));
+        assertEquals(expectedCityResponses, result);
     }
 
     @Test
     void getAll_noCities_emptyList() {
         when(repository.findAll()).thenReturn(new ArrayList<>());
+        when(mapper.toDto(new ArrayList<>())).thenReturn(new ArrayList<>());
 
         Collection<CityResponse> result = testedCityService.getAll();
 
