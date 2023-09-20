@@ -36,10 +36,10 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
         try {
             jwtUtils.validateToken(jwtAuthenticationToken.getToken());
         } catch (ExpiredJwtException e) {
-            log.warn(e.getMessage());
+            log.info(e.getMessage());
             throw new CredentialsExpiredException(e.getMessage(), e);
         } catch (UnsupportedJwtException | SignatureException | MalformedJwtException e) {
-            log.warn(e.getMessage());
+            log.info(e.getMessage());
             throw new BadCredentialsException(e.getMessage(), e);
         }
         log.debug("token {} is valid", jwtAuthenticationToken.getToken());
