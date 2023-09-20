@@ -19,7 +19,7 @@ CREATE TABLE "user"
     register_date TIMESTAMP    NOT NULL,
     role          USER_ROLE    NOT NULL DEFAULT 'ROLE_USER',
     enabled       BOOLEAN      NOT NULL DEFAULT TRUE,
-    version       BIGINT       NOT NULL
+    version BIGINT NOT NULL DEFAULT 1
 );
 
 CREATE SEQUENCE city_sequence;
@@ -28,7 +28,7 @@ CREATE TABLE city
     id            BIGINT PRIMARY KEY,
     name          VARCHAR(255) NOT NULL,
     cyrillic_name VARCHAR(255) NOT NULL,
-    version       BIGINT       NOT NULL
+    version BIGINT NOT NULL DEFAULT 1
 );
 
 CREATE SEQUENCE shop_chain_sequence;
@@ -37,7 +37,7 @@ CREATE TABLE shop_chain
     id            BIGINT PRIMARY KEY,
     name          VARCHAR(255) NOT NULL,
     cyrillic_name VARCHAR(255),
-    version       BIGINT       NOT NULL
+    version BIGINT NOT NULL DEFAULT 1
 );
 
 CREATE SEQUENCE shop_sequence;
@@ -50,7 +50,7 @@ CREATE TABLE shop
     city_id       BIGINT       NOT NULL REFERENCES city (id) ON UPDATE CASCADE ON DELETE RESTRICT,
     address       VARCHAR(255) NOT NULL,
     cookie        VARCHAR(255),
-    version       BIGINT       NOT NULL
+    version BIGINT NOT NULL DEFAULT 1
 );
 
 CREATE SEQUENCE product_information_sequence;
@@ -60,7 +60,7 @@ CREATE TABLE product_information
     name           VARCHAR(255),
     url            VARCHAR(512)   NOT NULL UNIQUE,
     parsing_status PARSING_STATUS NOT NULL,
-    version        BIGINT         NOT NULL
+    version BIGINT NOT NULL DEFAULT 1
 );
 CREATE INDEX ON product_information (url);
 
@@ -70,7 +70,7 @@ CREATE TABLE product
     id                     BIGINT PRIMARY KEY,
     product_information_id BIGINT NOT NULL REFERENCES product_information (id) ON UPDATE CASCADE ON DELETE RESTRICT,
     shop_id                BIGINT NOT NULL REFERENCES shop (id) ON UPDATE CASCADE ON DELETE RESTRICT,
-    version                BIGINT NOT NULL,
+    version BIGINT NOT NULL DEFAULT 1,
     UNIQUE (product_information_id, shop_id)
 );
 CREATE INDEX ON product (product_information_id, shop_id);
@@ -87,7 +87,7 @@ CREATE TABLE product_price
     availability_information VARCHAR(255),
     date                     TIMESTAMP,
     parsing_status           PARSING_STATUS NOT NULL,
-    version                  BIGINT         NOT NULL
+    version BIGINT NOT NULL DEFAULT 1
 );
 
 CREATE TABLE product_price_lenta
@@ -105,7 +105,7 @@ CREATE TABLE user_product
     monitor_discount      BOOLEAN NOT NULL,
     monitor_availability  BOOLEAN NOT NULL,
     monitor_price_changes BOOLEAN NOT NULL,
-    version               BIGINT  NOT NULL,
+    version BIGINT NOT NULL DEFAULT 1,
     UNIQUE (user_id, product_id)
 );
 CREATE INDEX ON user_product (user_id, product_id);
@@ -117,5 +117,5 @@ CREATE TABLE parsing_error
     product_price_id       BIGINT REFERENCES product_price (id),
     product_information_id BIGINT REFERENCES product_information (id) ON UPDATE CASCADE ON DELETE RESTRICT,
     message                VARCHAR(102400),
-    version                BIGINT NOT NULL
+    version BIGINT NOT NULL DEFAULT 1
 );

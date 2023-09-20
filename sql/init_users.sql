@@ -20,7 +20,7 @@ GRANT SELECT, UPDATE, INSERT, DELETE
     ON ALL TABLES IN SCHEMA discount_watcher_schema
     TO discount_watcher_users;
 
-GRANT SELECT
+GRANT USAGE
     ON ALL SEQUENCES IN SCHEMA discount_watcher_schema
     TO discount_watcher_users;
 
