@@ -2,6 +2,7 @@ package an.evdokimov.discount.watcher.server.api.product.controller;
 
 import an.evdokimov.discount.watcher.server.api.error.ServerException;
 import an.evdokimov.discount.watcher.server.api.product.dto.request.NewProductRequest;
+import an.evdokimov.discount.watcher.server.api.product.dto.request.NewProductWithCookiesRequest;
 import an.evdokimov.discount.watcher.server.api.product.dto.response.ProductResponse;
 import an.evdokimov.discount.watcher.server.database.user.model.User;
 import an.evdokimov.discount.watcher.server.service.product.ProductService;
@@ -10,7 +11,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.lang.Nullable;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collection;
 
@@ -30,9 +37,23 @@ public class ProductController {
      * @param newProduct information about the added product.
      * @throws ServerException any errors during adding the product.
      */
-    @PutMapping(value = "/products", produces = MediaType.APPLICATION_JSON_VALUE)
-    public void addProduct(Authentication authentication,
-                           @Valid @RequestBody NewProductRequest newProduct) throws ServerException {
+    @PutMapping(value = "/products/add_by_shop_id", produces = MediaType.APPLICATION_JSON_VALUE)
+    public void addProductByShopId(Authentication authentication,
+                                   @Valid @RequestBody NewProductRequest newProduct) throws ServerException {
+        log.info("Adding new product {} to user {}", newProduct.toString(),
+                ((User) authentication.getPrincipal()).getLogin());
+        productService.addProduct((User) authentication.getPrincipal(), newProduct);
+    }
+
+    /**
+     * Addition a new product to the current user. The product will be parsed from a shop cite.
+     *
+     * @param newProduct information about the added product.
+     * @throws ServerException any errors during adding the product.
+     */
+    @PutMapping(value = "/products/add_by_cookies", produces = MediaType.APPLICATION_JSON_VALUE)
+    public void addProductByCookies(Authentication authentication,
+                                    @Valid @RequestBody NewProductWithCookiesRequest newProduct) throws ServerException {
         log.info("Adding new product {} to user {}", newProduct.toString(),
                 ((User) authentication.getPrincipal()).getLogin());
         productService.addProduct((User) authentication.getPrincipal(), newProduct);

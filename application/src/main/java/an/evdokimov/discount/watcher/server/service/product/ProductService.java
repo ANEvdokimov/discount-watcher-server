@@ -2,6 +2,7 @@ package an.evdokimov.discount.watcher.server.service.product;
 
 import an.evdokimov.discount.watcher.server.api.error.ServerException;
 import an.evdokimov.discount.watcher.server.api.product.dto.request.NewProductRequest;
+import an.evdokimov.discount.watcher.server.api.product.dto.request.NewProductWithCookiesRequest;
 import an.evdokimov.discount.watcher.server.api.product.dto.response.ProductResponse;
 import an.evdokimov.discount.watcher.server.database.product.model.Product;
 import an.evdokimov.discount.watcher.server.database.user.model.User;
@@ -30,6 +31,8 @@ public interface ProductService {
             throws ServerException;
 
     void addProduct(@NotNull User user, @NotNull NewProductRequest newProduct) throws ServerException;
+
+    void addProduct(@NotNull User user, @NotNull NewProductWithCookiesRequest newProduct) throws ServerException;
 
     void updateProduct(@NotNull Product product);
 }

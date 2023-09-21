@@ -5,6 +5,7 @@ import an.evdokimov.discount.watcher.server.amqp.repository.ParserService;
 import an.evdokimov.discount.watcher.server.api.error.ServerErrorCode;
 import an.evdokimov.discount.watcher.server.api.error.ServerException;
 import an.evdokimov.discount.watcher.server.api.product.dto.request.NewProductRequest;
+import an.evdokimov.discount.watcher.server.api.product.dto.request.NewProductWithCookiesRequest;
 import an.evdokimov.discount.watcher.server.api.product.dto.response.ProductResponse;
 import an.evdokimov.discount.watcher.server.database.product.model.Product;
 import an.evdokimov.discount.watcher.server.database.product.model.ProductInformation;
@@ -129,6 +130,32 @@ public class ProductServiceImpl implements ProductService {
     public void addProduct(@NotNull User user, @NotNull NewProductRequest newProduct)
             throws ServerException {
         Shop shop = shopRepository.findById(newProduct.getShopId())
+                .orElseThrow(() -> new ServerException(ServerErrorCode.SHOP_NOT_FOUND));
+
+        ProductInformation information = productInformationRepository.findOrCreateByUrl(newProduct.getUrl());
+        Product product = productRepository.findOrCreateByProductInformationAndShop(information, shop);
+
+        ProductPrice price = productPriceMapper.mapNewPrice(product);
+        productPriceRepository.save(price);
+        product.addPrice(price);
+
+        userProductRepository.saveOrUpdate(userProductMapper.map(newProduct, user, product));
+
+        parserService.parseProduct(
+                new ProductForParsing(
+                        information.getId(),
+                        price.getId(),
+                        information.getUrl(),
+                        shop.getCookie()
+                )
+        );
+    }
+
+    @Override
+    @Transactional
+    public void addProduct(@NotNull User user, @NotNull NewProductWithCookiesRequest newProduct)
+            throws ServerException {
+        Shop shop = shopRepository.findByCookie(newProduct.getCookies())
                 .orElseThrow(() -> new ServerException(ServerErrorCode.SHOP_NOT_FOUND));
 
         ProductInformation information = productInformationRepository.findOrCreateByUrl(newProduct.getUrl());

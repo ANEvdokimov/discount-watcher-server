@@ -14,30 +14,31 @@ CREATE TABLE "user"
 (
     id            BIGINT PRIMARY KEY,
     login         VARCHAR(256) NOT NULL UNIQUE,
-    password      VARCHAR(255) NOT NULL,
+    password VARCHAR(256) NOT NULL,
     name          VARCHAR(256) NOT NULL,
     register_date TIMESTAMP    NOT NULL,
     role          USER_ROLE    NOT NULL DEFAULT 'ROLE_USER',
     enabled       BOOLEAN      NOT NULL DEFAULT TRUE,
-    version BIGINT NOT NULL DEFAULT 1
+    version  BIGINT       NOT NULL DEFAULT 1
 );
 
 CREATE SEQUENCE city_sequence;
 CREATE TABLE city
 (
     id            BIGINT PRIMARY KEY,
-    name          VARCHAR(255) NOT NULL,
-    cyrillic_name VARCHAR(255) NOT NULL,
-    version BIGINT NOT NULL DEFAULT 1
+    name          VARCHAR(256) NOT NULL,
+    cyrillic_name VARCHAR(256) NOT NULL,
+    version       BIGINT       NOT NULL DEFAULT 1
 );
 
 CREATE SEQUENCE shop_chain_sequence;
 CREATE TABLE shop_chain
 (
     id            BIGINT PRIMARY KEY,
-    name          VARCHAR(255) NOT NULL,
-    cyrillic_name VARCHAR(255),
-    version BIGINT NOT NULL DEFAULT 1
+    name          VARCHAR(256) NOT NULL UNIQUE,
+    cyrillic_name VARCHAR(256),
+    website       VARCHAR(256) NOT NULL UNIQUE,
+    version       BIGINT       NOT NULL DEFAULT 1
 );
 
 CREATE SEQUENCE shop_sequence;
@@ -45,19 +46,20 @@ CREATE TABLE shop
 (
     id            BIGINT PRIMARY KEY,
     shop_chain_id BIGINT       NOT NULL REFERENCES shop_chain (id) ON UPDATE CASCADE ON DELETE RESTRICT,
-    name          VARCHAR(255) NOT NULL,
-    cyrillic_name VARCHAR(255),
+    name          VARCHAR(256) NOT NULL,
+    cyrillic_name VARCHAR(256),
     city_id       BIGINT       NOT NULL REFERENCES city (id) ON UPDATE CASCADE ON DELETE RESTRICT,
-    address       VARCHAR(255) NOT NULL,
-    cookie        VARCHAR(255),
-    version BIGINT NOT NULL DEFAULT 1
+    address       VARCHAR(256) NOT NULL,
+    cookie        VARCHAR(256),
+    version       BIGINT       NOT NULL DEFAULT 1
 );
+CREATE INDEX ON shop (cookie);
 
 CREATE SEQUENCE product_information_sequence;
 CREATE TABLE product_information
 (
     id             BIGINT PRIMARY KEY,
-    name           VARCHAR(255),
+    name    VARCHAR(256),
     url            VARCHAR(512)   NOT NULL UNIQUE,
     parsing_status PARSING_STATUS NOT NULL,
     version BIGINT NOT NULL DEFAULT 1
@@ -73,7 +75,7 @@ CREATE TABLE product
     version BIGINT NOT NULL DEFAULT 1,
     UNIQUE (product_information_id, shop_id)
 );
-CREATE INDEX ON product (product_information_id, shop_id);
+CREATE UNIQUE INDEX ON product (product_information_id, shop_id);
 
 CREATE SEQUENCE product_price_sequence;
 CREATE TABLE product_price
@@ -84,10 +86,10 @@ CREATE TABLE product_price
     discount                 DOUBLE PRECISION,
     price_with_discount      DECIMAL(10, 2),
     is_in_stock              BOOLEAN,
-    availability_information VARCHAR(255),
+    availability_information VARCHAR(256),
     date                     TIMESTAMP,
     parsing_status           PARSING_STATUS NOT NULL,
-    version BIGINT NOT NULL DEFAULT 1
+    version                  BIGINT NOT NULL DEFAULT 1
 );
 
 CREATE TABLE product_price_lenta
@@ -108,7 +110,7 @@ CREATE TABLE user_product
     version BIGINT NOT NULL DEFAULT 1,
     UNIQUE (user_id, product_id)
 );
-CREATE INDEX ON user_product (user_id, product_id);
+CREATE UNIQUE INDEX ON user_product (user_id, product_id);
 
 CREATE SEQUENCE parsing_error_sequence;
 CREATE TABLE parsing_error
