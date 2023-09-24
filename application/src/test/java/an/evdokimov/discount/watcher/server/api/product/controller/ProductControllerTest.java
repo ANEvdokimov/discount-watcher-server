@@ -2,6 +2,7 @@ package an.evdokimov.discount.watcher.server.api.product.controller;
 
 import an.evdokimov.discount.watcher.server.api.TestConfig;
 import an.evdokimov.discount.watcher.server.api.product.dto.request.NewProductRequest;
+import an.evdokimov.discount.watcher.server.api.product.dto.request.NewProductWithCookiesRequest;
 import an.evdokimov.discount.watcher.server.api.product.dto.response.LentaProductPriceResponse;
 import an.evdokimov.discount.watcher.server.api.product.dto.response.ProductResponse;
 import an.evdokimov.discount.watcher.server.configuration.SecurityConfiguration;
@@ -140,7 +141,96 @@ class ProductControllerTest {
                 .url(new URL("https://test_url.com"))
                 .build();
 
-        MvcResult result = mvc.perform(put("/api/products")
+        MvcResult result = mvc.perform(put("/api/products/add_by_shop_id")
+                        .header(authHeaderName, "Bearer wrong_token")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(mapper.writeValueAsString(request)))
+                .andReturn();
+
+        assertAll(
+                () -> assertEquals(401, result.getResponse().getStatus()),
+                () -> verify(productService, times(0))
+                        .addProduct(eq(testConfig.getTestUser()), eq(request))
+        );
+    }
+
+    @Test
+    void addProductByCookie_correctRequest_ProductResponse() throws Exception {
+        LentaProductPriceResponse productPriceResponse = LentaProductPriceResponse.builder()
+                .price(BigDecimal.valueOf(100))
+                .priceWithCard(BigDecimal.valueOf(50))
+                .priceWithDiscount(BigDecimal.valueOf(30))
+                .build();
+
+        NewProductWithCookiesRequest request = NewProductWithCookiesRequest.builder()
+                .cookies("COOKIES!!!")
+                .url(new URL("https://test_url.com"))
+                .monitorAvailability(false)
+                .monitorDiscount(true)
+                .monitorPriceChanges(false)
+                .build();
+
+        MvcResult result = mvc.perform(put("/api/products/add_by_cookies")
+                        .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(mapper.writeValueAsString(request)))
+                .andReturn();
+
+        assertAll(
+                () -> assertEquals(200, result.getResponse().getStatus()),
+                () -> verify(productService, times(1))
+                        .addProduct(eq(testConfig.getTestUser()), eq(request))
+        );
+    }
+
+    @Test
+    void addProductByCookie_nullUrl_http400() throws Exception {
+        NewProductWithCookiesRequest request = NewProductWithCookiesRequest.builder()
+                .cookies("COOKIES!!!")
+                .url(null)
+                .build();
+
+        MvcResult result = mvc.perform(put("/api/products/add_by_cookies")
+                        .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(mapper.writeValueAsString(request)))
+                .andReturn();
+
+        assertAll(
+                () -> assertEquals(400, result.getResponse().getStatus()),
+                () -> verify(productService, times(0))
+                        .addProduct(eq(testConfig.getTestUser()), eq(request))
+        );
+    }
+
+    @Test
+    void addProductByCookie_nullShopId_http400() throws Exception {
+        NewProductWithCookiesRequest request = NewProductWithCookiesRequest.builder()
+                .cookies("COOKIES!!!")
+                .url(new URL("https://test_url.com"))
+                .build();
+
+        MvcResult result = mvc.perform(put("/api/products/add_by_cookies")
+                        .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(mapper.writeValueAsString(request)))
+                .andReturn();
+
+        assertAll(
+                () -> assertEquals(400, result.getResponse().getStatus()),
+                () -> verify(productService, times(0))
+                        .addProduct(eq(testConfig.getTestUser()), eq(request))
+        );
+    }
+
+    @Test
+    void addProductByCookie_invalidJwt_http401() throws Exception {
+        NewProductWithCookiesRequest request = NewProductWithCookiesRequest.builder()
+                .cookies("COOKIES!!!")
+                .url(new URL("https://test_url.com"))
+                .build();
+
+        MvcResult result = mvc.perform(put("/api/products/add_by_cookies")
                         .header(authHeaderName, "Bearer wrong_token")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(mapper.writeValueAsString(request)))
