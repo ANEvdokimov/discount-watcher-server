@@ -29,4 +29,8 @@ public enum ServerErrorCode {
     public void throwException(String details) throws ServerException {
         throw new ServerException(this, details);
     }
+
+    public ServerException getException(String details) {
+        return new ServerException(this, details);
+    }
 }

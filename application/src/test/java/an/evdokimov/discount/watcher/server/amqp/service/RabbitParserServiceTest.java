@@ -1,20 +1,21 @@
-package an.evdokimov.discount.watcher.server.amqp.repository;
+package an.evdokimov.discount.watcher.server.amqp.service;
 
 import an.evdokimov.discount.watcher.server.amqp.dto.ParsedProductInformation;
 import an.evdokimov.discount.watcher.server.amqp.dto.ParsedProductPrice;
 import an.evdokimov.discount.watcher.server.amqp.dto.ParsingErrorMessage;
 import an.evdokimov.discount.watcher.server.amqp.dto.ProductForParsing;
+import an.evdokimov.discount.watcher.server.api.error.ServerErrorCode;
 import an.evdokimov.discount.watcher.server.api.error.ServerException;
 import an.evdokimov.discount.watcher.server.configuration.property.RabbitProperties;
 import an.evdokimov.discount.watcher.server.database.product.model.ParsingError;
-import an.evdokimov.discount.watcher.server.database.product.model.ParsingStatus;
 import an.evdokimov.discount.watcher.server.database.product.model.ProductInformation;
 import an.evdokimov.discount.watcher.server.database.product.model.ProductPrice;
 import an.evdokimov.discount.watcher.server.database.product.repository.ParsingErrorRepository;
 import an.evdokimov.discount.watcher.server.database.product.repository.ProductInformationRepository;
 import an.evdokimov.discount.watcher.server.database.product.repository.ProductPriceRepository;
-import an.evdokimov.discount.watcher.server.mapper.product.ParsedProductPriceMapper;
 import an.evdokimov.discount.watcher.server.mapper.product.ParsingErrorMapper;
+import an.evdokimov.discount.watcher.server.service.product.ProductService;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,10 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest(classes = {RabbitParserService.class, RabbitProperties.class})
 class RabbitParserServiceTest {
@@ -39,9 +43,9 @@ class RabbitParserServiceTest {
     @MockBean
     private ParsingErrorRepository parsingErrorRepository;
     @MockBean
-    private ParsedProductPriceMapper parsedProductPriceMapper;
-    @MockBean
     private ParsingErrorMapper parsingErrorMapper;
+    @MockBean
+    private ProductService productService;
 
     @Autowired
     private RabbitParserService testedRabbitParserService;
@@ -74,24 +78,12 @@ class RabbitParserServiceTest {
                 mockedParsedPrice
         );
 
-        ProductPrice mockedPrice = ProductPrice.builder()
-                .id(mockedParsedPrice.getId())
-                .parsingStatus(ParsingStatus.PROCESSING)
-                .build();
-
-        when(productPriceRepository.findById(mockedParsedPrice.getId())).thenReturn(Optional.of(mockedPrice));
-        when(productInformationRepository.updateNameById(
-                mockedParsedInformation.getId(),
-                mockedParsedInformation.getName())
-        ).thenReturn(1);
-
         testedRabbitParserService.handleParsedProductPrice(mockedParsedInformation);
 
-        verify(productPriceRepository).save(mockedPrice);
-        verify(productInformationRepository)
-                .updateNameById(mockedParsedInformation.getId(), mockedParsedInformation.getName());
+        verify(productService).saveParsedProduct(mockedParsedInformation);
     }
 
+    @SneakyThrows
     @Test
     void handleParsedProductPrice_nullPriceId_ServerException() {
         ParsedProductPrice mockedParsedPrice = new ParsedProductPrice(
@@ -109,21 +101,14 @@ class RabbitParserServiceTest {
                 mockedParsedPrice
         );
 
-        ProductPrice mockedPrice = ProductPrice.builder()
-                .id(mockedParsedPrice.getId())
-                .parsingStatus(ParsingStatus.PROCESSING)
-                .build();
-
-
         assertThrows(
                 ServerException.class,
                 () -> testedRabbitParserService.handleParsedProductPrice(mockedParsedInformation)
         );
-        verify(productPriceRepository, never()).save(mockedPrice);
-        verify(productInformationRepository, never())
-                .updateNameById(mockedParsedInformation.getId(), mockedParsedInformation.getName());
+        verify(productService, never()).saveParsedProduct(mockedParsedInformation);
     }
 
+    @SneakyThrows
     @Test
     void handleParsedProductPrice_nullInformationId_ServerException() {
         ParsedProductPrice mockedParsedPrice = new ParsedProductPrice(
@@ -141,21 +126,14 @@ class RabbitParserServiceTest {
                 mockedParsedPrice
         );
 
-        ProductPrice mockedPrice = ProductPrice.builder()
-                .id(mockedParsedPrice.getId())
-                .parsingStatus(ParsingStatus.PROCESSING)
-                .build();
-
-
         assertThrows(
                 ServerException.class,
                 () -> testedRabbitParserService.handleParsedProductPrice(mockedParsedInformation)
         );
-        verify(productPriceRepository, never()).save(mockedPrice);
-        verify(productInformationRepository, never())
-                .updateNameById(mockedParsedInformation.getId(), mockedParsedInformation.getName());
+        verify(productService, never()).saveParsedProduct(mockedParsedInformation);
     }
 
+    @SneakyThrows
     @Test
     void handleParsedProductPrice_nullIds_ServerException() {
         ParsedProductPrice mockedParsedPrice = new ParsedProductPrice(
@@ -173,21 +151,14 @@ class RabbitParserServiceTest {
                 mockedParsedPrice
         );
 
-        ProductPrice mockedPrice = ProductPrice.builder()
-                .id(mockedParsedPrice.getId())
-                .parsingStatus(ParsingStatus.PROCESSING)
-                .build();
-
-
         assertThrows(
                 ServerException.class,
                 () -> testedRabbitParserService.handleParsedProductPrice(mockedParsedInformation)
         );
-        verify(productPriceRepository, never()).save(mockedPrice);
-        verify(productInformationRepository, never())
-                .updateNameById(mockedParsedInformation.getId(), mockedParsedInformation.getName());
+        verify(productService, never()).saveParsedProduct(mockedParsedInformation);
     }
 
+    @SneakyThrows
     @Test
     void handleParsedProductPrice_nonexistentPrice_ServerException() {
         ParsedProductPrice mockedParsedPrice = new ParsedProductPrice(
@@ -205,26 +176,16 @@ class RabbitParserServiceTest {
                 mockedParsedPrice
         );
 
-        ProductPrice mockedPrice = ProductPrice.builder()
-                .id(mockedParsedPrice.getId())
-                .parsingStatus(ParsingStatus.PROCESSING)
-                .build();
-
-        when(productPriceRepository.findById(mockedParsedPrice.getId())).thenReturn(Optional.ofNullable(null));
-        when(productInformationRepository.updateNameById(
-                mockedParsedInformation.getId(),
-                mockedParsedInformation.getName())
-        ).thenReturn(1);
+        doThrow(new ServerException(ServerErrorCode.PRODUCT_NOT_FOUND))
+                .when(productService).saveParsedProduct(mockedParsedInformation);
 
         assertThrows(
                 ServerException.class,
                 () -> testedRabbitParserService.handleParsedProductPrice(mockedParsedInformation)
         );
-        verify(productPriceRepository, never()).save(mockedPrice);
-        verify(productInformationRepository, never())
-                .updateNameById(mockedParsedInformation.getId(), mockedParsedInformation.getName());
     }
 
+    @SneakyThrows
     @Test
     void handleParsedProductPrice_nonexistentInformation_ServerException() {
         ParsedProductPrice mockedParsedPrice = new ParsedProductPrice(
@@ -242,24 +203,13 @@ class RabbitParserServiceTest {
                 mockedParsedPrice
         );
 
-        ProductPrice mockedPrice = ProductPrice.builder()
-                .id(mockedParsedPrice.getId())
-                .parsingStatus(ParsingStatus.PROCESSING)
-                .build();
-
-        when(productPriceRepository.findById(mockedParsedPrice.getId())).thenReturn(Optional.of(mockedPrice));
-        when(productInformationRepository.updateNameById(
-                mockedParsedInformation.getId(),
-                mockedParsedInformation.getName())
-        ).thenReturn(0);
+        doThrow(new ServerException(ServerErrorCode.PRODUCT_INFORMATION_NOT_FOUND))
+                .when(productService).saveParsedProduct(mockedParsedInformation);
 
         assertThrows(
                 ServerException.class,
                 () -> testedRabbitParserService.handleParsedProductPrice(mockedParsedInformation)
         );
-        verify(productPriceRepository).save(mockedPrice);
-        verify(productInformationRepository)
-                .updateNameById(mockedParsedInformation.getId(), mockedParsedInformation.getName());
     }
 
     @Test

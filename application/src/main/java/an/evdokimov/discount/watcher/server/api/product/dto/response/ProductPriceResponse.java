@@ -1,5 +1,7 @@
 package an.evdokimov.discount.watcher.server.api.product.dto.response;
 
+import an.evdokimov.discount.watcher.server.database.product.model.ParsingStatus;
+import an.evdokimov.discount.watcher.server.database.product.model.PriceChange;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -47,4 +49,14 @@ public class ProductPriceResponse {
      * An updating date.
      */
     private LocalDateTime date;
+
+    /**
+     * This product parsing status;
+     */
+    private ParsingStatus parsingStatus;
+
+    /**
+     * Price change relative to the previous one.
+     */
+    private PriceChange priceChange;
 }

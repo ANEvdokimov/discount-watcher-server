@@ -1,7 +1,6 @@
-package an.evdokimov.discount.watcher.server.amqp.repository;
+package an.evdokimov.discount.watcher.server.amqp.service;
 
 import an.evdokimov.discount.watcher.server.amqp.dto.ParsedProductInformation;
-import an.evdokimov.discount.watcher.server.amqp.dto.ParsedProductPrice;
 import an.evdokimov.discount.watcher.server.amqp.dto.ParsingErrorMessage;
 import an.evdokimov.discount.watcher.server.amqp.dto.ProductForParsing;
 import an.evdokimov.discount.watcher.server.api.error.ServerErrorCode;
@@ -13,8 +12,8 @@ import an.evdokimov.discount.watcher.server.database.product.model.ProductPrice;
 import an.evdokimov.discount.watcher.server.database.product.repository.ParsingErrorRepository;
 import an.evdokimov.discount.watcher.server.database.product.repository.ProductInformationRepository;
 import an.evdokimov.discount.watcher.server.database.product.repository.ProductPriceRepository;
-import an.evdokimov.discount.watcher.server.mapper.product.ParsedProductPriceMapper;
 import an.evdokimov.discount.watcher.server.mapper.product.ParsingErrorMapper;
+import an.evdokimov.discount.watcher.server.service.product.ProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
@@ -22,21 +21,37 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.api.RabbitListenerErrorHandler;
 import org.springframework.amqp.rabbit.support.ListenerExecutionFailedException;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
 public class RabbitParserService implements ParserService {
     private final RabbitTemplate rabbitTemplate;
     private final RabbitProperties rabbitProperties;
     private final ProductPriceRepository priceRepository;
     private final ProductInformationRepository informationRepository;
     private final ParsingErrorRepository parsingErrorRepository;
-    private final ParsedProductPriceMapper parsedProductPriceMapper;
     private final ParsingErrorMapper errorMapper;
+    private final ProductService productService;
+
+    public RabbitParserService(RabbitTemplate rabbitTemplate,
+                               RabbitProperties rabbitProperties,
+                               ProductPriceRepository priceRepository,
+                               ProductInformationRepository informationRepository,
+                               ParsingErrorRepository parsingErrorRepository,
+                               ParsingErrorMapper errorMapper,
+                               @Lazy ProductService productService) {
+        this.rabbitTemplate = rabbitTemplate;
+        this.rabbitProperties = rabbitProperties;
+        this.priceRepository = priceRepository;
+        this.informationRepository = informationRepository;
+        this.parsingErrorRepository = parsingErrorRepository;
+        this.errorMapper = errorMapper;
+        this.productService = productService;
+    }
 
     @Override
     public void parseProduct(ProductForParsing product) {
@@ -53,18 +68,7 @@ public class RabbitParserService implements ParserService {
         if (parsedProduct.getId() == null || parsedProduct.getProductPrice().getId() == null) {
             ServerErrorCode.PARSE_RESPONSE_ID_ERROR.throwException(parsedProduct.toString());
         } else {
-            ParsedProductPrice parsedPrice = parsedProduct.getProductPrice();
-            ProductPrice priceInDb = priceRepository
-                    .findById(parsedPrice.getId())
-                    .orElseThrow(() ->
-                            new ServerException(ServerErrorCode.PRODUCT_NOT_FOUND, parsedProduct.toString())
-                    );
-            parsedProductPriceMapper.updateNotNullFields(parsedPrice, priceInDb);
-            priceRepository.save(priceInDb);
-
-            if (informationRepository.updateNameById(parsedProduct.getId(), parsedProduct.getName()) != 1) {
-                ServerErrorCode.PRODUCT_INFORMATION_NOT_FOUND.throwException(parsedProduct.toString());
-            }
+            productService.saveParsedProduct(parsedProduct);
         }
     }
 

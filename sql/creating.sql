@@ -4,6 +4,7 @@ SET search_path TO discount_watcher_schema;
 
 CREATE TYPE user_role AS ENUM ('ROLE_USER');
 CREATE TYPE parsing_status AS ENUM ('PROCESSING', 'COMPLETE', 'ERROR');
+CREATE TYPE price_change AS ENUM ('UP', 'DOWN', 'EQUAL', 'FIRST_PRICE', 'UNDEFINED');
 
 CREATE CAST (character varying as user_role) WITH INOUT AS IMPLICIT;
 CREATE CAST (character varying as parsing_status) WITH INOUT AS IMPLICIT;
@@ -88,8 +89,9 @@ CREATE TABLE product_price
     is_in_stock              BOOLEAN,
     availability_information VARCHAR(256),
     date                     TIMESTAMP,
+    price_change PRICE_CHANGE,
     parsing_status           PARSING_STATUS NOT NULL,
-    version                  BIGINT NOT NULL DEFAULT 1
+    version      BIGINT NOT NULL DEFAULT 1
 );
 
 CREATE TABLE product_price_lenta

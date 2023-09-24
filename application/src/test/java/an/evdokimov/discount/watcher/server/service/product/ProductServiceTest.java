@@ -1,12 +1,20 @@
 package an.evdokimov.discount.watcher.server.service.product;
 
+import an.evdokimov.discount.watcher.server.amqp.dto.ParsedProductInformation;
+import an.evdokimov.discount.watcher.server.amqp.dto.ParsedProductPrice;
 import an.evdokimov.discount.watcher.server.amqp.dto.ProductForParsing;
-import an.evdokimov.discount.watcher.server.amqp.repository.ParserService;
+import an.evdokimov.discount.watcher.server.amqp.service.ParserService;
 import an.evdokimov.discount.watcher.server.api.error.ServerException;
 import an.evdokimov.discount.watcher.server.api.product.dto.request.NewProductRequest;
 import an.evdokimov.discount.watcher.server.api.product.dto.response.LentaProductPriceResponse;
 import an.evdokimov.discount.watcher.server.api.product.dto.response.ProductResponse;
-import an.evdokimov.discount.watcher.server.database.product.model.*;
+import an.evdokimov.discount.watcher.server.database.product.model.LentaProductPrice;
+import an.evdokimov.discount.watcher.server.database.product.model.ParsingStatus;
+import an.evdokimov.discount.watcher.server.database.product.model.PriceChange;
+import an.evdokimov.discount.watcher.server.database.product.model.Product;
+import an.evdokimov.discount.watcher.server.database.product.model.ProductInformation;
+import an.evdokimov.discount.watcher.server.database.product.model.ProductPrice;
+import an.evdokimov.discount.watcher.server.database.product.model.UserProduct;
 import an.evdokimov.discount.watcher.server.database.product.repository.ProductInformationRepository;
 import an.evdokimov.discount.watcher.server.database.product.repository.ProductPriceRepository;
 import an.evdokimov.discount.watcher.server.database.product.repository.ProductRepository;
@@ -14,9 +22,11 @@ import an.evdokimov.discount.watcher.server.database.product.repository.UserProd
 import an.evdokimov.discount.watcher.server.database.shop.model.Shop;
 import an.evdokimov.discount.watcher.server.database.shop.repository.ShopRepository;
 import an.evdokimov.discount.watcher.server.database.user.model.User;
+import an.evdokimov.discount.watcher.server.mapper.product.ParsedProductPriceMapper;
 import an.evdokimov.discount.watcher.server.mapper.product.ProductMapper;
 import an.evdokimov.discount.watcher.server.mapper.product.ProductPriceMapper;
 import an.evdokimov.discount.watcher.server.mapper.product.UserProductMapper;
+import lombok.SneakyThrows;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +36,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -34,10 +45,18 @@ import java.util.Optional;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyBoolean;
+import static org.mockito.Mockito.anyLong;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.refEq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest(classes = ProductServiceImpl.class)
 class ProductServiceTest {
@@ -59,6 +78,8 @@ class ProductServiceTest {
     private ProductPriceMapper productPriceMapper;
     @MockBean
     private UserProductMapper userProductMapper;
+    @MockBean
+    private ParsedProductPriceMapper parsedProductPriceMapper;
 
     @Autowired
     private ProductServiceImpl testedProductService;
@@ -917,6 +938,416 @@ class ProductServiceTest {
                         true,
                         true
                 )
+        );
+    }
+
+    @SneakyThrows
+    @Test
+    void saveParsedProduct_noPrevious_firstPrice() {
+        ParsedProductPrice testedParsedPrice = new ParsedProductPrice(
+                666L,
+                BigDecimal.TEN,
+                1.0,
+                BigDecimal.TWO,
+                false,
+                "yes",
+                LocalDateTime.now()
+        );
+        ParsedProductInformation testedParsedInformation = new ParsedProductInformation(
+                1L,
+                "product_name",
+                testedParsedPrice
+        );
+
+        Product productFromDb = Product.builder()
+                .id(111L)
+                .build();
+        ProductPrice mockedPriceFromDb = ProductPrice.builder()
+                .id(testedParsedPrice.getId())
+                .parsingStatus(ParsingStatus.PROCESSING)
+                .product(productFromDb)
+                .build();
+
+        when(productPriceRepository.findById(testedParsedPrice.getId())).thenReturn(Optional.of(mockedPriceFromDb));
+        when(productPriceRepository.findLastPriceByProduct(productFromDb)).thenReturn(Optional.empty());
+        when(productInformationRepository.updateNameById(
+                testedParsedInformation.getId(),
+                testedParsedInformation.getName())
+        ).thenReturn(1);
+        when(productInformationRepository.updateNameById(
+                testedParsedInformation.getId(),
+                testedParsedInformation.getName())
+        ).thenReturn(1);
+        doAnswer(invocation -> {
+            ParsedProductPrice parsedProductPrice = invocation.getArgument(0, ParsedProductPrice.class);
+            ProductPrice productPrice = invocation.getArgument(1, ProductPrice.class);
+
+            productPrice.setPrice(parsedProductPrice.getPrice());
+            productPrice.setDiscount(parsedProductPrice.getDiscount());
+            productPrice.setPriceWithDiscount(parsedProductPrice.getPriceWithDiscount());
+            productPrice.setIsInStock(parsedProductPrice.getIsInStock());
+            productPrice.setAvailabilityInformation(parsedProductPrice.getAvailabilityInformation());
+            productPrice.setDate(parsedProductPrice.getDate());
+
+            return null;
+        }).when(parsedProductPriceMapper).updateNotNullFields(testedParsedPrice, mockedPriceFromDb);
+
+        testedProductService.saveParsedProduct(testedParsedInformation);
+
+        assertEquals(PriceChange.FIRST_PRICE, mockedPriceFromDb.getPriceChange());
+        verify(productPriceRepository).save(mockedPriceFromDb);
+        verify(productInformationRepository)
+                .updateNameById(testedParsedInformation.getId(), testedParsedInformation.getName());
+    }
+
+    @SneakyThrows
+    @Test
+    void saveParsedProduct_noPrevious_undefined() {
+        ParsedProductPrice testedParsedPrice = new ParsedProductPrice(
+                666L,
+                null,
+                null,
+                null,
+                false,
+                "yes",
+                LocalDateTime.now()
+        );
+        ParsedProductInformation testedParsedInformation = new ParsedProductInformation(
+                1L,
+                "product_name",
+                testedParsedPrice
+        );
+
+        Product productFromDb = Product.builder()
+                .id(111L)
+                .build();
+        ProductPrice mockedPriceFromDb = ProductPrice.builder()
+                .id(testedParsedPrice.getId())
+                .parsingStatus(ParsingStatus.PROCESSING)
+                .product(productFromDb)
+                .build();
+
+        when(productPriceRepository.findById(testedParsedPrice.getId())).thenReturn(Optional.of(mockedPriceFromDb));
+        when(productPriceRepository.findLastPriceByProduct(productFromDb)).thenReturn(Optional.empty());
+        when(productInformationRepository.updateNameById(
+                testedParsedInformation.getId(),
+                testedParsedInformation.getName())
+        ).thenReturn(1);
+
+        testedProductService.saveParsedProduct(testedParsedInformation);
+
+        assertEquals(PriceChange.UNDEFINED, mockedPriceFromDb.getPriceChange());
+        verify(productPriceRepository).save(mockedPriceFromDb);
+        verify(productInformationRepository)
+                .updateNameById(testedParsedInformation.getId(), testedParsedInformation.getName());
+    }
+
+    @SneakyThrows
+    @Test
+    void saveParsedProduct_previous_undefined() {
+        ParsedProductPrice testedParsedPrice = new ParsedProductPrice(
+                666L,
+                null,
+                null,
+                null,
+                false,
+                "yes",
+                LocalDateTime.of(2023, 9, 24, 0, 0)
+        );
+        ParsedProductInformation testedParsedInformation = new ParsedProductInformation(
+                1L,
+                "product_name",
+                testedParsedPrice
+        );
+
+        Product productFromDb = Product.builder()
+                .id(111L)
+                .build();
+        ProductPrice mockedPriceFromDb = ProductPrice.builder()
+                .id(testedParsedPrice.getId())
+                .parsingStatus(ParsingStatus.PROCESSING)
+                .product(productFromDb)
+                .build();
+
+        ProductPrice previousPriceFromDb = ProductPrice.builder()
+                .id(665L)
+                .price(BigDecimal.TWO)
+                .isInStock(true)
+                .availabilityInformation("yes")
+                .date(testedParsedPrice.getDate().minusDays(1))
+                .parsingStatus(ParsingStatus.COMPLETE)
+                .priceChange(PriceChange.FIRST_PRICE)
+                .build();
+
+        when(productPriceRepository.findById(testedParsedPrice.getId())).thenReturn(Optional.of(mockedPriceFromDb));
+        when(productPriceRepository.findLastPriceByProduct(productFromDb)).thenReturn(Optional.of(previousPriceFromDb));
+        when(productInformationRepository.updateNameById(
+                testedParsedInformation.getId(),
+                testedParsedInformation.getName())
+        ).thenReturn(1);
+
+        testedProductService.saveParsedProduct(testedParsedInformation);
+
+        assertEquals(PriceChange.UNDEFINED, mockedPriceFromDb.getPriceChange());
+        verify(productPriceRepository).save(mockedPriceFromDb);
+        verify(productInformationRepository)
+                .updateNameById(testedParsedInformation.getId(), testedParsedInformation.getName());
+    }
+
+    @SneakyThrows
+    @Test
+    void saveParsedProduct_previousEqual_equal() {
+        ParsedProductPrice testedParsedPrice = new ParsedProductPrice(
+                666L,
+                BigDecimal.TEN,
+                1.0,
+                BigDecimal.TWO,
+                false,
+                "yes",
+                LocalDateTime.now()
+        );
+        ParsedProductInformation testedParsedInformation = new ParsedProductInformation(
+                1L,
+                "product_name",
+                testedParsedPrice
+        );
+
+        Product productFromDb = Product.builder()
+                .id(111L)
+                .build();
+        ProductPrice mockedPriceFromDb = ProductPrice.builder()
+                .id(testedParsedPrice.getId())
+                .parsingStatus(ParsingStatus.PROCESSING)
+                .product(productFromDb)
+                .build();
+
+        ProductPrice previousPriceFromDb = ProductPrice.builder()
+                .id(665L)
+                .price(BigDecimal.TWO)
+                .isInStock(false)
+                .availabilityInformation("yes")
+                .date(testedParsedPrice.getDate().minusDays(1))
+                .parsingStatus(ParsingStatus.COMPLETE)
+                .priceChange(PriceChange.UNDEFINED)
+                .build();
+
+        when(productPriceRepository.findById(testedParsedPrice.getId())).thenReturn(Optional.of(mockedPriceFromDb));
+        when(productPriceRepository.findLastPriceByProduct(productFromDb)).thenReturn(Optional.of(previousPriceFromDb));
+        when(productInformationRepository.updateNameById(
+                testedParsedInformation.getId(),
+                testedParsedInformation.getName())
+        ).thenReturn(1);
+        doAnswer(invocation -> {
+            ParsedProductPrice parsedProductPrice = invocation.getArgument(0, ParsedProductPrice.class);
+            ProductPrice productPrice = invocation.getArgument(1, ProductPrice.class);
+
+            productPrice.setPrice(parsedProductPrice.getPrice());
+            productPrice.setDiscount(parsedProductPrice.getDiscount());
+            productPrice.setPriceWithDiscount(parsedProductPrice.getPriceWithDiscount());
+            productPrice.setIsInStock(parsedProductPrice.getIsInStock());
+            productPrice.setAvailabilityInformation(parsedProductPrice.getAvailabilityInformation());
+            productPrice.setDate(parsedProductPrice.getDate());
+
+            return null;
+        }).when(parsedProductPriceMapper).updateNotNullFields(testedParsedPrice, mockedPriceFromDb);
+
+        testedProductService.saveParsedProduct(testedParsedInformation);
+
+        assertEquals(PriceChange.EQUAL, mockedPriceFromDb.getPriceChange());
+        verify(productPriceRepository).save(mockedPriceFromDb);
+        verify(productInformationRepository)
+                .updateNameById(testedParsedInformation.getId(), testedParsedInformation.getName());
+    }
+
+    @SneakyThrows
+    @Test
+    void saveParsedProduct_previousLower_up() {
+        ParsedProductPrice testedParsedPrice = new ParsedProductPrice(
+                666L,
+                BigDecimal.TEN,
+                1.0,
+                BigDecimal.TWO,
+                false,
+                "yes",
+                LocalDateTime.now()
+        );
+        ParsedProductInformation testedParsedInformation = new ParsedProductInformation(
+                1L,
+                "product_name",
+                testedParsedPrice
+        );
+
+        Product productFromDb = Product.builder()
+                .id(111L)
+                .build();
+        ProductPrice mockedPriceFromDb = ProductPrice.builder()
+                .id(testedParsedPrice.getId())
+                .parsingStatus(ParsingStatus.PROCESSING)
+                .product(productFromDb)
+                .build();
+
+        ProductPrice previousPriceFromDb = ProductPrice.builder()
+                .id(665L)
+                .price(BigDecimal.ONE)
+                .isInStock(false)
+                .availabilityInformation("yes")
+                .date(testedParsedPrice.getDate().minusDays(1))
+                .parsingStatus(ParsingStatus.COMPLETE)
+                .priceChange(PriceChange.UNDEFINED)
+                .build();
+
+        when(productPriceRepository.findById(testedParsedPrice.getId())).thenReturn(Optional.of(mockedPriceFromDb));
+        when(productPriceRepository.findLastPriceByProduct(productFromDb)).thenReturn(Optional.of(previousPriceFromDb));
+        when(productInformationRepository.updateNameById(
+                testedParsedInformation.getId(),
+                testedParsedInformation.getName())
+        ).thenReturn(1);
+        doAnswer(invocation -> {
+            ParsedProductPrice parsedProductPrice = invocation.getArgument(0, ParsedProductPrice.class);
+            ProductPrice productPrice = invocation.getArgument(1, ProductPrice.class);
+
+            productPrice.setPrice(parsedProductPrice.getPrice());
+            productPrice.setDiscount(parsedProductPrice.getDiscount());
+            productPrice.setPriceWithDiscount(parsedProductPrice.getPriceWithDiscount());
+            productPrice.setIsInStock(parsedProductPrice.getIsInStock());
+            productPrice.setAvailabilityInformation(parsedProductPrice.getAvailabilityInformation());
+            productPrice.setDate(parsedProductPrice.getDate());
+
+            return null;
+        }).when(parsedProductPriceMapper).updateNotNullFields(testedParsedPrice, mockedPriceFromDb);
+
+        testedProductService.saveParsedProduct(testedParsedInformation);
+
+        assertEquals(PriceChange.UP, mockedPriceFromDb.getPriceChange());
+        verify(productPriceRepository).save(mockedPriceFromDb);
+        verify(productInformationRepository)
+                .updateNameById(testedParsedInformation.getId(), testedParsedInformation.getName());
+    }
+
+    @SneakyThrows
+    @Test
+    void saveParsedProduct_previousHigher_down() {
+        ParsedProductPrice testedParsedPrice = new ParsedProductPrice(
+                666L,
+                BigDecimal.TEN,
+                1.0,
+                BigDecimal.TWO,
+                false,
+                "yes",
+                LocalDateTime.now()
+        );
+        ParsedProductInformation testedParsedInformation = new ParsedProductInformation(
+                1L,
+                "product_name",
+                testedParsedPrice
+        );
+
+        Product productFromDb = Product.builder()
+                .id(111L)
+                .build();
+        ProductPrice mockedPriceFromDb = ProductPrice.builder()
+                .id(testedParsedPrice.getId())
+                .parsingStatus(ParsingStatus.PROCESSING)
+                .product(productFromDb)
+                .build();
+
+        ProductPrice previousPriceFromDb = ProductPrice.builder()
+                .id(665L)
+                .price(BigDecimal.TEN)
+                .isInStock(false)
+                .availabilityInformation("yes")
+                .date(testedParsedPrice.getDate().minusDays(1))
+                .parsingStatus(ParsingStatus.COMPLETE)
+                .priceChange(PriceChange.UNDEFINED)
+                .build();
+
+        when(productPriceRepository.findById(testedParsedPrice.getId())).thenReturn(Optional.of(mockedPriceFromDb));
+        when(productPriceRepository.findLastPriceByProduct(productFromDb)).thenReturn(Optional.of(previousPriceFromDb));
+        when(productInformationRepository.updateNameById(
+                testedParsedInformation.getId(),
+                testedParsedInformation.getName())
+        ).thenReturn(1);
+        doAnswer(invocation -> {
+            ParsedProductPrice parsedProductPrice = invocation.getArgument(0, ParsedProductPrice.class);
+            ProductPrice productPrice = invocation.getArgument(1, ProductPrice.class);
+
+            productPrice.setPrice(parsedProductPrice.getPrice());
+            productPrice.setDiscount(parsedProductPrice.getDiscount());
+            productPrice.setPriceWithDiscount(parsedProductPrice.getPriceWithDiscount());
+            productPrice.setIsInStock(parsedProductPrice.getIsInStock());
+            productPrice.setAvailabilityInformation(parsedProductPrice.getAvailabilityInformation());
+            productPrice.setDate(parsedProductPrice.getDate());
+
+            return null;
+        }).when(parsedProductPriceMapper).updateNotNullFields(testedParsedPrice, mockedPriceFromDb);
+
+        testedProductService.saveParsedProduct(testedParsedInformation);
+
+        assertEquals(PriceChange.DOWN, mockedPriceFromDb.getPriceChange());
+        verify(productPriceRepository).save(mockedPriceFromDb);
+        verify(productInformationRepository)
+                .updateNameById(testedParsedInformation.getId(), testedParsedInformation.getName());
+    }
+
+    @SneakyThrows
+    @Test
+    void saveParsedProduct_nonexistentPrice_serverException() {
+        ParsedProductPrice testedParsedPrice = new ParsedProductPrice(
+                666L,
+                BigDecimal.TEN,
+                1.0,
+                BigDecimal.TWO,
+                false,
+                "yes",
+                LocalDateTime.now()
+        );
+        ParsedProductInformation testedParsedInformation = new ParsedProductInformation(
+                1L,
+                "product_name",
+                testedParsedPrice
+        );
+
+        when(productPriceRepository.findById(testedParsedPrice.getId())).thenReturn(Optional.empty());
+
+        assertThrows(
+                ServerException.class,
+                () -> testedProductService.saveParsedProduct(testedParsedInformation)
+        );
+    }
+
+    @SneakyThrows
+    @Test
+    void saveParsedProduct_nonexistentInformation_serverException() {
+        ParsedProductPrice testedParsedPrice = new ParsedProductPrice(
+                666L,
+                BigDecimal.TEN,
+                1.0,
+                BigDecimal.TWO,
+                false,
+                "yes",
+                LocalDateTime.now()
+        );
+        ParsedProductInformation testedParsedInformation = new ParsedProductInformation(
+                1L,
+                "product_name",
+                testedParsedPrice
+        );
+
+        Product productFromDb = Product.builder()
+                .id(111L)
+                .build();
+        ProductPrice mockedPriceFromDb = ProductPrice.builder()
+                .id(testedParsedPrice.getId())
+                .parsingStatus(ParsingStatus.PROCESSING)
+                .product(productFromDb)
+                .build();
+
+        when(productPriceRepository.findById(testedParsedPrice.getId())).thenReturn(Optional.of(mockedPriceFromDb));
+        when(productPriceRepository.findLastPriceByProduct(productFromDb)).thenReturn(Optional.empty());
+
+        assertThrows(
+                ServerException.class,
+                () -> testedProductService.saveParsedProduct(testedParsedInformation)
         );
     }
 }

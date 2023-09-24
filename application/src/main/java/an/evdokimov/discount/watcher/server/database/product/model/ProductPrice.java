@@ -1,8 +1,24 @@
 package an.evdokimov.discount.watcher.server.database.product.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.InheritanceType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.DynamicUpdate;
@@ -47,12 +63,14 @@ public class ProductPrice {
     @Enumerated(EnumType.STRING)
     @NotNull
     private ParsingStatus parsingStatus;
+    @Enumerated(EnumType.STRING)
+    private PriceChange priceChange;
     @Version
     private Long version;
 
     public ProductPrice(Long id, Product product, BigDecimal price, Double discount, BigDecimal priceWithDiscount,
                         Boolean isInStock, String availabilityInformation, LocalDateTime date,
-                        ParsingStatus parsingStatus) {
+                        ParsingStatus parsingStatus, PriceChange priceChange) {
         this.id = id;
         this.product = product;
         this.price = price;
@@ -62,29 +80,32 @@ public class ProductPrice {
         this.availabilityInformation = availabilityInformation;
         this.date = date;
         this.parsingStatus = parsingStatus;
+        this.priceChange = priceChange;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        ProductPrice price1 = (ProductPrice) o;
-        return Objects.equals(getId(), price1.getId())
-                && Objects.equals(getProduct().getId(), price1.getProduct().getId())
-                && Objects.equals(getPrice(), price1.getPrice())
-                && Objects.equals(getDiscount(), price1.getDiscount())
-                && Objects.equals(getPriceWithDiscount(), price1.getPriceWithDiscount())
-                && Objects.equals(getIsInStock(), price1.getIsInStock())
-                && Objects.equals(getAvailabilityInformation(), price1.getAvailabilityInformation())
-                && Objects.equals(getDate(), price1.getDate())
-                && getParsingStatus() == price1.getParsingStatus()
-                && Objects.equals(getVersion(), price1.getVersion());
+        ProductPrice otherPrice = (ProductPrice) o;
+        return Objects.equals(getId(), otherPrice.getId())
+                && Objects.equals(getProduct().getId(), otherPrice.getProduct().getId())
+                && Objects.equals(getPrice(), otherPrice.getPrice())
+                && Objects.equals(getDiscount(), otherPrice.getDiscount())
+                && Objects.equals(getPriceWithDiscount(), otherPrice.getPriceWithDiscount())
+                && Objects.equals(getIsInStock(), otherPrice.getIsInStock())
+                && Objects.equals(getAvailabilityInformation(), otherPrice.getAvailabilityInformation())
+                && Objects.equals(getDate(), otherPrice.getDate())
+                && getPriceChange() == otherPrice.getPriceChange()
+                && getParsingStatus() == otherPrice.getParsingStatus()
+                && Objects.equals(getVersion(), otherPrice.getVersion());
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(getId(), getProduct().getId(), getPrice(), getDiscount(), getPriceWithDiscount(),
-                getIsInStock(), getAvailabilityInformation(), getDate(), getParsingStatus(), getVersion());
+                getIsInStock(), getAvailabilityInformation(), getDate(), getParsingStatus(), getPriceChange(),
+                getVersion());
     }
 
     // toString parameters for lombok

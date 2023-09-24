@@ -1,12 +1,15 @@
 package an.evdokimov.discount.watcher.server.service.product;
 
+import an.evdokimov.discount.watcher.server.amqp.dto.ParsedProductInformation;
+import an.evdokimov.discount.watcher.server.amqp.dto.ParsedProductPrice;
 import an.evdokimov.discount.watcher.server.amqp.dto.ProductForParsing;
-import an.evdokimov.discount.watcher.server.amqp.repository.ParserService;
+import an.evdokimov.discount.watcher.server.amqp.service.ParserService;
 import an.evdokimov.discount.watcher.server.api.error.ServerErrorCode;
 import an.evdokimov.discount.watcher.server.api.error.ServerException;
 import an.evdokimov.discount.watcher.server.api.product.dto.request.NewProductRequest;
 import an.evdokimov.discount.watcher.server.api.product.dto.request.NewProductWithCookiesRequest;
 import an.evdokimov.discount.watcher.server.api.product.dto.response.ProductResponse;
+import an.evdokimov.discount.watcher.server.database.product.model.PriceChange;
 import an.evdokimov.discount.watcher.server.database.product.model.Product;
 import an.evdokimov.discount.watcher.server.database.product.model.ProductInformation;
 import an.evdokimov.discount.watcher.server.database.product.model.ProductPrice;
@@ -17,6 +20,7 @@ import an.evdokimov.discount.watcher.server.database.product.repository.UserProd
 import an.evdokimov.discount.watcher.server.database.shop.model.Shop;
 import an.evdokimov.discount.watcher.server.database.shop.repository.ShopRepository;
 import an.evdokimov.discount.watcher.server.database.user.model.User;
+import an.evdokimov.discount.watcher.server.mapper.product.ParsedProductPriceMapper;
 import an.evdokimov.discount.watcher.server.mapper.product.ProductMapper;
 import an.evdokimov.discount.watcher.server.mapper.product.ProductPriceMapper;
 import an.evdokimov.discount.watcher.server.mapper.product.UserProductMapper;
@@ -27,6 +31,7 @@ import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
@@ -42,6 +47,7 @@ public class ProductServiceImpl implements ProductService {
     private final ProductMapper productMapper;
     private final ProductPriceMapper productPriceMapper;
     private final UserProductMapper userProductMapper;
+    private final ParsedProductPriceMapper parsedProductPriceMapper;
     private final ParserService parserService;
 
     @Override
@@ -193,5 +199,42 @@ public class ProductServiceImpl implements ProductService {
                         product.getShop().getCookie()
                 )
         );
+    }
+
+    @Override
+    @Transactional
+    public void saveParsedProduct(@NotNull ParsedProductInformation parsedProduct) throws ServerException {
+        ParsedProductPrice parsedPrice = parsedProduct.getProductPrice();
+        ProductPrice priceInDb = productPriceRepository
+                .findById(parsedPrice.getId())
+                .orElseThrow(() -> ServerErrorCode.PRODUCT_PRICE_NOT_FOUND.getException(parsedProduct.toString()));
+        parsedProductPriceMapper.updateNotNullFields(parsedPrice, priceInDb);
+
+        productPriceRepository.findLastPriceByProduct(priceInDb.getProduct())
+                .ifPresentOrElse(
+                        previousPrice -> {
+                            BigDecimal previous = previousPrice.getPriceWithDiscount() != null ?
+                                    previousPrice.getPriceWithDiscount() : previousPrice.getPrice();
+                            BigDecimal actual = priceInDb.getPriceWithDiscount() != null ?
+                                    priceInDb.getPriceWithDiscount() : priceInDb.getPrice();
+
+                            if (actual == null) priceInDb.setPriceChange(PriceChange.UNDEFINED);
+                            else if (previous.equals(actual)) priceInDb.setPriceChange(PriceChange.EQUAL);
+                            else if (previous.compareTo(actual) < 0) priceInDb.setPriceChange(PriceChange.UP);
+                            else if (previous.compareTo(actual) > 0) priceInDb.setPriceChange(PriceChange.DOWN);
+                        },
+                        () -> {
+                            BigDecimal actual = priceInDb.getPriceWithDiscount() != null ?
+                                    priceInDb.getPriceWithDiscount() : priceInDb.getPrice();
+                            if (actual == null) priceInDb.setPriceChange(PriceChange.UNDEFINED);
+                            else priceInDb.setPriceChange(PriceChange.FIRST_PRICE);
+                        }
+                );
+
+        productPriceRepository.save(priceInDb);
+
+        if (productInformationRepository.updateNameById(parsedProduct.getId(), parsedProduct.getName()) != 1) {
+            ServerErrorCode.PRODUCT_INFORMATION_NOT_FOUND.throwException(parsedProduct.toString());
+        }
     }
 }

@@ -2,7 +2,11 @@ package an.evdokimov.discount.watcher.server.database.product.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.DynamicUpdate;
@@ -25,8 +29,9 @@ public class LentaProductPrice extends ProductPrice {
 
     public LentaProductPrice(Long id, Product product, BigDecimal price, Double discount, BigDecimal priceWithDiscount,
                              Boolean isInStock, String availabilityInformation, LocalDateTime date,
-                             ParsingStatus parsingStatus, BigDecimal priceWithCard) {
-        super(id, product, price, discount, priceWithDiscount, isInStock, availabilityInformation, date, parsingStatus);
+                             PriceChange priceChange, ParsingStatus parsingStatus, BigDecimal priceWithCard) {
+        super(id, product, price, discount, priceWithDiscount, isInStock, availabilityInformation, date, parsingStatus,
+                priceChange);
         this.priceWithCard = priceWithCard;
     }
 

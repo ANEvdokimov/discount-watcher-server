@@ -1,4 +1,4 @@
-package an.evdokimov.discount.watcher.server.amqp.repository;
+package an.evdokimov.discount.watcher.server.amqp.service;
 
 import an.evdokimov.discount.watcher.server.amqp.dto.ParsedProductInformation;
 import an.evdokimov.discount.watcher.server.amqp.dto.ParsingErrorMessage;
