@@ -31,7 +31,13 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyBoolean;
+import static org.mockito.Mockito.anyLong;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.isNull;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
@@ -74,7 +80,7 @@ class ProductControllerTest {
                 .monitorPriceChanges(false)
                 .build();
 
-        MvcResult result = mvc.perform(put("/api/products")
+        MvcResult result = mvc.perform(put("/api/products/add_by_shop_id")
                         .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(mapper.writeValueAsString(request)))
@@ -94,7 +100,7 @@ class ProductControllerTest {
                 .url(null)
                 .build();
 
-        MvcResult result = mvc.perform(put("/api/products")
+        MvcResult result = mvc.perform(put("/api/products/add_by_shop_id")
                         .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(mapper.writeValueAsString(request)))
@@ -114,7 +120,7 @@ class ProductControllerTest {
                 .url(new URL("https://test_url.com"))
                 .build();
 
-        MvcResult result = mvc.perform(put("/api/products")
+        MvcResult result = mvc.perform(put("/api/products/add_by_shop_id")
                         .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(mapper.writeValueAsString(request)))
