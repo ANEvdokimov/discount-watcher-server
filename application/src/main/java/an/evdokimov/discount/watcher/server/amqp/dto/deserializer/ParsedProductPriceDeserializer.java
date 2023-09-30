@@ -24,10 +24,18 @@ public class ParsedProductPriceDeserializer extends StdDeserializer<ParsedProduc
         if (jsonNode.has("priceWithCard")) {
             return ParsedLentaProductPrice.builder()
                     .id(jsonNode.get("id").longValue())
-                    .price(jsonNode.get("price").decimalValue())
-                    .discount(jsonNode.get("discount").asDouble())
-                    .priceWithDiscount(jsonNode.get("priceWithDiscount").decimalValue())
-                    .priceWithCard(jsonNode.get("priceWithCard").decimalValue())
+                    .price(jsonNode.get("price").isNull()
+                            ? null
+                            : jsonNode.get("price").decimalValue())
+                    .discount(jsonNode.get("discount").isNull()
+                            ? null
+                            : jsonNode.get("discount").asDouble())
+                    .priceWithDiscount(jsonNode.get("priceWithDiscount").isNull()
+                            ? null :
+                            jsonNode.get("priceWithDiscount").decimalValue())
+                    .priceWithCard(jsonNode.get("priceWithCard").isNull()
+                            ? null
+                            : jsonNode.get("priceWithCard").decimalValue())
                     .isInStock(jsonNode.get("isInStock").booleanValue())
                     .availabilityInformation(jsonNode.get("availabilityInformation").textValue())
                     .date(LocalDateTime.parse(jsonNode.get("date").textValue()))
@@ -35,9 +43,15 @@ public class ParsedProductPriceDeserializer extends StdDeserializer<ParsedProduc
         } else {
             return ParsedProductPrice.builder()
                     .id(jsonNode.get("id").asLong())
-                    .price(jsonNode.get("price").decimalValue())
-                    .discount(jsonNode.get("discount").asDouble())
-                    .priceWithDiscount(jsonNode.get("priceWithDiscount").decimalValue())
+                    .price(jsonNode.get("price").isNull()
+                            ? null
+                            : jsonNode.get("price").decimalValue())
+                    .discount(jsonNode.get("discount").isNull()
+                            ? null
+                            : jsonNode.get("discount").asDouble())
+                    .priceWithDiscount(jsonNode.get("priceWithDiscount").isNull()
+                            ? null :
+                            jsonNode.get("priceWithDiscount").decimalValue())
                     .isInStock(jsonNode.get("isInStock").booleanValue())
                     .availabilityInformation(jsonNode.get("availabilityInformation").textValue())
                     .date(LocalDateTime.parse(jsonNode.get("date").textValue()))
