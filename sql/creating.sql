@@ -8,6 +8,7 @@ CREATE TYPE price_change AS ENUM ('UP', 'DOWN', 'EQUAL', 'FIRST_PRICE', 'UNDEFIN
 
 CREATE CAST (character varying as user_role) WITH INOUT AS IMPLICIT;
 CREATE CAST (character varying as parsing_status) WITH INOUT AS IMPLICIT;
+CREATE CAST (character varying as price_change) WITH INOUT AS IMPLICIT;
 
 CREATE SEQUENCE user_sequence;
 

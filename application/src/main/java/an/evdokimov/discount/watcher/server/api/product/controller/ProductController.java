@@ -13,6 +13,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -111,5 +112,16 @@ public class ProductController {
             throws ServerException {
         log.info("Getting product by id={}, price_history={}", id, withPriceHistory);
         return productService.getProduct(id, withPriceHistory);
+    }
+
+    /**
+     * Parse existing product
+     *
+     * @param id a product id.
+     */
+    @PostMapping("/product/update/{id}")
+    public void updateProduct(@PathVariable Long id) throws ServerException {
+        log.info("Update product by id={}", id);
+        productService.updateProduct(id);
     }
 }

@@ -24,10 +24,10 @@ import an.evdokimov.discount.watcher.server.mapper.product.ParsedProductPriceMap
 import an.evdokimov.discount.watcher.server.mapper.product.ProductMapper;
 import an.evdokimov.discount.watcher.server.mapper.product.ProductPriceMapper;
 import an.evdokimov.discount.watcher.server.mapper.product.UserProductMapper;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,7 +37,6 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final UserProductRepository userProductRepository;
@@ -49,6 +48,33 @@ public class ProductServiceImpl implements ProductService {
     private final UserProductMapper userProductMapper;
     private final ParsedProductPriceMapper parsedProductPriceMapper;
     private final ParserService parserService;
+
+    private final ProductServiceImpl self;
+
+
+    public ProductServiceImpl(ProductRepository productRepository,
+                              UserProductRepository userProductRepository,
+                              ProductPriceRepository productPriceRepository,
+                              ProductInformationRepository productInformationRepository,
+                              ShopRepository shopRepository,
+                              ProductMapper productMapper,
+                              ProductPriceMapper productPriceMapper,
+                              UserProductMapper userProductMapper,
+                              ParsedProductPriceMapper parsedProductPriceMapper,
+                              ParserService parserService,
+                              @Lazy ProductServiceImpl productService) {
+        this.productRepository = productRepository;
+        this.userProductRepository = userProductRepository;
+        this.productPriceRepository = productPriceRepository;
+        this.productInformationRepository = productInformationRepository;
+        this.shopRepository = shopRepository;
+        this.productMapper = productMapper;
+        this.productPriceMapper = productPriceMapper;
+        this.userProductMapper = userProductMapper;
+        this.parsedProductPriceMapper = parsedProductPriceMapper;
+        this.parserService = parserService;
+        this.self = productService;
+    }
 
     @Override
     public ProductResponse getProduct(@NotNull Long id, boolean withPriceHistory) throws ServerException {
@@ -181,6 +207,12 @@ public class ProductServiceImpl implements ProductService {
                         shop.getCookie()
                 )
         );
+    }
+
+    @Override
+    public void updateProduct(@NotNull Long productId) throws ServerException {
+        self.updateProduct(productRepository.findById(productId)
+                .orElseThrow(() -> ServerErrorCode.PRODUCT_NOT_FOUND.getException("Product id: " + productId)));
     }
 
     @Override

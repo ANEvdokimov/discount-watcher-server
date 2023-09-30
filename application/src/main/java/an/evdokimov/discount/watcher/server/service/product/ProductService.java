@@ -35,6 +35,8 @@ public interface ProductService {
 
     void addProduct(@NotNull User user, @NotNull NewProductWithCookiesRequest newProduct) throws ServerException;
 
+    void updateProduct(@NotNull Long id) throws ServerException;
+
     void updateProduct(@NotNull Product product);
 
     void saveParsedProduct(@NotNull ParsedProductInformation parsedProduct) throws ServerException;
