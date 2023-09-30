@@ -25,6 +25,7 @@ import an.evdokimov.discount.watcher.server.mapper.product.ProductMapper;
 import an.evdokimov.discount.watcher.server.mapper.product.ProductPriceMapper;
 import an.evdokimov.discount.watcher.server.mapper.product.UserProductMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.context.annotation.Lazy;
@@ -265,8 +266,10 @@ public class ProductServiceImpl implements ProductService {
 
         productPriceRepository.save(priceInDb);
 
-        if (productInformationRepository.updateNameById(parsedProduct.getId(), parsedProduct.getName()) != 1) {
-            ServerErrorCode.PRODUCT_INFORMATION_NOT_FOUND.throwException(parsedProduct.toString());
+        if (StringUtils.isNotBlank(parsedProduct.getName())) {
+            if (productInformationRepository.updateNameById(parsedProduct.getId(), parsedProduct.getName()) != 1) {
+                ServerErrorCode.PRODUCT_INFORMATION_NOT_FOUND.throwException(parsedProduct.toString());
+            }
         }
     }
 }
