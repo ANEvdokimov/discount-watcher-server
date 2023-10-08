@@ -33,6 +33,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.Clock;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
@@ -49,6 +51,7 @@ public class ProductServiceImpl implements ProductService {
     private final UserProductMapper userProductMapper;
     private final ParsedProductPriceMapper parsedProductPriceMapper;
     private final ParserService parserService;
+    private final Clock clock;
 
     private final ProductServiceImpl self;
 
@@ -63,6 +66,7 @@ public class ProductServiceImpl implements ProductService {
                               UserProductMapper userProductMapper,
                               ParsedProductPriceMapper parsedProductPriceMapper,
                               ParserService parserService,
+                              Clock clock,
                               @Lazy ProductServiceImpl productService) {
         this.productRepository = productRepository;
         this.userProductRepository = userProductRepository;
@@ -74,6 +78,7 @@ public class ProductServiceImpl implements ProductService {
         this.userProductMapper = userProductMapper;
         this.parsedProductPriceMapper = parsedProductPriceMapper;
         this.parserService = parserService;
+        this.clock = clock;
         this.self = productService;
     }
 
@@ -168,7 +173,7 @@ public class ProductServiceImpl implements ProductService {
         ProductInformation information = productInformationRepository.findOrCreateByUrl(newProduct.getUrl());
         Product product = productRepository.findOrCreateByProductInformationAndShop(information, shop);
 
-        ProductPrice price = productPriceMapper.mapNewPrice(product);
+        ProductPrice price = productPriceMapper.mapNewPrice(product, LocalDateTime.now(clock));
         productPriceRepository.save(price);
         product.addPrice(price);
 
@@ -194,7 +199,7 @@ public class ProductServiceImpl implements ProductService {
         ProductInformation information = productInformationRepository.findOrCreateByUrl(newProduct.getUrl());
         Product product = productRepository.findOrCreateByProductInformationAndShop(information, shop);
 
-        ProductPrice price = productPriceMapper.mapNewPrice(product);
+        ProductPrice price = productPriceMapper.mapNewPrice(product, LocalDateTime.now(clock));
         productPriceRepository.save(price);
         product.addPrice(price);
 
@@ -219,7 +224,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional
     public void updateProduct(@NotNull Product product) {
-        ProductPrice productPrice = productPriceMapper.mapNewPrice(product);
+        ProductPrice productPrice = productPriceMapper.mapNewPrice(product, LocalDateTime.now(clock));
 
         productPriceRepository.save(productPrice);
         product.addPrice(productPrice);

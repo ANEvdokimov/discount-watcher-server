@@ -8,6 +8,7 @@ import an.evdokimov.discount.watcher.server.database.product.model.Product;
 import an.evdokimov.discount.watcher.server.database.product.model.ProductPrice;
 import org.mapstruct.Mapper;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -34,15 +35,17 @@ public abstract class ProductPriceMapper {
 
     abstract LentaProductPriceResponse mapLentaProductPrice(LentaProductPrice productPrice);
 
-    public ProductPrice mapNewPrice(Product product) { //todo refactor
+    public ProductPrice mapNewPrice(Product product, LocalDateTime creationDate) { //todo refactor
         if (product.getProductInformation().getUrl().getHost().equals("lenta.com")) {
             return LentaProductPrice.builder()
                     .product(product)
+                    .creationDate(creationDate)
                     .parsingStatus(ParsingStatus.PROCESSING)
                     .build();
         } else {
             return ProductPrice.builder()
                     .product(product)
+                    .creationDate(creationDate)
                     .parsingStatus(ParsingStatus.PROCESSING)
                     .build();
         }

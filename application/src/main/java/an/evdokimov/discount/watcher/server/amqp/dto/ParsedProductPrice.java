@@ -22,5 +22,5 @@ public class ParsedProductPrice {
     private BigDecimal priceWithDiscount;
     private Boolean isInStock;
     private String availabilityInformation;
-    private LocalDateTime date;
+    private LocalDateTime parsingDate;
 }

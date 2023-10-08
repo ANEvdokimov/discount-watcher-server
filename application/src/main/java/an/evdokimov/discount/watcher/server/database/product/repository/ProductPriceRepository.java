@@ -15,7 +15,7 @@ public interface ProductPriceRepository extends JpaRepository<ProductPrice, Long
             and price.parsingStatus = 'COMPLETE'
             and price.price is not null
             and price.priceChange != 'UNDEFINED'
-            order by price.date desc
+            order by price.parsingDate desc
             limit 1
             """)
     Optional<ProductPrice> findLastPriceByProduct(@Param("product") Product product);

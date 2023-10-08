@@ -28,6 +28,7 @@ import an.evdokimov.discount.watcher.server.mapper.product.ProductPriceMapper;
 import an.evdokimov.discount.watcher.server.mapper.product.UserProductMapper;
 import lombok.SneakyThrows;
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -36,7 +37,10 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.Clock;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -80,9 +84,18 @@ class ProductServiceTest {
     private UserProductMapper userProductMapper;
     @MockBean
     private ParsedProductPriceMapper parsedProductPriceMapper;
+    @MockBean
+    private Clock clock;
 
     @Autowired
     private ProductServiceImpl testedProductService;
+
+    @BeforeEach
+    public void initClock() {
+        Clock fixedClock = Clock.fixed(LocalDate.of(2023, 5, 10).atStartOfDay(ZoneOffset.UTC).toInstant(), ZoneOffset.UTC);
+        when(clock.instant()).thenReturn(fixedClock.instant());
+        when(clock.getZone()).thenReturn(fixedClock.getZone());
+    }
 
     @Test
     void addProduct_LentaProduct_LentaProductResponse() throws MalformedURLException, ServerException {
@@ -123,7 +136,7 @@ class ProductServiceTest {
         when(productInformationRepository.findOrCreateByUrl(request.getUrl())).thenReturn(mockedInformation);
         when(productRepository.findOrCreateByProductInformationAndShop(mockedInformation, mockedShop))
                 .thenReturn(mockedProduct);
-        when(productPriceMapper.mapNewPrice(mockedProduct)).thenReturn(mockedPrice);
+        when(productPriceMapper.mapNewPrice(eq(mockedProduct), any())).thenReturn(mockedPrice);
         when(userProductMapper.map(request, mockedUser, mockedProduct)).thenReturn(mockedUserProduct);
 
 
@@ -728,7 +741,7 @@ class ProductServiceTest {
                 .parsingStatus(ParsingStatus.PROCESSING)
                 .build();
 
-        when(productPriceMapper.mapNewPrice(mockedProduct)).thenReturn(mockedPrice);
+        when(productPriceMapper.mapNewPrice(eq(mockedProduct), any())).thenReturn(mockedPrice);
 
         ProductForParsing expectedResult = new ProductForParsing(
                 mockedProduct.getProductInformation().getId(),
@@ -987,7 +1000,7 @@ class ProductServiceTest {
             productPrice.setPriceWithDiscount(parsedProductPrice.getPriceWithDiscount());
             productPrice.setIsInStock(parsedProductPrice.getIsInStock());
             productPrice.setAvailabilityInformation(parsedProductPrice.getAvailabilityInformation());
-            productPrice.setDate(parsedProductPrice.getDate());
+            productPrice.setParsingDate(parsedProductPrice.getParsingDate());
 
             return null;
         }).when(parsedProductPriceMapper).updateNotNullFields(testedParsedPrice, mockedPriceFromDb);
@@ -1074,7 +1087,7 @@ class ProductServiceTest {
                 .price(BigDecimal.TWO)
                 .isInStock(true)
                 .availabilityInformation("yes")
-                .date(testedParsedPrice.getDate().minusDays(1))
+                .parsingDate(testedParsedPrice.getParsingDate().minusDays(1))
                 .parsingStatus(ParsingStatus.COMPLETE)
                 .priceChange(PriceChange.FIRST_PRICE)
                 .build();
@@ -1126,7 +1139,7 @@ class ProductServiceTest {
                 .price(BigDecimal.TWO)
                 .isInStock(false)
                 .availabilityInformation("yes")
-                .date(testedParsedPrice.getDate().minusDays(1))
+                .parsingDate(testedParsedPrice.getParsingDate().minusDays(1))
                 .parsingStatus(ParsingStatus.COMPLETE)
                 .priceChange(PriceChange.UNDEFINED)
                 .build();
@@ -1146,7 +1159,7 @@ class ProductServiceTest {
             productPrice.setPriceWithDiscount(parsedProductPrice.getPriceWithDiscount());
             productPrice.setIsInStock(parsedProductPrice.getIsInStock());
             productPrice.setAvailabilityInformation(parsedProductPrice.getAvailabilityInformation());
-            productPrice.setDate(parsedProductPrice.getDate());
+            productPrice.setParsingDate(parsedProductPrice.getParsingDate());
 
             return null;
         }).when(parsedProductPriceMapper).updateNotNullFields(testedParsedPrice, mockedPriceFromDb);
@@ -1191,7 +1204,7 @@ class ProductServiceTest {
                 .price(BigDecimal.ONE)
                 .isInStock(false)
                 .availabilityInformation("yes")
-                .date(testedParsedPrice.getDate().minusDays(1))
+                .parsingDate(testedParsedPrice.getParsingDate().minusDays(1))
                 .parsingStatus(ParsingStatus.COMPLETE)
                 .priceChange(PriceChange.UNDEFINED)
                 .build();
@@ -1211,7 +1224,7 @@ class ProductServiceTest {
             productPrice.setPriceWithDiscount(parsedProductPrice.getPriceWithDiscount());
             productPrice.setIsInStock(parsedProductPrice.getIsInStock());
             productPrice.setAvailabilityInformation(parsedProductPrice.getAvailabilityInformation());
-            productPrice.setDate(parsedProductPrice.getDate());
+            productPrice.setParsingDate(parsedProductPrice.getParsingDate());
 
             return null;
         }).when(parsedProductPriceMapper).updateNotNullFields(testedParsedPrice, mockedPriceFromDb);
@@ -1256,7 +1269,7 @@ class ProductServiceTest {
                 .price(BigDecimal.TEN)
                 .isInStock(false)
                 .availabilityInformation("yes")
-                .date(testedParsedPrice.getDate().minusDays(1))
+                .parsingDate(testedParsedPrice.getParsingDate().minusDays(1))
                 .parsingStatus(ParsingStatus.COMPLETE)
                 .priceChange(PriceChange.UNDEFINED)
                 .build();
@@ -1276,7 +1289,7 @@ class ProductServiceTest {
             productPrice.setPriceWithDiscount(parsedProductPrice.getPriceWithDiscount());
             productPrice.setIsInStock(parsedProductPrice.getIsInStock());
             productPrice.setAvailabilityInformation(parsedProductPrice.getAvailabilityInformation());
-            productPrice.setDate(parsedProductPrice.getDate());
+            productPrice.setParsingDate(parsedProductPrice.getParsingDate());
 
             return null;
         }).when(parsedProductPriceMapper).updateNotNullFields(testedParsedPrice, mockedPriceFromDb);

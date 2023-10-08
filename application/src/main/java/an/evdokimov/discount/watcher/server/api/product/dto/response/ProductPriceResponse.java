@@ -2,6 +2,7 @@ package an.evdokimov.discount.watcher.server.api.product.dto.response;
 
 import an.evdokimov.discount.watcher.server.database.product.model.ParsingStatus;
 import an.evdokimov.discount.watcher.server.database.product.model.PriceChange;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -48,7 +49,8 @@ public class ProductPriceResponse {
     /**
      * An updating date.
      */
-    private LocalDateTime date;
+    @JsonProperty("date")
+    private LocalDateTime parsingDate;
 
     /**
      * This product parsing status;

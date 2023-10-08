@@ -28,10 +28,11 @@ public class LentaProductPrice extends ProductPrice {
     private BigDecimal priceWithCard;
 
     public LentaProductPrice(Long id, Product product, BigDecimal price, Double discount, BigDecimal priceWithDiscount,
-                             Boolean isInStock, String availabilityInformation, LocalDateTime date,
-                             PriceChange priceChange, ParsingStatus parsingStatus, BigDecimal priceWithCard) {
-        super(id, product, price, discount, priceWithDiscount, isInStock, availabilityInformation, date, parsingStatus,
-                priceChange);
+                             Boolean isInStock, String availabilityInformation, LocalDateTime creationDate,
+                             LocalDateTime parsingDate, PriceChange priceChange, ParsingStatus parsingStatus,
+                             BigDecimal priceWithCard) {
+        super(id, product, price, discount, priceWithDiscount, isInStock, availabilityInformation, creationDate,
+                parsingDate, parsingStatus, priceChange);
         this.priceWithCard = priceWithCard;
     }
 

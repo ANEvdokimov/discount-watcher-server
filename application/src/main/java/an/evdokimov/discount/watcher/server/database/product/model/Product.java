@@ -1,9 +1,24 @@
 package an.evdokimov.discount.watcher.server.database.product.model;
 
 import an.evdokimov.discount.watcher.server.database.shop.model.Shop;
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.Hibernate;
 
 import java.util.ArrayList;
@@ -41,7 +56,7 @@ public class Product {
     @ToString.Exclude
     private Shop shop;
     @OneToMany(mappedBy = "product")
-    @OrderBy("date DESC")
+    @OrderBy("parsingDate DESC")
     @NotNull
     @ToString.Exclude
     @Builder.Default

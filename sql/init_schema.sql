@@ -89,10 +89,11 @@ CREATE TABLE product_price
     price_with_discount      DECIMAL(10, 2),
     is_in_stock              BOOLEAN,
     availability_information VARCHAR(256),
-    date                     TIMESTAMP,
-    price_change PRICE_CHANGE,
+    creation_date TIMESTAMP NOT NULL,
+    parsing_date  TIMESTAMP,
+    price_change  PRICE_CHANGE,
     parsing_status           PARSING_STATUS NOT NULL,
-    version      BIGINT NOT NULL DEFAULT 1
+    version       BIGINT    NOT NULL DEFAULT 1
 );
 
 CREATE TABLE product_price_lenta

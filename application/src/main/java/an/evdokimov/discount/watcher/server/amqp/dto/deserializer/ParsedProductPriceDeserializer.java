@@ -38,7 +38,7 @@ public class ParsedProductPriceDeserializer extends StdDeserializer<ParsedProduc
                             : jsonNode.get("priceWithCard").decimalValue())
                     .isInStock(jsonNode.get("isInStock").booleanValue())
                     .availabilityInformation(jsonNode.get("availabilityInformation").textValue())
-                    .date(LocalDateTime.parse(jsonNode.get("date").textValue()))
+                    .parsingDate(LocalDateTime.parse(jsonNode.get("date").textValue()))
                     .build();
         } else {
             return ParsedProductPrice.builder()
@@ -54,7 +54,7 @@ public class ParsedProductPriceDeserializer extends StdDeserializer<ParsedProduc
                             jsonNode.get("priceWithDiscount").decimalValue())
                     .isInStock(jsonNode.get("isInStock").booleanValue())
                     .availabilityInformation(jsonNode.get("availabilityInformation").textValue())
-                    .date(LocalDateTime.parse(jsonNode.get("date").textValue()))
+                    .parsingDate(LocalDateTime.parse(jsonNode.get("date").textValue()))
                     .build();
         }
     }

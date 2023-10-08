@@ -2,7 +2,11 @@ package an.evdokimov.discount.watcher.server.database.product.repository;
 
 import an.evdokimov.discount.watcher.server.database.city.model.City;
 import an.evdokimov.discount.watcher.server.database.city.repository.CityRepository;
-import an.evdokimov.discount.watcher.server.database.product.model.*;
+import an.evdokimov.discount.watcher.server.database.product.model.ParsingStatus;
+import an.evdokimov.discount.watcher.server.database.product.model.Product;
+import an.evdokimov.discount.watcher.server.database.product.model.ProductInformation;
+import an.evdokimov.discount.watcher.server.database.product.model.ProductPrice;
+import an.evdokimov.discount.watcher.server.database.product.model.UserProduct;
 import an.evdokimov.discount.watcher.server.database.shop.model.Shop;
 import an.evdokimov.discount.watcher.server.database.shop.model.ShopChain;
 import an.evdokimov.discount.watcher.server.database.shop.repository.ShopChainRepository;
@@ -115,20 +119,23 @@ class ProductRepositoryTest {
                 .product(product1)
                 .parsingStatus(ParsingStatus.COMPLETE)
                 .price(new BigDecimal("100.00"))
-                .date(LocalDateTime.of(2022, 4, 1, 0, 0))
+                .creationDate(LocalDateTime.of(2000, 4, 1, 0, 0))
+                .parsingDate(LocalDateTime.of(2022, 4, 1, 0, 0))
                 .build());
         price1_2 = priceRepository.save(ProductPrice.builder()
                 .product(product1)
                 .parsingStatus(ParsingStatus.COMPLETE)
                 .price(new BigDecimal("200.00"))
-                .date(LocalDateTime.of(2022, 4, 2, 0, 0))
+                .creationDate(LocalDateTime.of(2000, 4, 1, 0, 0))
+                .parsingDate(LocalDateTime.of(2022, 4, 2, 0, 0))
                 .build());
         price1_3 = priceRepository.save(ProductPrice.builder()
                 .product(product1)
                 .parsingStatus(ParsingStatus.COMPLETE)
                 .price(new BigDecimal("300.00"))
                 .isInStock(true)
-                .date(LocalDateTime.of(2022, 4, 2, 12, 0))
+                .creationDate(LocalDateTime.of(2000, 4, 1, 0, 0))
+                .parsingDate(LocalDateTime.of(2022, 4, 2, 12, 0))
                 .build());
 
         price2_1 = priceRepository.save(ProductPrice.builder()
@@ -137,35 +144,40 @@ class ProductRepositoryTest {
                 .price(new BigDecimal("222.00"))
                 .discount(50.0)
                 .isInStock(true)
-                .date(LocalDateTime.of(2022, 4, 6, 0, 0))
+                .creationDate(LocalDateTime.of(2000, 4, 1, 0, 0))
+                .parsingDate(LocalDateTime.of(2022, 4, 6, 0, 0))
                 .build());
 
         price3_1 = priceRepository.save(ProductPrice.builder()
                 .product(product3)
                 .parsingStatus(ParsingStatus.COMPLETE)
                 .price(new BigDecimal("10.00"))
-                .date(LocalDateTime.of(2022, 4, 12, 0, 0))
+                .creationDate(LocalDateTime.of(2000, 4, 1, 0, 0))
+                .parsingDate(LocalDateTime.of(2022, 4, 12, 0, 0))
                 .build());
         price3_2 = priceRepository.save(ProductPrice.builder()
                 .product(product3)
                 .parsingStatus(ParsingStatus.COMPLETE)
                 .price(new BigDecimal("15.00"))
                 .discount(20.0)
-                .date(LocalDateTime.of(2022, 4, 13, 0, 0))
+                .creationDate(LocalDateTime.of(2000, 4, 1, 0, 0))
+                .parsingDate(LocalDateTime.of(2022, 4, 13, 0, 0))
                 .build());
 
         price5_1 = priceRepository.save(ProductPrice.builder()
                 .product(product5)
                 .parsingStatus(ParsingStatus.COMPLETE)
                 .price(new BigDecimal("100.00"))
-                .date(LocalDateTime.of(2022, 4, 13, 0, 0))
+                .creationDate(LocalDateTime.of(2000, 4, 1, 0, 0))
+                .parsingDate(LocalDateTime.of(2022, 4, 13, 0, 0))
                 .build());
 
         price6_1 = priceRepository.save(ProductPrice.builder()
                 .product(product6)
                 .parsingStatus(ParsingStatus.COMPLETE)
                 .price(new BigDecimal("100.00"))
-                .date(LocalDateTime.of(2022, 4, 13, 0, 0))
+                .creationDate(LocalDateTime.of(2000, 4, 1, 0, 0))
+                .parsingDate(LocalDateTime.of(2022, 4, 13, 0, 0))
                 .isInStock(true)
                 .build());
 
@@ -173,7 +185,8 @@ class ProductRepositoryTest {
                 .product(product7)
                 .parsingStatus(ParsingStatus.COMPLETE)
                 .price(new BigDecimal("100.00"))
-                .date(LocalDateTime.of(2022, 4, 13, 0, 0))
+                .creationDate(LocalDateTime.of(2000, 4, 1, 0, 0))
+                .parsingDate(LocalDateTime.of(2022, 4, 13, 0, 0))
                 .discount(100.0)
                 .isInStock(false)
                 .build());

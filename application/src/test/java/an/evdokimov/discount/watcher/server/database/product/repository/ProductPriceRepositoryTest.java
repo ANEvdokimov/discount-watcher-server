@@ -100,6 +100,7 @@ class ProductPriceRepositoryTest {
                 .price(BigDecimal.valueOf(1000))
                 .priceWithCard(BigDecimal.valueOf(500))
                 .priceWithDiscount(BigDecimal.valueOf(500))
+                .creationDate(LocalDateTime.of(2000, 4, 1, 0, 0))
                 .parsingStatus(ParsingStatus.COMPLETE)
                 .build();
         LentaProductPrice savedLentaProductPrice = testedPriceRepository.save(lentaProductPrice);
@@ -113,6 +114,7 @@ class ProductPriceRepositoryTest {
                 .product(mockedProduct)
                 .price(BigDecimal.valueOf(1000))
                 .priceWithDiscount(BigDecimal.valueOf(500))
+                .creationDate(LocalDateTime.of(2000, 4, 1, 0, 0))
                 .parsingStatus(ParsingStatus.COMPLETE)
                 .build();
         ProductPrice savedProductPrice = testedPriceRepository.save(productPrice);
@@ -131,7 +133,8 @@ class ProductPriceRepositoryTest {
                 .product(mockedProduct)
                 .price(null)
                 .priceWithDiscount(null)
-                .date(LocalDateTime.of(2005, 3, 1, 0, 0))
+                .creationDate(LocalDateTime.of(2005, 3, 1, 0, 0))
+                .parsingDate(LocalDateTime.of(2005, 3, 1, 0, 0))
                 .parsingStatus(ParsingStatus.COMPLETE)
                 .priceChange(PriceChange.UNDEFINED)
                 .build();
@@ -147,7 +150,8 @@ class ProductPriceRepositoryTest {
                 .product(mockedProduct)
                 .price(BigDecimal.valueOf(1000))
                 .priceWithDiscount(BigDecimal.valueOf(500))
-                .date(LocalDateTime.of(1998, 9, 26, 0, 0))
+                .creationDate(LocalDateTime.of(1998, 9, 26, 0, 0))
+                .parsingDate(LocalDateTime.of(1998, 9, 26, 0, 0))
                 .parsingStatus(ParsingStatus.COMPLETE)
                 .priceChange(PriceChange.FIRST_PRICE)
                 .build();
@@ -164,7 +168,8 @@ class ProductPriceRepositoryTest {
                 .product(mockedProduct)
                 .price(BigDecimal.valueOf(1000))
                 .priceWithDiscount(BigDecimal.valueOf(500))
-                .date(LocalDateTime.of(1998, 9, 26, 0, 0))
+                .creationDate(LocalDateTime.of(1998, 9, 26, 0, 0))
+                .parsingDate(LocalDateTime.of(1998, 9, 26, 0, 0))
                 .parsingStatus(ParsingStatus.COMPLETE)
                 .priceChange(PriceChange.FIRST_PRICE)
                 .build();
@@ -174,7 +179,8 @@ class ProductPriceRepositoryTest {
                 .product(mockedProduct)
                 .price(BigDecimal.valueOf(2000))
                 .priceWithDiscount(BigDecimal.valueOf(1000))
-                .date(LocalDateTime.of(2005, 3, 1, 0, 0))
+                .creationDate(LocalDateTime.of(2005, 3, 1, 0, 0))
+                .parsingDate(LocalDateTime.of(2005, 3, 1, 0, 0))
                 .parsingStatus(ParsingStatus.COMPLETE)
                 .priceChange(PriceChange.UP)
                 .build();
@@ -191,7 +197,8 @@ class ProductPriceRepositoryTest {
                 .product(mockedProduct)
                 .price(BigDecimal.valueOf(1000))
                 .priceWithDiscount(BigDecimal.valueOf(500))
-                .date(LocalDateTime.of(1998, 9, 26, 0, 0))
+                .creationDate(LocalDateTime.of(1998, 9, 26, 0, 0))
+                .parsingDate(LocalDateTime.of(1998, 9, 26, 0, 0))
                 .parsingStatus(ParsingStatus.COMPLETE)
                 .priceChange(PriceChange.FIRST_PRICE)
                 .build();
@@ -201,7 +208,8 @@ class ProductPriceRepositoryTest {
                 .product(mockedProduct)
                 .price(null)
                 .priceWithDiscount(null)
-                .date(LocalDateTime.of(2005, 3, 1, 0, 0))
+                .creationDate(LocalDateTime.of(2005, 3, 1, 0, 0))
+                .parsingDate(LocalDateTime.of(2005, 3, 1, 0, 0))
                 .parsingStatus(ParsingStatus.COMPLETE)
                 .priceChange(PriceChange.UNDEFINED)
                 .build();

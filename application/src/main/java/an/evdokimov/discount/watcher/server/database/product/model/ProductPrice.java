@@ -59,7 +59,9 @@ public class ProductPrice {
     private BigDecimal priceWithDiscount;
     private Boolean isInStock;
     private String availabilityInformation;
-    private LocalDateTime date;
+    @NotNull
+    private LocalDateTime creationDate;
+    private LocalDateTime parsingDate;
     @Enumerated(EnumType.STRING)
     @NotNull
     private ParsingStatus parsingStatus;
@@ -69,8 +71,8 @@ public class ProductPrice {
     private Long version;
 
     public ProductPrice(Long id, Product product, BigDecimal price, Double discount, BigDecimal priceWithDiscount,
-                        Boolean isInStock, String availabilityInformation, LocalDateTime date,
-                        ParsingStatus parsingStatus, PriceChange priceChange) {
+                        Boolean isInStock, String availabilityInformation, LocalDateTime creationDate,
+                        LocalDateTime parsingDate, ParsingStatus parsingStatus, PriceChange priceChange) {
         this.id = id;
         this.product = product;
         this.price = price;
@@ -78,7 +80,8 @@ public class ProductPrice {
         this.priceWithDiscount = priceWithDiscount;
         this.isInStock = isInStock;
         this.availabilityInformation = availabilityInformation;
-        this.date = date;
+        this.creationDate = creationDate;
+        this.parsingDate = parsingDate;
         this.parsingStatus = parsingStatus;
         this.priceChange = priceChange;
     }
@@ -95,7 +98,8 @@ public class ProductPrice {
                 && Objects.equals(getPriceWithDiscount(), otherPrice.getPriceWithDiscount())
                 && Objects.equals(getIsInStock(), otherPrice.getIsInStock())
                 && Objects.equals(getAvailabilityInformation(), otherPrice.getAvailabilityInformation())
-                && Objects.equals(getDate(), otherPrice.getDate())
+                && Objects.equals(getCreationDate(), otherPrice.getCreationDate())
+                && Objects.equals(getParsingDate(), otherPrice.getParsingDate())
                 && getPriceChange() == otherPrice.getPriceChange()
                 && getParsingStatus() == otherPrice.getParsingStatus()
                 && Objects.equals(getVersion(), otherPrice.getVersion());
@@ -104,8 +108,8 @@ public class ProductPrice {
     @Override
     public int hashCode() {
         return Objects.hash(getId(), getProduct().getId(), getPrice(), getDiscount(), getPriceWithDiscount(),
-                getIsInStock(), getAvailabilityInformation(), getDate(), getParsingStatus(), getPriceChange(),
-                getVersion());
+                getIsInStock(), getAvailabilityInformation(), getCreationDate(), getParsingDate(), getParsingStatus(),
+                getPriceChange(), getVersion());
     }
 
     // toString parameters for lombok
