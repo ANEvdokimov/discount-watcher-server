@@ -24,6 +24,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -234,8 +235,8 @@ class ProductPriceRepositoryTest {
                 .discount(null)
                 .parsingStatus(ParsingStatus.COMPLETE)
                 .priceChange(PriceChange.FIRST_PRICE)
-                .creationDate(LocalDateTime.of(2023, 10, 1, 0, 0))
-                .parsingDate(LocalDateTime.of(2023, 10, 1, 0, 0))
+                .creationDate(LocalDateTime.of(2023, 10, 1, 1, 0))
+                .parsingDate(LocalDateTime.of(2023, 10, 1, 1, 0))
                 .build();
         testedPriceRepository.save(price1);
         ProductPrice price2 = ProductPrice.builder()
@@ -257,8 +258,8 @@ class ProductPriceRepositoryTest {
                 .discount(null)
                 .parsingStatus(ParsingStatus.COMPLETE)
                 .priceChange(PriceChange.DOWN)
-                .creationDate(LocalDateTime.of(2023, 10, 2, 0, 0))
-                .parsingDate(LocalDateTime.of(2023, 10, 2, 0, 0))
+                .creationDate(LocalDateTime.of(2023, 10, 2, 1, 0))
+                .parsingDate(LocalDateTime.of(2023, 10, 2, 1, 0))
                 .build();
         testedPriceRepository.save(price3);
         ProductPrice price4 = ProductPrice.builder()
@@ -273,45 +274,14 @@ class ProductPriceRepositoryTest {
                 .build();
         testedPriceRepository.save(price4);
 
-        List<ProductPrice> result = testedPriceRepository.findByProductAndGroup(mockedProduct);
-
-        assertThat(
-                result,
-                contains(price3, price1)
+        List<ProductPrice> result = testedPriceRepository.findByProductAndParsingDateIsAfterOrderByParsingDateDesc(
+                mockedProduct,
+                LocalDate.of(2023, 10, 2).atStartOfDay()
         );
-    }
-
-    @SneakyThrows
-    @Test
-    void findGroupedByProduct_equalActualPrices_prices() {
-        ProductPrice price1 = ProductPrice.builder()
-                .product(mockedProduct)
-                .price(BigDecimal.ONE)
-                .priceWithDiscount(null)
-                .discount(null)
-                .parsingStatus(ParsingStatus.COMPLETE)
-                .priceChange(PriceChange.FIRST_PRICE)
-                .creationDate(LocalDateTime.of(2023, 10, 1, 0, 0))
-                .parsingDate(LocalDateTime.of(2023, 10, 1, 0, 0))
-                .build();
-        testedPriceRepository.save(price1);
-        ProductPrice price2 = ProductPrice.builder()
-                .product(mockedProduct)
-                .price(BigDecimal.TEN)
-                .priceWithDiscount(BigDecimal.ONE)
-                .discount(90.0)
-                .parsingStatus(ParsingStatus.COMPLETE)
-                .priceChange(PriceChange.EQUAL)
-                .creationDate(LocalDateTime.of(2023, 10, 1, 12, 0))
-                .parsingDate(LocalDateTime.of(2023, 10, 1, 12, 0))
-                .build();
-        testedPriceRepository.save(price2);
-
-        List<ProductPrice> result = testedPriceRepository.findByProductAndGroup(mockedProduct);
 
         assertThat(
                 result,
-                contains(price1)
+                contains(price4, price3)
         );
     }
 }
