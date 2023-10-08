@@ -221,7 +221,7 @@ public class ProductServiceImpl implements ProductService {
                 .orElseThrow(() -> ServerErrorCode.PRODUCT_PRICE_NOT_FOUND.getException(parsedProduct.toString()));
         parsedProductPriceMapper.updateNotNullFields(parsedPrice, priceInDb);
 
-        productPriceRepository.findLastPriceByProduct(priceInDb.getProduct())
+        productPriceRepository.findLastCompletedPriceByProduct(priceInDb.getProduct())
                 .ifPresentOrElse(
                         previousPrice -> {
                             BigDecimal previous = previousPrice.getPriceWithDiscount() != null ?

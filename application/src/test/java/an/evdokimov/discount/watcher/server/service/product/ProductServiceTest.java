@@ -482,7 +482,7 @@ class ProductServiceTest {
                 .build();
 
         when(productPriceRepository.findById(testedParsedPrice.getId())).thenReturn(Optional.of(mockedPriceFromDb));
-        when(productPriceRepository.findLastPriceByProduct(productFromDb)).thenReturn(Optional.empty());
+        when(productPriceRepository.findLastCompletedPriceByProduct(productFromDb)).thenReturn(Optional.empty());
         when(productInformationRepository.updateNameById(
                 testedParsedInformation.getId(),
                 testedParsedInformation.getName())
@@ -541,7 +541,7 @@ class ProductServiceTest {
                 .build();
 
         when(productPriceRepository.findById(testedParsedPrice.getId())).thenReturn(Optional.of(mockedPriceFromDb));
-        when(productPriceRepository.findLastPriceByProduct(productFromDb)).thenReturn(Optional.empty());
+        when(productPriceRepository.findLastCompletedPriceByProduct(productFromDb)).thenReturn(Optional.empty());
         when(productInformationRepository.updateNameById(
                 testedParsedInformation.getId(),
                 testedParsedInformation.getName())
@@ -593,7 +593,7 @@ class ProductServiceTest {
                 .build();
 
         when(productPriceRepository.findById(testedParsedPrice.getId())).thenReturn(Optional.of(mockedPriceFromDb));
-        when(productPriceRepository.findLastPriceByProduct(productFromDb)).thenReturn(Optional.of(previousPriceFromDb));
+        when(productPriceRepository.findLastCompletedPriceByProduct(productFromDb)).thenReturn(Optional.of(previousPriceFromDb));
         when(productInformationRepository.updateNameById(
                 testedParsedInformation.getId(),
                 testedParsedInformation.getName())
@@ -645,7 +645,7 @@ class ProductServiceTest {
                 .build();
 
         when(productPriceRepository.findById(testedParsedPrice.getId())).thenReturn(Optional.of(mockedPriceFromDb));
-        when(productPriceRepository.findLastPriceByProduct(productFromDb)).thenReturn(Optional.of(previousPriceFromDb));
+        when(productPriceRepository.findLastCompletedPriceByProduct(productFromDb)).thenReturn(Optional.of(previousPriceFromDb));
         when(productInformationRepository.updateNameById(
                 testedParsedInformation.getId(),
                 testedParsedInformation.getName())
@@ -710,7 +710,7 @@ class ProductServiceTest {
                 .build();
 
         when(productPriceRepository.findById(testedParsedPrice.getId())).thenReturn(Optional.of(mockedPriceFromDb));
-        when(productPriceRepository.findLastPriceByProduct(productFromDb)).thenReturn(Optional.of(previousPriceFromDb));
+        when(productPriceRepository.findLastCompletedPriceByProduct(productFromDb)).thenReturn(Optional.of(previousPriceFromDb));
         when(productInformationRepository.updateNameById(
                 testedParsedInformation.getId(),
                 testedParsedInformation.getName())
@@ -775,7 +775,7 @@ class ProductServiceTest {
                 .build();
 
         when(productPriceRepository.findById(testedParsedPrice.getId())).thenReturn(Optional.of(mockedPriceFromDb));
-        when(productPriceRepository.findLastPriceByProduct(productFromDb)).thenReturn(Optional.of(previousPriceFromDb));
+        when(productPriceRepository.findLastCompletedPriceByProduct(productFromDb)).thenReturn(Optional.of(previousPriceFromDb));
         when(productInformationRepository.updateNameById(
                 testedParsedInformation.getId(),
                 testedParsedInformation.getName())
@@ -856,7 +856,7 @@ class ProductServiceTest {
                 .build();
 
         when(productPriceRepository.findById(testedParsedPrice.getId())).thenReturn(Optional.of(mockedPriceFromDb));
-        when(productPriceRepository.findLastPriceByProduct(productFromDb)).thenReturn(Optional.empty());
+        when(productPriceRepository.findLastCompletedPriceByProduct(productFromDb)).thenReturn(Optional.empty());
 
         assertThrows(
                 ServerException.class,

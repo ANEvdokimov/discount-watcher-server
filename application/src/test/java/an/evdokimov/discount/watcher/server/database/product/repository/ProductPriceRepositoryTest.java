@@ -12,6 +12,7 @@ import an.evdokimov.discount.watcher.server.database.shop.model.Shop;
 import an.evdokimov.discount.watcher.server.database.shop.model.ShopChain;
 import an.evdokimov.discount.watcher.server.database.shop.repository.ShopChainRepository;
 import an.evdokimov.discount.watcher.server.database.shop.repository.ShopRepository;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -24,8 +25,11 @@ import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -124,7 +128,7 @@ class ProductPriceRepositoryTest {
 
     @Test
     void findLastPriceByProduct_noPreviousPrice_null() {
-        assertTrue(testedPriceRepository.findLastPriceByProduct(mockedProduct).isEmpty());
+        assertTrue(testedPriceRepository.findLastCompletedPriceByProduct(mockedProduct).isEmpty());
     }
 
     @Test
@@ -140,7 +144,7 @@ class ProductPriceRepositoryTest {
                 .build();
         testedPriceRepository.save(productPrice);
 
-        Optional<ProductPrice> result = testedPriceRepository.findLastPriceByProduct(mockedProduct);
+        Optional<ProductPrice> result = testedPriceRepository.findLastCompletedPriceByProduct(mockedProduct);
         assertTrue(result.isEmpty());
     }
 
@@ -157,7 +161,7 @@ class ProductPriceRepositoryTest {
                 .build();
         ProductPrice savedProductPrice = testedPriceRepository.save(productPrice);
 
-        Optional<ProductPrice> result = testedPriceRepository.findLastPriceByProduct(mockedProduct);
+        Optional<ProductPrice> result = testedPriceRepository.findLastCompletedPriceByProduct(mockedProduct);
         assertTrue(result.isPresent());
         assertEquals(savedProductPrice, result.get());
     }
@@ -186,7 +190,7 @@ class ProductPriceRepositoryTest {
                 .build();
         ProductPrice savedProductPrice = testedPriceRepository.save(productPrice2);
 
-        Optional<ProductPrice> result = testedPriceRepository.findLastPriceByProduct(mockedProduct);
+        Optional<ProductPrice> result = testedPriceRepository.findLastCompletedPriceByProduct(mockedProduct);
         assertTrue(result.isPresent());
         assertEquals(savedProductPrice, result.get());
     }
@@ -215,8 +219,99 @@ class ProductPriceRepositoryTest {
                 .build();
         testedPriceRepository.save(productPrice2);
 
-        Optional<ProductPrice> result = testedPriceRepository.findLastPriceByProduct(mockedProduct);
+        Optional<ProductPrice> result = testedPriceRepository.findLastCompletedPriceByProduct(mockedProduct);
         assertTrue(result.isPresent());
         assertEquals(savedProductPrice, result.get());
+    }
+
+    @SneakyThrows
+    @Test
+    void findGroupedByProduct_twoPairsOfSamePrices_prices() {
+        ProductPrice price1 = ProductPrice.builder()
+                .product(mockedProduct)
+                .price(BigDecimal.TEN)
+                .priceWithDiscount(null)
+                .discount(null)
+                .parsingStatus(ParsingStatus.COMPLETE)
+                .priceChange(PriceChange.FIRST_PRICE)
+                .creationDate(LocalDateTime.of(2023, 10, 1, 0, 0))
+                .parsingDate(LocalDateTime.of(2023, 10, 1, 0, 0))
+                .build();
+        testedPriceRepository.save(price1);
+        ProductPrice price2 = ProductPrice.builder()
+                .product(mockedProduct)
+                .price(BigDecimal.TEN)
+                .priceWithDiscount(null)
+                .discount(null)
+                .parsingStatus(ParsingStatus.COMPLETE)
+                .priceChange(PriceChange.EQUAL)
+                .creationDate(LocalDateTime.of(2023, 10, 1, 12, 0))
+                .parsingDate(LocalDateTime.of(2023, 10, 1, 12, 0))
+                .build();
+        testedPriceRepository.save(price2);
+
+        ProductPrice price3 = ProductPrice.builder()
+                .product(mockedProduct)
+                .price(BigDecimal.TWO)
+                .priceWithDiscount(null)
+                .discount(null)
+                .parsingStatus(ParsingStatus.COMPLETE)
+                .priceChange(PriceChange.DOWN)
+                .creationDate(LocalDateTime.of(2023, 10, 2, 0, 0))
+                .parsingDate(LocalDateTime.of(2023, 10, 2, 0, 0))
+                .build();
+        testedPriceRepository.save(price3);
+        ProductPrice price4 = ProductPrice.builder()
+                .product(mockedProduct)
+                .price(BigDecimal.TWO)
+                .priceWithDiscount(null)
+                .discount(null)
+                .parsingStatus(ParsingStatus.COMPLETE)
+                .priceChange(PriceChange.EQUAL)
+                .creationDate(LocalDateTime.of(2023, 10, 2, 12, 0))
+                .parsingDate(LocalDateTime.of(2023, 10, 2, 12, 0))
+                .build();
+        testedPriceRepository.save(price4);
+
+        List<ProductPrice> result = testedPriceRepository.findByProductAndGroup(mockedProduct);
+
+        assertThat(
+                result,
+                contains(price3, price1)
+        );
+    }
+
+    @SneakyThrows
+    @Test
+    void findGroupedByProduct_equalActualPrices_prices() {
+        ProductPrice price1 = ProductPrice.builder()
+                .product(mockedProduct)
+                .price(BigDecimal.ONE)
+                .priceWithDiscount(null)
+                .discount(null)
+                .parsingStatus(ParsingStatus.COMPLETE)
+                .priceChange(PriceChange.FIRST_PRICE)
+                .creationDate(LocalDateTime.of(2023, 10, 1, 0, 0))
+                .parsingDate(LocalDateTime.of(2023, 10, 1, 0, 0))
+                .build();
+        testedPriceRepository.save(price1);
+        ProductPrice price2 = ProductPrice.builder()
+                .product(mockedProduct)
+                .price(BigDecimal.TEN)
+                .priceWithDiscount(BigDecimal.ONE)
+                .discount(90.0)
+                .parsingStatus(ParsingStatus.COMPLETE)
+                .priceChange(PriceChange.EQUAL)
+                .creationDate(LocalDateTime.of(2023, 10, 1, 12, 0))
+                .parsingDate(LocalDateTime.of(2023, 10, 1, 12, 0))
+                .build();
+        testedPriceRepository.save(price2);
+
+        List<ProductPrice> result = testedPriceRepository.findByProductAndGroup(mockedProduct);
+
+        assertThat(
+                result,
+                contains(price1)
+        );
     }
 }
