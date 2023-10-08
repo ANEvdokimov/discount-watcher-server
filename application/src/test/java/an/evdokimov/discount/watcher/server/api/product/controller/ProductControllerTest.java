@@ -252,15 +252,14 @@ class ProductControllerTest {
         );
 
         when(productService.getUserProducts(
-                any(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean())
+                any(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean())
         ).thenReturn(Collections.emptyList());
         when(productService.getUserProducts(
-                eq(testConfig.getTestUser()), anyBoolean(), anyBoolean(), eq(true), isNull(), isNull())
+                eq(testConfig.getTestUser()), anyBoolean(), eq(true), isNull(), isNull())
         ).thenReturn(products);
 
         MvcResult result = mvc.perform(get("/api/products")
                 .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
-                .header("with-price-history", true)
                 .header("only-active", true)
                 .header("monitor-availability", true)
         ).andReturn();
@@ -278,7 +277,6 @@ class ProductControllerTest {
                                 eq(testConfig.getTestUser()),
                                 anyBoolean(),
                                 anyBoolean(),
-                                anyBoolean(),
                                 isNull(),
                                 isNull()
                         ),
@@ -289,14 +287,12 @@ class ProductControllerTest {
                                 anyBoolean(),
                                 anyBoolean(),
                                 anyBoolean(),
-                                anyBoolean(),
                                 anyBoolean()
                         ),
                 () -> verify(productService, times(0))
                         .getUserProductsInShop(
                                 eq(testConfig.getTestUser()),
                                 anyLong(),
-                                anyBoolean(),
                                 anyBoolean(),
                                 anyBoolean(),
                                 isNull(),
@@ -314,15 +310,14 @@ class ProductControllerTest {
         );
 
         when(productService.getUserProducts(
-                any(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean())
+                any(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean())
         ).thenReturn(Collections.emptyList());
         when(productService.getUserProducts(
-                eq(testConfig.getTestUser()), anyBoolean(), anyBoolean(), eq(false), eq(true), eq(false))
+                eq(testConfig.getTestUser()), anyBoolean(), eq(false), eq(true), eq(false))
         ).thenReturn(products);
 
         MvcResult result = mvc.perform(get("/api/products")
                 .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
-                .header("with-price-history", true)
                 .header("only-active", true)
                 .header("monitor-availability", false)
                 .header("monitor-discount", true)
@@ -343,14 +338,12 @@ class ProductControllerTest {
                                 anyBoolean(),
                                 anyBoolean(),
                                 anyBoolean(),
-                                anyBoolean(),
                                 anyBoolean()
                         ),
                 () -> verify(productService, times(0))
                         .getUserProductsInShop(
                                 eq(testConfig.getTestUser()),
                                 anyLong(),
-                                anyBoolean(),
                                 anyBoolean(),
                                 anyBoolean(),
                                 anyBoolean(),
@@ -368,15 +361,14 @@ class ProductControllerTest {
         );
 
         when(productService.getUserProducts(
-                any(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean())
+                any(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean())
         ).thenReturn(Collections.emptyList());
         when(productService.getUserProducts(
-                eq(testConfig.getTestUser()), anyBoolean(), anyBoolean(), isNull(), isNull(), eq(true))
+                eq(testConfig.getTestUser()), anyBoolean(), isNull(), isNull(), eq(true))
         ).thenReturn(products);
 
         MvcResult result = mvc.perform(get("/api/products")
                 .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
-                .header("with-price-history", true)
                 .header("only-active", true)
                 .header("monitor-price-changes", true)
         ).andReturn();
@@ -393,7 +385,6 @@ class ProductControllerTest {
                         .getUserProducts(
                                 eq(testConfig.getTestUser()),
                                 anyBoolean(),
-                                anyBoolean(),
                                 isNull(),
                                 isNull(),
                                 anyBoolean()
@@ -405,14 +396,12 @@ class ProductControllerTest {
                                 anyBoolean(),
                                 anyBoolean(),
                                 anyBoolean(),
-                                anyBoolean(),
                                 anyBoolean()
                         ),
                 () -> verify(productService, times(0))
                         .getUserProductsInShop(
                                 eq(testConfig.getTestUser()),
                                 anyLong(),
-                                anyBoolean(),
                                 anyBoolean(),
                                 isNull(),
                                 isNull(),
@@ -430,15 +419,14 @@ class ProductControllerTest {
         );
 
         when(productService.getUserProducts(
-                any(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean())
+                any(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean())
         ).thenReturn(Collections.emptyList());
         when(productService.getUserProducts(
-                eq(testConfig.getTestUser()), anyBoolean(), anyBoolean(), eq(true), eq(true), isNull())
+                eq(testConfig.getTestUser()), anyBoolean(), eq(true), eq(true), isNull())
         ).thenReturn(products);
 
         MvcResult result = mvc.perform(get("/api/products")
                 .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
-                .header("with-price-history", true)
                 .header("only-active", true)
                 .header("monitor-availability", true)
                 .header("monitor-discount", true)
@@ -458,7 +446,6 @@ class ProductControllerTest {
                                 anyBoolean(),
                                 anyBoolean(),
                                 anyBoolean(),
-                                anyBoolean(),
                                 isNull()
                         ),
                 () -> verify(productService, times(0))
@@ -468,14 +455,12 @@ class ProductControllerTest {
                                 anyBoolean(),
                                 anyBoolean(),
                                 anyBoolean(),
-                                anyBoolean(),
                                 anyBoolean()
                         ),
                 () -> verify(productService, times(0))
                         .getUserProductsInShop(
                                 eq(testConfig.getTestUser()),
                                 anyLong(),
-                                anyBoolean(),
                                 anyBoolean(),
                                 anyBoolean(),
                                 anyBoolean(),
@@ -493,16 +478,15 @@ class ProductControllerTest {
         );
 
         when(productService.getUserProductsInShop(
-                any(), anyLong(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean())
+                any(), anyLong(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean())
         ).thenReturn(Collections.emptyList());
         when(productService.getUserProductsInShop(
-                eq(testConfig.getTestUser()), eq(1L), anyBoolean(), anyBoolean(),
+                eq(testConfig.getTestUser()), eq(1L), anyBoolean(),
                 eq(true), isNull(), isNull())
         ).thenReturn(products);
 
         MvcResult result = mvc.perform(get("/api/products")
                 .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
-                .header("with-price-history", true)
                 .header("only-active", true)
                 .header("monitor-availability", true)
                 .header("shop-id", 1)
@@ -522,7 +506,6 @@ class ProductControllerTest {
                                 anyLong(),
                                 anyBoolean(),
                                 anyBoolean(),
-                                anyBoolean(),
                                 isNull(),
                                 isNull()
                         )
@@ -538,16 +521,15 @@ class ProductControllerTest {
         );
 
         when(productService.getUserProductsInShop(
-                any(), anyLong(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean())
+                any(), anyLong(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean())
         ).thenReturn(Collections.emptyList());
         when(productService.getUserProductsInShop(
-                eq(testConfig.getTestUser()), eq(1L), anyBoolean(), anyBoolean(),
+                eq(testConfig.getTestUser()), eq(1L), anyBoolean(),
                 isNull(), eq(true), isNull())
         ).thenReturn(products);
 
         MvcResult result = mvc.perform(get("/api/products")
                 .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
-                .header("with-price-history", true)
                 .header("only-active", true)
                 .header("monitor-discount", true)
                 .header("shop-id", 1)
@@ -565,7 +547,6 @@ class ProductControllerTest {
                         .getUserProductsInShop(
                                 eq(testConfig.getTestUser()),
                                 anyLong(),
-                                anyBoolean(),
                                 anyBoolean(),
                                 isNull(),
                                 anyBoolean(),
@@ -583,16 +564,15 @@ class ProductControllerTest {
         );
 
         when(productService.getUserProductsInShop(
-                any(), anyLong(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean())
+                any(), anyLong(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean())
         ).thenReturn(Collections.emptyList());
         when(productService.getUserProductsInShop(
-                eq(testConfig.getTestUser()), eq(1L), anyBoolean(), anyBoolean(),
+                eq(testConfig.getTestUser()), eq(1L), anyBoolean(),
                 isNull(), isNull(), eq(true))
         ).thenReturn(products);
 
         MvcResult result = mvc.perform(get("/api/products")
                 .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
-                .header("with-price-history", true)
                 .header("only-active", true)
                 .header("monitor-price-changes", true)
                 .header("shop-id", 1)
@@ -611,7 +591,6 @@ class ProductControllerTest {
                                 eq(testConfig.getTestUser()),
                                 anyLong(),
                                 anyBoolean(),
-                                anyBoolean(),
                                 isNull(),
                                 isNull(),
                                 anyBoolean()
@@ -628,16 +607,15 @@ class ProductControllerTest {
         );
 
         when(productService.getUserProductsInShop(
-                any(), anyLong(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean())
+                any(), anyLong(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean())
         ).thenReturn(Collections.emptyList());
         when(productService.getUserProductsInShop(
-                eq(testConfig.getTestUser()), eq(1L), anyBoolean(), anyBoolean(),
+                eq(testConfig.getTestUser()), eq(1L), anyBoolean(),
                 isNull(), eq(true), eq(true))
         ).thenReturn(products);
 
         MvcResult result = mvc.perform(get("/api/products")
                 .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
-                .header("with-price-history", true)
                 .header("only-active", true)
                 .header("monitor-discount", true)
                 .header("monitor-price-changes", true)
@@ -657,7 +635,6 @@ class ProductControllerTest {
                                 eq(testConfig.getTestUser()),
                                 anyLong(),
                                 anyBoolean(),
-                                anyBoolean(),
                                 isNull(),
                                 anyBoolean(),
                                 anyBoolean()
@@ -674,15 +651,14 @@ class ProductControllerTest {
         );
 
         when(productService.getUserProducts(
-                any(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean())
+                any(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean())
         ).thenReturn(Collections.emptyList());
         when(productService.getUserProducts(
-                eq(testConfig.getTestUser()), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean())
+                eq(testConfig.getTestUser()), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean())
         ).thenReturn(products);
 
         MvcResult result = mvc.perform(get("/api/products")
                 .header(authHeaderName, "wrong jwt")
-                .header("with-price-history", true)
         ).andReturn();
 
         assertAll(
@@ -690,7 +666,6 @@ class ProductControllerTest {
                 () -> verify(productService, times(0))
                         .getUserProducts(
                                 eq(testConfig.getTestUser()),
-                                anyBoolean(),
                                 anyBoolean(),
                                 anyBoolean(),
                                 anyBoolean(),
@@ -719,14 +694,12 @@ class ProductControllerTest {
                                 anyBoolean(),
                                 anyBoolean(),
                                 anyBoolean(),
-                                anyBoolean(),
                                 anyBoolean()
                         ),
                 () -> verify(productService, times(0))
                         .getUserProductsInShop(
                                 eq(testConfig.getTestUser()),
                                 anyLong(),
-                                anyBoolean(),
                                 anyBoolean(),
                                 anyBoolean(),
                                 anyBoolean(),
@@ -738,11 +711,10 @@ class ProductControllerTest {
     @Test
     void getProduct_validJwt_http200() throws Exception {
         ProductResponse expectedProductResponse = ProductResponse.builder().id(1L).build();
-        when(productService.getProduct(anyLong(), anyBoolean())).thenReturn(expectedProductResponse);
+        when(productService.getProduct(anyLong())).thenReturn(expectedProductResponse);
 
         MvcResult result = mvc.perform(get("/api/product/" + expectedProductResponse.getId())
                 .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
-                .header("with-price-history", true)
         ).andReturn();
 
         ProductResponse returnedProductResponse =
@@ -752,38 +724,22 @@ class ProductControllerTest {
                 () -> assertEquals(200, result.getResponse().getStatus()),
                 () -> assertEquals(expectedProductResponse, returnedProductResponse),
                 () -> verify(productService, times(1))
-                        .getProduct(expectedProductResponse.getId(), true)
+                        .getProduct(expectedProductResponse.getId())
         );
     }
 
     @Test
     void getProduct_invalidJwt_http401() throws Exception {
         ProductResponse expectedProductResponse = ProductResponse.builder().id(1L).build();
-        when(productService.getProduct(anyLong(), anyBoolean())).thenReturn(expectedProductResponse);
+        when(productService.getProduct(anyLong())).thenReturn(expectedProductResponse);
 
         MvcResult result = mvc.perform(get("/api/product/" + expectedProductResponse.getId())
                 .header(authHeaderName, "invalid jwt")
-                .header("with-price-history", true)
         ).andReturn();
 
         assertAll(
                 () -> assertEquals(401, result.getResponse().getStatus()),
-                () -> verify(productService, times(0)).getProduct(anyLong(), anyBoolean())
-        );
-    }
-
-    @Test
-    void getProduct_withoutPriceHistoryHeader_http400() throws Exception {
-        ProductResponse expectedProductResponse = ProductResponse.builder().id(1L).build();
-        when(productService.getProduct(anyLong(), anyBoolean())).thenReturn(expectedProductResponse);
-
-        MvcResult result = mvc.perform(get("/api/product/" + expectedProductResponse.getId())
-                .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
-        ).andReturn();
-
-        assertAll(
-                () -> assertEquals(400, result.getResponse().getStatus()),
-                () -> verify(productService, times(0)).getProduct(anyLong(), anyBoolean())
+                () -> verify(productService, times(0)).getProduct(anyLong())
         );
     }
 }

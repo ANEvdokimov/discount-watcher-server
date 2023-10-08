@@ -13,10 +13,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 
 public interface ProductService {
-    ProductResponse getProduct(@NotNull Long id, boolean withPriceHistory) throws ServerException;
+    ProductResponse getProduct(@NotNull Long id) throws ServerException;
 
     Collection<ProductResponse> getUserProducts(@NotNull User user,
-                                                boolean withPriceHistory,
                                                 boolean onlyActive,
                                                 @Nullable Boolean monitorAvailability,
                                                 @Nullable Boolean monitorDiscount,
@@ -24,7 +23,6 @@ public interface ProductService {
 
     Collection<ProductResponse> getUserProductsInShop(@NotNull User user,
                                                       @NotNull Long shopId,
-                                                      boolean withPriceHistory,
                                                       boolean onlyActive,
                                                       @Nullable Boolean monitorAvailability,
                                                       @Nullable Boolean monitorDiscount,

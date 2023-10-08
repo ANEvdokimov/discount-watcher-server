@@ -4,13 +4,14 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     properties:
       hibernate:
-        default_schema: discount_watcher_schema
         format_sql: true
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/postgres
     username: discount_watcher_server
     password: secret-password
+    hikari:
+      schema: discount_watcher_schema
   rabbitmq:
     host: localhost
 

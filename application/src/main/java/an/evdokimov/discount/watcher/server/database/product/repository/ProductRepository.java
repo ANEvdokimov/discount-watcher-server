@@ -34,13 +34,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Optional<Product> findByProductInformationAndShop(ProductInformation productInformation, Shop shop);
 
     @Query("""
-            SELECT p FROM Product p
-                LEFT JOIN FETCH p.prices pp
-            WHERE p.id = :id AND pp.parsingDate = (SELECT MAX(pp2.parsingDate) FROM ProductPrice pp2 WHERE pp2.product = p)
-            """)
-    Optional<Product> findByIdWithLastPrice(@Param("id") Long id);
-
-    @Query("""
             SELECT DISTINCT up.product FROM UserProduct up
                 WHERE (
                     up.monitorAvailability = true OR
@@ -69,25 +62,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     );
 
     @Query("""
-            SELECT p FROM Product p
-                LEFT JOIN FETCH p.prices pp
-            WHERE
-                pp.parsingDate = (SELECT MAX(pp2.parsingDate) FROM ProductPrice pp2 WHERE pp2.product = p) AND
-                p.id in (
-                    SELECT DISTINCT up.product FROM UserProduct up
-                        WHERE up.user = :user
-                          AND (:monitorAvailability is null OR up.monitorAvailability = :monitorAvailability)
-                          AND (:monitorDiscount is null OR up.monitorDiscount = :monitorDiscount)
-                          AND (:monitorPriceChanges is null OR up.monitorPriceChanges = :monitorPriceChanges)
-                        )
-            """)
-    Collection<Product> findAllUserProductsWithLastPrice(@Param("user") User user,
-                                                         @Param("monitorAvailability") @Nullable Boolean monitorAvailability,
-                                                         @Param("monitorDiscount") @Nullable Boolean monitorDiscount,
-                                                         @Param("monitorPriceChanges") @Nullable Boolean monitorPriceChanges
-    );
-
-    @Query("""
             SELECT DISTINCT up.product FROM UserProduct up
                 WHERE up.user = :user
                   AND up.product.shop = :shop
@@ -100,27 +74,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                                                   @Param("monitorAvailability") @Nullable Boolean monitorAvailability,
                                                   @Param("monitorDiscount") @Nullable Boolean monitorDiscount,
                                                   @Param("monitorPriceChanges") @Nullable Boolean monitorPriceChanges
-    );
-
-    @Query("""
-            SELECT p FROM Product p
-                LEFT JOIN FETCH p.prices pp
-            WHERE
-                pp.parsingDate = (SELECT MAX(pp2.parsingDate) FROM ProductPrice pp2 WHERE pp2.product = p) AND
-                p.shop = :shop AND
-                p.id in (
-                    SELECT DISTINCT up.product FROM UserProduct up
-                        WHERE up.user = :user
-                          AND (:monitorAvailability is null OR up.monitorAvailability = :monitorAvailability)
-                          AND (:monitorDiscount is null OR up.monitorDiscount = :monitorDiscount)
-                          AND (:monitorPriceChanges is null OR up.monitorPriceChanges = :monitorPriceChanges)
-                )
-            """)
-    Collection<Product> findAllUserProductsWithLastPriceInShop(@Param("user") User user,
-                                                               @Param("shop") Shop shop,
-                                                               @Param("monitorAvailability") @Nullable Boolean monitorAvailability,
-                                                               @Param("monitorDiscount") @Nullable Boolean monitorDiscount,
-                                                               @Param("monitorPriceChanges") @Nullable Boolean monitorPriceChanges
     );
 
 
@@ -138,18 +91,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                 .toList();
     }
 
-    default Collection<Product> findActiveUserProductsWithLastPrice(User user,
-                                                                    @Nullable Boolean monitorAvailability,
-                                                                    @Nullable Boolean monitorDiscount,
-                                                                    @Nullable Boolean monitorPriceChanges) {
-        Collection<Product> allUsersProductsWithLastPrice =
-                findAllUserProductsWithLastPrice(user, monitorAvailability, monitorDiscount, monitorPriceChanges);
-
-        return allUsersProductsWithLastPrice.stream()
-                .filter(product -> filter(product, monitorAvailability, monitorDiscount, monitorPriceChanges))
-                .toList();
-    }
-
     default Collection<Product> findActiveUserProductsInShop(User user,
                                                              Shop shop,
                                                              @Nullable Boolean monitorAvailability,
@@ -163,21 +104,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                 .toList();
     }
 
-    default Collection<Product> findActiveUserProductsWithLastPriceInShop(User user,
-                                                                          Shop shop,
-                                                                          @Nullable Boolean monitorAvailability,
-                                                                          @Nullable Boolean monitorDiscount,
-                                                                          @Nullable Boolean monitorPriceChanges) {
-        Collection<Product> allUsersProductsWithLastPriceInShop =
-                findAllUserProductsWithLastPriceInShop(
-                        user, shop, monitorAvailability, monitorDiscount, monitorPriceChanges
-                );
-        return allUsersProductsWithLastPriceInShop.stream()
-                .filter(product -> filter(product, monitorAvailability, monitorDiscount, monitorPriceChanges))
-                .toList();
-    }
-
-    private boolean filter(Product product, Boolean isAvailable, Boolean hasDiscount, Boolean isPriceChange) {
+    private boolean filter(Product product, Boolean isAvailable, Boolean hasDiscount, Boolean isPriceChange) {//todo фильтр чего?
         if (product == null) {
             return false;
         }
@@ -200,32 +127,10 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Collection<Product> findAllUserProducts(@Param("user") User user);
 
     @Query("""
-            SELECT p FROM Product p
-                LEFT JOIN FETCH p.prices pp
-            WHERE
-                p.id in (SELECT up.product.id FROM UserProduct up WHERE up.user = :user) AND
-                pp.parsingDate = (SELECT MAX(pp2.parsingDate) FROM ProductPrice pp2 WHERE pp2.product = p)
-            """)
-    Collection<Product> findAllUserProductsWithLastPrice(@Param("user") User user);
-
-    @Query("""
             SELECT up.product FROM UserProduct up
                 WHERE
                     up.user = :user AND
                     up.product.shop = :shop
             """)
     Collection<Product> findAllUserProductsInShop(@Param("user") User user, @Param("shop") Shop shop);
-
-    @Query("""
-            SELECT p FROM Product p
-                LEFT JOIN FETCH p.prices pp
-            WHERE
-                pp.parsingDate = (SELECT MAX(pp2.parsingDate) FROM ProductPrice pp2 WHERE pp2.product = p) AND
-                p.shop = :shop AND
-                p.id in (
-                    SELECT DISTINCT up.product FROM UserProduct up
-                        WHERE up.user = :user
-                )
-            """)
-    Collection<Product> findAllUserProductsWithLastPriceInShop(@Param("user") User user, @Param("shop") Shop shop);
 }

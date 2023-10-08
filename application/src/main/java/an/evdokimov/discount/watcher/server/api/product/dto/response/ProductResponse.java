@@ -6,8 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 /**
  * A product in a specific shop.
  */
@@ -30,7 +28,7 @@ public class ProductResponse {
     private ShopResponse shop;
 
     /**
-     * Prices of the product.
+     * Actual (last) price.
      */
-    private List<ProductPriceResponse> prices;
+    private ProductPriceResponse lastPrice;
 }

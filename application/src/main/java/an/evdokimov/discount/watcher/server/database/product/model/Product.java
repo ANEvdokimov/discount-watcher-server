@@ -2,6 +2,7 @@ package an.evdokimov.discount.watcher.server.database.product.model;
 
 import an.evdokimov.discount.watcher.server.database.shop.model.Shop;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -20,6 +21,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.Hibernate;
+import org.hibernate.annotations.JoinFormula;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,6 +57,10 @@ public class Product {
     @NotNull
     @ToString.Exclude
     private Shop shop;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinFormula("(select pp.id from product_price pp where pp.product_id = id order by pp.parsing_date desc limit 1)")
+    @ToString.Exclude
+    private ProductPrice lastPrice;
     @OneToMany(mappedBy = "product")
     @OrderBy("parsingDate DESC")
     @NotNull

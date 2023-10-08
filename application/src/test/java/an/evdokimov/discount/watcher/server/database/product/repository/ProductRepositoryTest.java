@@ -282,124 +282,6 @@ class ProductRepositoryTest {
     }
 
     @Test
-    void findByIdWithLastPrice_productWith3Prices_productWithLastPrice() {
-        assertThat(
-                testedProductRepository.findByIdWithLastPrice(product1.getId()).get().getPrices(),
-                contains(price1_3)
-        );
-    }
-
-    @Test
-    void findAllUsersProductWithLastPrice_products_usersProductsWithLastPrice() {
-        Collection<Product> allUsersProducts = testedProductRepository.findAllUserProductsWithLastPrice(user1);
-
-        assertAll(
-                () -> assertThat(
-                        allUsersProducts,
-                        containsInAnyOrder(product1, product2)
-                ),
-                () -> assertThat(
-                        allUsersProducts.stream().filter(product -> product.equals(product1))
-                                .toList().get(0).getPrices(),
-                        contains(price1_3)
-                ),
-                () -> assertThat(
-                        allUsersProducts.stream().filter(product -> product.equals(product2))
-                                .toList().get(0).getPrices(),
-                        contains(price2_1)
-                )
-        );
-    }
-
-    @Test
-    void findAllUsersProductsWithLastPrice_monitorAvailability_emptyList() {
-        ArrayList<Product> products =
-                new ArrayList<>(testedProductRepository.findAllUserProductsWithLastPrice(user4, true, null, null));
-
-        assertTrue(products.isEmpty());
-    }
-
-    @Test
-    void findAllUsersProductsWithLastPrice_monitorAvailability_productsWithLastPrice() {
-        ArrayList<Product> products =
-                new ArrayList<>(testedProductRepository.findAllUserProductsWithLastPrice(user1, true, null, null));
-
-        assertAll(
-                () -> assertThat(products, contains(product1)),
-                () -> assertThat(products.get(0).getPrices(), contains(price1_3))
-        );
-    }
-
-    @Test
-    void findAllUsersProductsWithLastPrice_monitorDiscount_emptyList() {
-        ArrayList<Product> products =
-                new ArrayList<>(testedProductRepository.findAllUserProductsWithLastPrice(user1, null, true, null));
-
-        assertTrue(products.isEmpty());
-    }
-
-    @Test
-    void findAllUsersProductsWithLastPrice_monitorDiscount_productsWithLastPrice() {
-        ArrayList<Product> products =
-                new ArrayList<>(testedProductRepository.findAllUserProductsWithLastPrice(user2, null, true, null));
-
-        assertAll(
-                () -> assertThat(products, containsInAnyOrder(product2, product3)),
-                () -> assertThat(products.get(0).getPrices(), contains(price3_2))
-        );
-    }
-
-    @Test
-    void findAllUsersProductsWithLastPrice_monitorPriceChanges_emptyList() {
-        ArrayList<Product> products =
-                new ArrayList<>(testedProductRepository.findAllUserProductsWithLastPrice(user1, null, null, true));
-
-        assertTrue(products.isEmpty());
-    }
-
-    @Test
-    void findAllUsersProductsWithLastPrice_monitorPriceChanges_productsWithLastPrice() {
-        ArrayList<Product> products =
-                new ArrayList<>(testedProductRepository.findAllUserProductsWithLastPrice(user2, null, null, true));
-
-        assertAll(
-                () -> assertThat(products, containsInAnyOrder(product2, product5)),
-                () -> assertThat(products.stream()
-                                .filter(product -> product.getId().equals(product2.getId()))
-                                .findAny()
-                                .get().getPrices(),
-                        contains(price2_1)),
-                () -> assertThat(products.stream()
-                                .filter(product -> product.getId().equals(product5.getId()))
-                                .findAny()
-                                .get().getPrices(),
-                        contains(price5_1))
-        );
-    }
-
-    @Test
-    void findAllUsersProductsWithLastPrice_monitorAvailabilityAndDiscountAndPriceChanges_productsWithLastPrice() {
-        ArrayList<Product> products =
-                new ArrayList<>(testedProductRepository.findAllUserProductsWithLastPrice(user2, true, true, true));
-
-        assertAll(
-                () -> assertThat(products, contains(product2)),
-                () -> assertThat(products.get(0).getPrices(), contains(price2_1))
-        );
-    }
-
-    @Test
-    void findAllUsersProductsWithLastPrice_onlyDiscount_productsWithLastPrice() {
-        ArrayList<Product> products =
-                new ArrayList<>(testedProductRepository.findAllUserProductsWithLastPrice(user2, false, true, false));
-
-        assertAll(
-                () -> assertThat(products, containsInAnyOrder(product3)),
-                () -> assertThat(products.get(0).getPrices(), contains(price3_2))
-        );
-    }
-
-    @Test
     void findAllUsersProducts_monitorAvailability_emptyList() {
         ArrayList<Product> products =
                 new ArrayList<>(testedProductRepository.findAllUserProducts(user4, true, null, null));
@@ -408,7 +290,7 @@ class ProductRepositoryTest {
     }
 
     @Test
-    void findAllUsersProducts_monitorAvailability_productsWithPriceHistory() {
+    void findAllUsersProducts_monitorAvailability_products() {
         ArrayList<Product> products =
                 new ArrayList<>(testedProductRepository.findAllUserProducts(user1, true, null, null));
 
@@ -427,7 +309,7 @@ class ProductRepositoryTest {
     }
 
     @Test
-    void findAllUsersProducts_monitorDiscount_productsWithPriceHistory() {
+    void findAllUsersProducts_monitorDiscount_products() {
         ArrayList<Product> products =
                 new ArrayList<>(testedProductRepository.findAllUserProducts(user2, null, true, null));
 
@@ -448,7 +330,7 @@ class ProductRepositoryTest {
     }
 
     @Test
-    void findAllUsersProducts_onlyDiscount_productsWithPriceHistory() {
+    void findAllUsersProducts_onlyDiscount_products() {
         ArrayList<Product> products =
                 new ArrayList<>(testedProductRepository.findAllUserProducts(user2, false, true, false));
 
@@ -467,7 +349,7 @@ class ProductRepositoryTest {
     }
 
     @Test
-    void findAllUsersProducts_monitorPriceChanges_productsWithPriceHistory() {
+    void findAllUsersProducts_monitorPriceChanges_products() {
         ArrayList<Product> products =
                 new ArrayList<>(testedProductRepository.findAllUserProducts(user2, null, true, null));
 
@@ -481,7 +363,7 @@ class ProductRepositoryTest {
     }
 
     @Test
-    void findAllUsersProducts_monitorAvailabilityAndDiscountAndPriceChanges_productsWithPriceHistory() {
+    void findAllUsersProducts_monitorAvailabilityAndDiscountAndPriceChanges_products() {
         ArrayList<Product> products =
                 new ArrayList<>(testedProductRepository.findAllUserProducts(user2, true, true, true));
 
@@ -492,7 +374,7 @@ class ProductRepositoryTest {
     }
 
     @Test
-    void findAllUsersProductsInShop_user1AndShop1_listOfProductsWithPriceHistory() {
+    void findAllUsersProductsInShop_user1AndShop1_AvailableProducts() {
         ArrayList<Product> products = new ArrayList<>(testedProductRepository
                 .findAllUserProductsInShop(user1, shop1, true, null, null));
 
@@ -511,7 +393,7 @@ class ProductRepositoryTest {
     }
 
     @Test
-    void findAllUsersProductsInShop_user4AndShop1_listOfProductsWithPriceHistory() {
+    void findAllUsersProductsInShop_user4AndShop1_priceChangedProducts() {
         ArrayList<Product> products = new ArrayList<>(testedProductRepository
                 .findAllUserProductsInShop(user4, shop1, null, null, true));
 
@@ -533,18 +415,7 @@ class ProductRepositoryTest {
     }
 
     @Test
-    void findAllUserProductsWithLastPriceInShop_user1AndShop1_listOfProductsWithLastPrice() {
-        ArrayList<Product> products = new ArrayList<>(testedProductRepository
-                .findAllUserProductsWithLastPriceInShop(user1, shop1, true, null, null));
-
-        assertAll(
-                () -> assertThat(products, contains(product1)),
-                () -> assertThat(products.get(0).getPrices(), contains(price1_3))
-        );
-    }
-
-    @Test
-    void findAllUsersProductsInShop_user1AndShop1_listOfProducts() {
+    void findAllUsersProductsInShop_user1AndShop1_allProducts() {
         Collection<Product> allUsersProductsInShop = testedProductRepository.findAllUserProductsInShop(user1, shop1);
 
         assertAll(
@@ -557,18 +428,7 @@ class ProductRepositoryTest {
     }
 
     @Test
-    void findAllUsersProductsWithLastPriceInShop_user1AndShop1_listOfProducts() {
-        Collection<Product> allUsersProductsInShop =
-                testedProductRepository.findAllUserProductsWithLastPriceInShop(user1, shop1);
-
-        assertAll(
-                () -> assertThat(allUsersProductsInShop, contains(product1)),
-                () -> assertThat(allUsersProductsInShop.stream().findAny().get().getPrices(), contains(price1_3))
-        );
-    }
-
-    @Test
-    void findActiveUsersProducts_availability_listOfProductsWithPriceHistory() {
+    void findActiveUsersProducts_availability_availableProducts() {
         ArrayList<Product> products = new ArrayList<>(
                 testedProductRepository.findActiveUserProducts(user1, true, null, null)
         );
@@ -580,7 +440,7 @@ class ProductRepositoryTest {
     }
 
     @Test
-    void findActiveUsersProducts_discount_listOfProductsWithPriceHistory() {
+    void findActiveUsersProducts_discount_listOfProducts() {
         ArrayList<Product> products = new ArrayList<>(
                 testedProductRepository.findActiveUserProducts(user2, null, true, null)
         );
@@ -603,7 +463,7 @@ class ProductRepositoryTest {
     }
 
     @Test
-    void findActiveUsersProducts_availabilityAndDiscount_listOfProductsWithPriceHistory() {
+    void findActiveUsersProducts_availabilityAndDiscount_listOfProducts() {
         ArrayList<Product> products = new ArrayList<>(
                 testedProductRepository.findActiveUserProducts(user2, true, true, null)
         );
@@ -615,55 +475,7 @@ class ProductRepositoryTest {
     }
 
     @Test
-    void findActiveUsersProducts_availability_listOfProductsWithOnlyLastPrice() {
-        ArrayList<Product> products = new ArrayList<>(
-                testedProductRepository.findActiveUserProductsWithLastPrice(user1, true, null, null)
-        );
-
-        assertAll(
-                () -> assertThat(products, contains(product1)),
-                () -> assertThat(products.get(0).getPrices(), contains(price1_3))
-        );
-    }
-
-    @Test
-    void findActiveUsersProducts_discount_listOfProductsWithOnlyLastPrice() {
-        ArrayList<Product> products = new ArrayList<>(
-                testedProductRepository.findActiveUserProductsWithLastPrice(user2, null, true, null)
-        );
-
-        assertAll(
-                () -> assertThat(products, containsInAnyOrder(product2, product3)),
-                () -> assertThat(products.stream()
-                                .filter(product -> product.getId().equals(product2.getId()))
-                                .findAny()
-                                .get().getPrices(),
-                        contains(price2_1)
-                ),
-                () -> assertThat(products.stream()
-                                .filter(product -> product.getId().equals(product3.getId()))
-                                .findAny()
-                                .get().getPrices(),
-                        contains(price3_2)
-                )
-        );
-    }
-
-    @Test
-    void findActiveUsersProducts_availabilityAndDiscount_listOfProductsWithOnlyLastPrice() {
-        ArrayList<Product> products = new ArrayList<>(
-                testedProductRepository.findActiveUserProductsWithLastPrice(user2, true, true, null)
-        );
-
-        assertAll(
-                () -> assertThat(products, contains(product2)),
-                () -> assertThat(products.get(0).getPrices(), contains(price2_1))
-        );
-    }
-
-    ////////////////
-    @Test
-    void findActiveUsersProductsInShop_availability_listOfProductsWithPriceHistory() {
+    void findActiveUsersProductsInShop_availability_listOfProducts() {
         ArrayList<Product> products = new ArrayList<>(
                 testedProductRepository.findActiveUserProductsInShop(user1, shop1, true, null, null)
         );
@@ -675,7 +487,7 @@ class ProductRepositoryTest {
     }
 
     @Test
-    void findActiveUsersProductsInShop_discount_listOfProductsWithPriceHistory() {
+    void findActiveUsersProductsInShop_discount_listOfProducts() {
         ArrayList<Product> products = new ArrayList<>(
                 testedProductRepository.findActiveUserProductsInShop(user2, shop2, null, true, null)
         );
@@ -687,7 +499,7 @@ class ProductRepositoryTest {
     }
 
     @Test
-    void findActiveUsersProductsInShop_availabilityAndDiscount_listOfProductsWithPriceHistory() {
+    void findActiveUsersProductsInShop_availabilityAndDiscount_listOfProducts() {
         ArrayList<Product> products = new ArrayList<>(
                 testedProductRepository.findActiveUserProductsInShop(user2, shop2, true, true, null)
         );
@@ -695,77 +507,6 @@ class ProductRepositoryTest {
         assertAll(
                 () -> assertThat(products, contains(product2)),
                 () -> assertThat(products.get(0).getPrices(), contains(price2_1))
-        );
-    }
-
-    @Test
-    void findActiveUsersProductsInShop_availability_listOfProductsWithOnlyLastPrice() {
-        ArrayList<Product> products = new ArrayList<>(
-                testedProductRepository.findActiveUserProductsWithLastPriceInShop(user1, shop1, true, null, null)
-        );
-
-        assertAll(
-                () -> assertThat(products, contains(product1)),
-                () -> assertThat(products.get(0).getPrices(), contains(price1_3))
-        );
-    }
-
-    @Test
-    void findActiveUsersProductsInShop_discount_listOfProductsWithOnlyLastPrice() {
-        ArrayList<Product> products = new ArrayList<>(
-                testedProductRepository.findActiveUserProductsInShop(user2, shop2, null, true, null)
-        );
-
-        assertAll(
-                () -> assertThat(products, contains(product2)),
-                () -> assertThat(products.get(0).getPrices(), contains(price2_1))
-        );
-    }
-
-    @Test
-    void findActiveUsersProductsInShop_availabilityAndDiscount_listOfProductsWithOnlyLastPrice() {
-        ArrayList<Product> products = new ArrayList<>(
-                testedProductRepository.findActiveUserProductsWithLastPriceInShop(user2, shop2, true, true, null)
-        );
-
-        assertAll(
-                () -> assertThat(products, contains(product2)),
-                () -> assertThat(products.get(0).getPrices(), contains(price2_1))
-        );
-    }
-
-    @Test
-    void findActiveUsersProductsInShop_availabilityAndDiscount_emptyList() {
-        ArrayList<Product> products = new ArrayList<>(
-                testedProductRepository.findActiveUserProductsWithLastPriceInShop(user5, shop2, true, true, null)
-        );
-
-        assertTrue(products.isEmpty());
-    }
-
-    @Test
-    void findActiveUserProductsWithLastPrice_allProducts_listOfProducts() {
-        ArrayList<Product> products = new ArrayList<>(
-                testedProductRepository.findActiveUserProductsWithLastPrice(
-                        user6,
-                        null,
-                        null,
-                        null
-                )
-        );
-
-        assertAll(
-                () -> assertThat(products, containsInAnyOrder(product6, product7)),
-                () -> assertThat(products.stream()
-                                .filter(product -> product.getId().equals(product6.getId()))
-                                .findAny()
-                                .get().getPrices(),
-                        contains(price6_1)),
-                () -> assertThat(products.stream()
-                                .filter(product -> product.getId().equals(product7.getId()))
-                                .findAny()
-                                .get().getPrices(),
-                        contains(price7_1))
         );
     }
 }

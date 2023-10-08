@@ -83,43 +83,27 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResponse getProduct(@NotNull Long id, boolean withPriceHistory) throws ServerException {
+    public ProductResponse getProduct(@NotNull Long id) throws ServerException {
         Product product;
-        if (withPriceHistory) {
-            product = productRepository.findById(id)
-                    .orElseThrow(() -> new ServerException(ServerErrorCode.PRODUCT_NOT_FOUND));
-        } else {
-            product = productRepository.findByIdWithLastPrice(id)
-                    .orElseThrow(() -> new ServerException(ServerErrorCode.PRODUCT_NOT_FOUND));
-        }
+        product = productRepository.findById(id)
+                .orElseThrow(() -> new ServerException(ServerErrorCode.PRODUCT_NOT_FOUND));
 
         return productMapper.map(product);
     }
 
     @Override
     public Collection<ProductResponse> getUserProducts(@NotNull User user,
-                                                       boolean withPriceHistory,
                                                        boolean onlyActive,
                                                        @Nullable Boolean monitorAvailability,
                                                        @Nullable Boolean monitorDiscount,
                                                        @Nullable Boolean monitorPriceChanges) {
         Collection<Product> userProducts;
-        if (withPriceHistory) {
-            if (onlyActive) {
-                userProducts = productRepository.findActiveUserProducts(user, monitorAvailability, monitorDiscount,
-                        monitorPriceChanges);
-            } else {
-                userProducts = productRepository.findAllUserProducts(user, monitorAvailability, monitorDiscount,
-                        monitorPriceChanges);
-            }
+        if (onlyActive) {
+            userProducts = productRepository.findActiveUserProducts(user, monitorAvailability, monitorDiscount,
+                    monitorPriceChanges);
         } else {
-            if (onlyActive) {
-                userProducts = productRepository.findActiveUserProductsWithLastPrice(user, monitorAvailability,
-                        monitorDiscount, monitorPriceChanges);
-            } else {
-                userProducts = productRepository.findAllUserProductsWithLastPrice(user, monitorAvailability,
-                        monitorDiscount, monitorPriceChanges);
-            }
+            userProducts = productRepository.findAllUserProducts(user, monitorAvailability, monitorDiscount,
+                    monitorPriceChanges);
         }
 
         return userProducts.stream()
@@ -130,7 +114,6 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Collection<ProductResponse> getUserProductsInShop(@NotNull User user,
                                                              @NotNull Long shopId,
-                                                             boolean withPriceHistory,
                                                              boolean onlyActive,
                                                              @Nullable Boolean monitorAvailability,
                                                              @Nullable Boolean monitorDiscount,
@@ -140,22 +123,12 @@ public class ProductServiceImpl implements ProductService {
                 shopRepository.findById(shopId).orElseThrow(() -> new ServerException(ServerErrorCode.SHOP_NOT_FOUND));
 
         Collection<Product> userProducts;
-        if (withPriceHistory) {
-            if (onlyActive) {
-                userProducts = productRepository.findActiveUserProductsInShop(user, shop, monitorAvailability,
-                        monitorDiscount, monitorPriceChanges);
-            } else {
-                userProducts = productRepository.findAllUserProductsInShop(user, shop, monitorAvailability,
-                        monitorDiscount, monitorPriceChanges);
-            }
+        if (onlyActive) {
+            userProducts = productRepository.findActiveUserProductsInShop(user, shop, monitorAvailability,
+                    monitorDiscount, monitorPriceChanges);
         } else {
-            if (onlyActive) {
-                userProducts = productRepository.findActiveUserProductsWithLastPriceInShop(user, shop,
-                        monitorAvailability, monitorDiscount, monitorPriceChanges);
-            } else {
-                userProducts = productRepository.findAllUserProductsWithLastPriceInShop(user, shop,
-                        monitorAvailability, monitorDiscount, monitorPriceChanges);
-            }
+            userProducts = productRepository.findAllUserProductsInShop(user, shop, monitorAvailability,
+                    monitorDiscount, monitorPriceChanges);
         }
 
         return userProducts.stream()

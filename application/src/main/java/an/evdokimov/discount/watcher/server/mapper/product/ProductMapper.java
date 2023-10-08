@@ -1,15 +1,10 @@
 package an.evdokimov.discount.watcher.server.mapper.product;
 
-import an.evdokimov.discount.watcher.server.api.product.dto.response.ProductPriceResponse;
 import an.evdokimov.discount.watcher.server.api.product.dto.response.ProductResponse;
 import an.evdokimov.discount.watcher.server.database.product.model.Product;
 import an.evdokimov.discount.watcher.server.mapper.shop.ShopMapper;
 import org.mapstruct.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Mapper(
         componentModel = "spring",
@@ -32,20 +27,11 @@ public abstract class ProductMapper {
             return null;
         }
 
-        List<ProductPriceResponse> productPriceResponses;
-        if (product.getPrices() != null) {
-            productPriceResponses = product.getPrices().stream()
-                    .map(productPrice -> productPriceMapper.map(productPrice))
-                    .collect(Collectors.toList());
-        } else {
-            productPriceResponses = new ArrayList<>();
-        }
-
         return ProductResponse.builder()
                 .id(product.getId())
                 .productInformation(productInformationMapper.map(product.getProductInformation()))
                 .shop(shopMapper.map(product.getShop()))
-                .prices(productPriceResponses)
+                .lastPrice(productPriceMapper.map(product.getLastPrice()))
                 .build();
     }
 }

@@ -11,13 +11,14 @@ spring:
       ddl-auto: create
     properties:
       hibernate:
-        default_schema: discount_watcher_schema_test
         format_sql: true
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/postgres
     username: discount_watcher_server_test
     password: password-for-tests
+    hikari:
+      schema: discount_watcher_schema_test
 
 application:
   security:
