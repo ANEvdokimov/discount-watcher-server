@@ -26,6 +26,7 @@ import org.hibernate.annotations.JoinFormula;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Entity
 @Table(name = "product")
@@ -90,12 +91,20 @@ public class Product {
                 && Objects.equals(getId(), that.getId())
                 && Objects.equals(getProductInformation().getId(), that.getProductInformation().getId())
                 && Objects.equals(getShop().getId(), that.getShop().getId())
+                && Objects.equals(Optional.ofNullable(getLastPrice()).map(ProductPrice::getId),
+                Optional.ofNullable(that.getLastPrice()).map(ProductPrice::getId))
                 && Objects.equals(getVersion(), that.getVersion());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getProductInformation().getId(), getShop().getId(), getVersion());
+        return Objects.hash(
+                getId(),
+                getProductInformation().getId(),
+                getShop().getId(),
+                Optional.ofNullable(getLastPrice()).map(ProductPrice::getId),
+                getVersion()
+        );
     }
 
     // toString parameters for lombok

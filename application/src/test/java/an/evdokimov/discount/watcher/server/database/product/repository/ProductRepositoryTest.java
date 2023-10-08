@@ -192,11 +192,17 @@ class ProductRepositoryTest {
                 .build());
 
         product1.setPrices(List.of(price1_1, price1_2, price1_3));
+        product1.setLastPrice(price1_3);
         product2.setPrices(List.of(price2_1));
+        product2.setLastPrice(price2_1);
         product3.setPrices(List.of(price3_1, price3_2));
+        product3.setLastPrice(price3_2);
         product5.setPrices(List.of(price5_1));
+        product5.setLastPrice(price5_1);
         product6.setPrices(List.of(price6_1));
+        product6.setLastPrice(price6_1);
         product7.setPrices(List.of(price7_1));
+        product7.setLastPrice(price7_1);
 
         userProductRepository.save(UserProduct.builder().user(user1).monitorAvailability(true).monitorDiscount(false)
                 .monitorPriceChanges(false).product(product1).build());
