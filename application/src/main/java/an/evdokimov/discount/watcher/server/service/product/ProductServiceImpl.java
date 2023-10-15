@@ -27,7 +27,6 @@ import an.evdokimov.discount.watcher.server.mapper.product.UserProductMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,8 +34,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -89,51 +86,6 @@ public class ProductServiceImpl implements ProductService {
                 .orElseThrow(() -> new ServerException(ServerErrorCode.PRODUCT_NOT_FOUND));
 
         return productMapper.map(product);
-    }
-
-    @Override
-    public Collection<ProductResponse> getUserProducts(@NotNull User user,
-                                                       boolean onlyActive,
-                                                       @Nullable Boolean monitorAvailability,
-                                                       @Nullable Boolean monitorDiscount,
-                                                       @Nullable Boolean monitorPriceChanges) {
-        Collection<Product> userProducts;
-        if (onlyActive) {
-            userProducts = productRepository.findActiveUserProducts(user, monitorAvailability, monitorDiscount,
-                    monitorPriceChanges);
-        } else {
-            userProducts = productRepository.findAllUserProducts(user, monitorAvailability, monitorDiscount,
-                    monitorPriceChanges);
-        }
-
-        return userProducts.stream()
-                .map(productMapper::map)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public Collection<ProductResponse> getUserProductsInShop(@NotNull User user,
-                                                             @NotNull Long shopId,
-                                                             boolean onlyActive,
-                                                             @Nullable Boolean monitorAvailability,
-                                                             @Nullable Boolean monitorDiscount,
-                                                             @Nullable Boolean monitorPriceChanges)
-            throws ServerException {
-        Shop shop =
-                shopRepository.findById(shopId).orElseThrow(() -> new ServerException(ServerErrorCode.SHOP_NOT_FOUND));
-
-        Collection<Product> userProducts;
-        if (onlyActive) {
-            userProducts = productRepository.findActiveUserProductsInShop(user, shop, monitorAvailability,
-                    monitorDiscount, monitorPriceChanges);
-        } else {
-            userProducts = productRepository.findAllUserProductsInShop(user, shop, monitorAvailability,
-                    monitorDiscount, monitorPriceChanges);
-        }
-
-        return userProducts.stream()
-                .map(productMapper::map)
-                .toList();
     }
 
     @Override

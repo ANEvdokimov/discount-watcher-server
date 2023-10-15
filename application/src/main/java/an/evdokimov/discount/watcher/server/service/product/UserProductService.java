@@ -1,0 +1,26 @@
+package an.evdokimov.discount.watcher.server.service.product;
+
+import an.evdokimov.discount.watcher.server.api.error.ServerException;
+import an.evdokimov.discount.watcher.server.api.product.dto.response.UserProductResponse;
+import an.evdokimov.discount.watcher.server.database.user.model.User;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
+
+public interface UserProductService {
+
+    List<UserProductResponse> getUserProducts(@NotNull User user,
+                                              boolean onlyActive,
+                                              @Nullable Boolean monitorAvailability,
+                                              @Nullable Boolean monitorDiscount,
+                                              @Nullable Boolean monitorPriceChanges);
+
+    List<UserProductResponse> getUserProductsInShop(@NotNull User user,
+                                                    @NotNull Long shopId,
+                                                    boolean onlyActive,
+                                                    @Nullable Boolean monitorAvailability,
+                                                    @Nullable Boolean monitorDiscount,
+                                                    @Nullable Boolean monitorPriceChanges)
+            throws ServerException;
+}
