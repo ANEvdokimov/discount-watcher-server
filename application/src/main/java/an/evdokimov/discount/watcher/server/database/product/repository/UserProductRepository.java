@@ -97,10 +97,9 @@ public interface UserProductRepository extends JpaRepository<UserProduct, Long> 
 
     // ---------------- OTHER OPERATIONS ----------------
 
-//    @Query("SELECT up.product FROM UserProduct up WHERE up.user = :user")
-//    List<Product> findAllUserProducts(@Param("user") User user); //todo заменить на findByUser
+    List<UserProduct> findByUser(User user);
 
-    List<UserProduct> findByUser(User user);//todo old findAllUserProducts
+    Optional<UserProduct> findByIdAndUser(Long id, User user);
 
     @Query("""
             SELECT up FROM UserProduct up

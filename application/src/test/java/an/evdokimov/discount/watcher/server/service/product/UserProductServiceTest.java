@@ -1,6 +1,7 @@
 package an.evdokimov.discount.watcher.server.service.product;
 
 import an.evdokimov.discount.watcher.server.api.error.ServerException;
+import an.evdokimov.discount.watcher.server.api.product.dto.request.UserProductRequest;
 import an.evdokimov.discount.watcher.server.api.product.dto.response.LentaProductPriceResponse;
 import an.evdokimov.discount.watcher.server.api.product.dto.response.ProductResponse;
 import an.evdokimov.discount.watcher.server.api.product.dto.response.UserProductResponse;
@@ -12,6 +13,7 @@ import an.evdokimov.discount.watcher.server.database.shop.model.Shop;
 import an.evdokimov.discount.watcher.server.database.shop.repository.ShopRepository;
 import an.evdokimov.discount.watcher.server.database.user.model.User;
 import an.evdokimov.discount.watcher.server.mapper.product.UserProductMapper;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,18 +27,21 @@ import java.util.Optional;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.refEq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest(classes = UserProductServiceImpl.class)
 public class UserProductServiceTest {
     @MockBean
-    private UserProductRepository productRepository;
+    private UserProductRepository userProductRepository;
     @MockBean
     private ShopRepository shopRepository;
     @MockBean
@@ -109,7 +114,7 @@ public class UserProductServiceTest {
 
         when(userProductMapper.map(refEq(userProduct1))).thenReturn(response1);
         when(userProductMapper.map(refEq(userProduct2))).thenReturn(response2);
-        when(productRepository.findAllUserProducts(
+        when(userProductRepository.findAllUserProducts(
                 eq(userWithProducts), anyBoolean(), anyBoolean(), anyBoolean())
         ).thenReturn(List.of(
                 userProduct1,
@@ -188,7 +193,7 @@ public class UserProductServiceTest {
 
         when(userProductMapper.map(refEq(userProduct1))).thenReturn(response1);
         when(userProductMapper.map(refEq(userProduct2))).thenReturn(response2);
-        when(productRepository.findActiveUserProducts(userWithProducts, true, true, true))
+        when(userProductRepository.findActiveUserProducts(userWithProducts, true, true, true))
                 .thenReturn(List.of(
                         userProduct1,
                         userProduct2
@@ -260,10 +265,10 @@ public class UserProductServiceTest {
         Shop shop = Shop.builder().id(1L).name("shop").build();
         when(shopRepository.findById(shop.getId())).thenReturn(Optional.of(shop));
 
-        when(productRepository.findAllUserProductsInShop(
+        when(userProductRepository.findAllUserProductsInShop(
                 any(), any(), anyBoolean(), anyBoolean(), anyBoolean())
         ).thenReturn(List.of(userProduct1));
-        when(productRepository.findActiveUserProductsInShop(any(), any(), anyBoolean(), anyBoolean(), anyBoolean()))
+        when(userProductRepository.findActiveUserProductsInShop(any(), any(), anyBoolean(), anyBoolean(), anyBoolean()))
                 .thenReturn(List.of(userProduct3));
 
         Collection<UserProductResponse> returnedProducts = testedService.getUserProductsInShop(
@@ -329,10 +334,10 @@ public class UserProductServiceTest {
         Shop shop = Shop.builder().id(1L).name("shop").build();
         when(shopRepository.findById(shop.getId())).thenReturn(Optional.of(shop));
 
-        when(productRepository.findActiveUserProductsInShop(
+        when(userProductRepository.findActiveUserProductsInShop(
                 any(), any(), anyBoolean(), anyBoolean(), anyBoolean())
         ).thenReturn(List.of(userProduct1));
-        when(productRepository.findActiveUserProductsInShop(any(), any(), anyBoolean(), anyBoolean(), anyBoolean()))
+        when(userProductRepository.findActiveUserProductsInShop(any(), any(), anyBoolean(), anyBoolean(), anyBoolean()))
                 .thenReturn(List.of(userProduct3));
 
         Collection<UserProductResponse> returnedProducts =
@@ -363,5 +368,93 @@ public class UserProductServiceTest {
                         true
                 )
         );
+    }
+
+    @SneakyThrows
+    @Test
+    void update_validUserProduct_updatedProduct() {
+        User user = User.builder().id(666L).build();
+        Product product = Product.builder().id(1L).build();
+
+        UserProduct userProductFromDb = UserProduct.builder()
+                .id(666L)
+                .user(user)
+                .product(product)
+                .monitorDiscount(true)
+                .monitorAvailability(true)
+                .monitorPriceChanges(true)
+                .build();
+
+        UserProductRequest updatedUserProduct = UserProductRequest.builder()
+                .id(666L)
+                .productId(product.getId())
+                .monitorDiscount(false)
+                .monitorAvailability(false)
+                .monitorPriceChanges(false)
+                .build();
+
+        when(userProductRepository.findByIdAndUser(updatedUserProduct.getId(), user))
+                .thenReturn(Optional.of(userProductFromDb));
+
+        testedService.update(user, updatedUserProduct);
+
+        assertEquals(updatedUserProduct.isMonitorDiscount(), userProductFromDb.isMonitorDiscount());
+        assertEquals(updatedUserProduct.isMonitorAvailability(), userProductFromDb.isMonitorAvailability());
+        assertEquals(updatedUserProduct.isMonitorPriceChanges(), userProductFromDb.isMonitorPriceChanges());
+    }
+
+    @SneakyThrows
+    @Test
+    void update_nonexistentUserProduct_ServerException() {
+        User user = User.builder().id(666L).build();
+        Product product = Product.builder().id(1L).build();
+
+        UserProductRequest updatedUserProduct = UserProductRequest.builder()
+                .id(666L)
+                .productId(product.getId())
+                .monitorDiscount(false)
+                .monitorAvailability(false)
+                .monitorPriceChanges(false)
+                .build();
+
+        when(userProductRepository.findByIdAndUser(updatedUserProduct.getId(), user))
+                .thenReturn(Optional.empty());
+
+        assertThrows(ServerException.class,
+                () -> testedService.update(user, updatedUserProduct));
+    }
+
+    @Test
+    void delete_userProduct_deletedProduct() throws ServerException {
+        User user = User.builder().id(666L).build();
+        Product product = Product.builder().id(1L).build();
+
+        UserProduct userProductFromDb = UserProduct.builder()
+                .id(666L)
+                .user(user)
+                .product(product)
+                .monitorDiscount(true)
+                .monitorAvailability(true)
+                .monitorPriceChanges(true)
+                .build();
+
+        when(userProductRepository.findByIdAndUser(666L, user))
+                .thenReturn(Optional.of(userProductFromDb));
+
+        testedService.delete(user, 666L);
+
+        verify(userProductRepository).delete(userProductFromDb);
+    }
+
+    @Test
+    void delete_nonexistentUserProduct_ServerException() {
+        User user = User.builder().id(666L).build();
+
+        when(userProductRepository.findByIdAndUser(666L, user))
+                .thenReturn(Optional.empty());
+
+        assertThrows(ServerException.class,
+                () -> testedService.delete(user, 666L));
+        verify(userProductRepository, times(0)).delete(any());
     }
 }

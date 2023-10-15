@@ -1,6 +1,8 @@
 package an.evdokimov.discount.watcher.server.api.product.controller;
 
 import an.evdokimov.discount.watcher.server.api.TestConfig;
+import an.evdokimov.discount.watcher.server.api.error.ServerErrorCode;
+import an.evdokimov.discount.watcher.server.api.product.dto.request.UserProductRequest;
 import an.evdokimov.discount.watcher.server.api.product.dto.response.UserProductResponse;
 import an.evdokimov.discount.watcher.server.configuration.SecurityConfiguration;
 import an.evdokimov.discount.watcher.server.service.product.UserProductServiceImpl;
@@ -13,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -30,10 +33,13 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(UserProductController.class)
@@ -520,5 +526,94 @@ public class UserProductControllerTest {
                                 anyBoolean()
                         )
         );
+    }
+
+    @Test
+    void update_userProduct_http200() throws Exception {
+        UserProductRequest userProduct = UserProductRequest.builder()
+                .id(666L)
+                .productId(555L)
+                .monitorDiscount(true)
+                .monitorAvailability(false)
+                .monitorPriceChanges(true)
+                .build();
+
+        MvcResult result = mvc.perform(post("/api/products/by_user")
+                        .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(mapper.writeValueAsString(userProduct)))
+                .andReturn();
+
+        assertEquals(200, result.getResponse().getStatus());
+    }
+
+    @Test
+    void update_noId_http400() throws Exception {
+        UserProductRequest userProduct = UserProductRequest.builder()
+                .productId(555L)
+                .monitorDiscount(true)
+                .monitorAvailability(false)
+                .monitorPriceChanges(true)
+                .build();
+
+        MvcResult result = mvc.perform(post("/api/products/by_user")
+                        .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(mapper.writeValueAsString(userProduct)))
+                .andReturn();
+
+        assertEquals(400, result.getResponse().getStatus());
+    }
+
+    @Test
+    void update_nonexistentUserProduct_http400() throws Exception {
+        UserProductRequest userProduct = UserProductRequest.builder()
+                .id(666L)
+                .productId(555L)
+                .monitorDiscount(true)
+                .monitorAvailability(false)
+                .monitorPriceChanges(true)
+                .build();
+
+        doThrow(ServerErrorCode.USER_PRODUCT_NOT_FOUND.getException())
+                .when(service).update(any(), eq(userProduct));
+
+        MvcResult result = mvc.perform(post("/api/products/by_user")
+                        .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(mapper.writeValueAsString(userProduct)))
+                .andReturn();
+
+        assertEquals(400, result.getResponse().getStatus());
+    }
+
+    @Test
+    void delete_userProduct_http200() throws Exception {
+        MvcResult result = mvc.perform(delete("/api/products/by_user/666")
+                        .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user")))
+                .andReturn();
+
+        assertEquals(200, result.getResponse().getStatus());
+    }
+
+    @Test
+    void delete_noId_http404() throws Exception {
+        MvcResult result = mvc.perform(delete("/api/products/by_user/")
+                        .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user")))
+                .andReturn();
+
+        assertEquals(404, result.getResponse().getStatus());
+    }
+
+    @Test
+    void delete_nonexistentUserProduct_http400() throws Exception {
+        doThrow(ServerErrorCode.USER_PRODUCT_NOT_FOUND.getException())
+                .when(service).delete(any(), eq(666L));
+
+        MvcResult result = mvc.perform(delete("/api/products/by_user/666")
+                        .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user")))
+                .andReturn();
+
+        assertEquals(400, result.getResponse().getStatus());
     }
 }

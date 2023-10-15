@@ -1,15 +1,21 @@
 package an.evdokimov.discount.watcher.server.api.product.controller;
 
 import an.evdokimov.discount.watcher.server.api.error.ServerException;
+import an.evdokimov.discount.watcher.server.api.product.dto.request.UserProductRequest;
 import an.evdokimov.discount.watcher.server.api.product.dto.response.UserProductResponse;
 import an.evdokimov.discount.watcher.server.database.user.model.User;
 import an.evdokimov.discount.watcher.server.service.product.UserProductService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.lang.Nullable;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -55,5 +61,33 @@ public class UserProductController {
             return service.getUserProducts(currentUser, onlyActive, monitorAvailability,
                     monitorDiscount, monitorPriceChanges);
         }
+    }
+
+    /**
+     * Update UserProduct
+     *
+     * @param authentication information about a current user.
+     * @param userProduct    updated UserProduct.
+     */
+    @PostMapping
+    public void update(Authentication authentication,
+                       @Valid @RequestBody UserProductRequest userProduct) throws ServerException {
+        User currentUser = (User) authentication.getPrincipal();
+        log.info("Updating UserProduct [{}] for user [{}]", userProduct, currentUser.getLogin());
+        service.update(currentUser, userProduct);
+    }
+
+    /**
+     * Delete UserProduct
+     *
+     * @param authentication information about a current user.
+     * @param userProductId  ID of UserProduct to delete.
+     */
+    @DeleteMapping("/{userProductId}")
+    public void delete(Authentication authentication,
+                       @Valid @PathVariable Long userProductId) throws ServerException {
+        User currentUser = (User) authentication.getPrincipal();
+        log.info("Deletion UserProduct [id={}] for user [{}]", userProductId, currentUser.getLogin());
+        service.delete(currentUser, userProductId);
     }
 }

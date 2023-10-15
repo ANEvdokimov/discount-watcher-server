@@ -2,6 +2,7 @@ package an.evdokimov.discount.watcher.server.service.product;
 
 import an.evdokimov.discount.watcher.server.api.error.ServerErrorCode;
 import an.evdokimov.discount.watcher.server.api.error.ServerException;
+import an.evdokimov.discount.watcher.server.api.product.dto.request.UserProductRequest;
 import an.evdokimov.discount.watcher.server.api.product.dto.response.UserProductResponse;
 import an.evdokimov.discount.watcher.server.database.product.model.UserProduct;
 import an.evdokimov.discount.watcher.server.database.product.repository.UserProductRepository;
@@ -13,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -67,5 +69,27 @@ public class UserProductServiceImpl implements UserProductService {
         return userProducts.stream()
                 .map(mapper::map)
                 .toList();
+    }
+
+    @Override
+    @Transactional
+    public void update(User user, UserProductRequest updatedUserProduct) throws ServerException {
+        UserProduct userProduct = repository.findByIdAndUser(updatedUserProduct.getId(), user).orElseThrow(() ->
+                ServerErrorCode.USER_PRODUCT_NOT_FOUND.getException("user_product_id=%s, user_login=%s"
+                        .formatted(updatedUserProduct.getId(), user.getLogin())));
+
+        userProduct.setMonitorDiscount(updatedUserProduct.isMonitorDiscount());
+        userProduct.setMonitorAvailability(updatedUserProduct.isMonitorAvailability());
+        userProduct.setMonitorPriceChanges(updatedUserProduct.isMonitorPriceChanges());
+    }
+
+    @Override
+    @Transactional
+    public void delete(User user, Long userProductId) throws ServerException {
+        UserProduct userProduct = repository.findByIdAndUser(userProductId, user).orElseThrow(() ->
+                ServerErrorCode.USER_PRODUCT_NOT_FOUND.getException("user_product_id=%s, user_login=%s"
+                        .formatted(userProductId, user.getLogin())));
+
+        repository.delete(userProduct);
     }
 }
