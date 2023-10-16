@@ -30,6 +30,22 @@ public class UserProductController {
     private final UserProductService service;
 
     /**
+     * Getting current user's UserProduct by id.
+     *
+     * @param authentication information about a current user.
+     * @param userProductId  ID of the product you are looking for.
+     * @return founded UserProduct.
+     * @throws ServerException UserProduct not found.
+     */
+    @GetMapping(value = "/{userProductId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public UserProductResponse getById(Authentication authentication,
+                                       @PathVariable Long userProductId) throws ServerException {
+        User currentUser = (User) authentication.getPrincipal();
+        log.info("Getting user product by id={} for user={}", userProductId, currentUser.getLogin());
+        return service.getById(currentUser, userProductId);
+    }
+
+    /**
      * Getting all current user's products.
      *
      * @param authentication      information about a current user.
@@ -85,7 +101,7 @@ public class UserProductController {
      */
     @DeleteMapping("/{userProductId}")
     public void delete(Authentication authentication,
-                       @Valid @PathVariable Long userProductId) throws ServerException {
+                       @PathVariable Long userProductId) throws ServerException {
         User currentUser = (User) authentication.getPrincipal();
         log.info("Deletion UserProduct [id={}] for user [{}]", userProductId, currentUser.getLogin());
         service.delete(currentUser, userProductId);

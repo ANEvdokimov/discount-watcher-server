@@ -27,6 +27,14 @@ public class UserProductServiceImpl implements UserProductService {
     private final UserProductMapper mapper;
 
     @Override
+    public UserProductResponse getById(@NotNull User user, @NotNull Long id) throws ServerException {
+        UserProduct userProduct = repository.findByIdAndUser(id, user).orElseThrow(() ->
+                ServerErrorCode.USER_PRODUCT_NOT_FOUND.getException("user=%s, user_product=%s"
+                        .formatted(user.getLogin(), id)));
+        return mapper.map(userProduct);
+    }
+
+    @Override
     public List<UserProductResponse> getUserProducts(@NotNull User user,
                                                      boolean onlyActive,
                                                      @Nullable Boolean monitorAvailability,

@@ -10,6 +10,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public interface UserProductService {
+    UserProductResponse getById(@NotNull User user, @NotNull Long id) throws ServerException;
 
     List<UserProductResponse> getUserProducts(@NotNull User user,
                                               boolean onlyActive,
