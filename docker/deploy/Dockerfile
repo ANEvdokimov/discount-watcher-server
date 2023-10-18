@@ -1,4 +1,4 @@
-FROM openjdk:19
+FROM openjdk:21
 
 ARG key_store_dir=/usr/keys/
 ARG key_store_name=discount-watcher-server.p12
