@@ -15,14 +15,6 @@ spring:
   rabbitmq:
     host: localhost
 
-server:
-  ssl:
-    enabled: true
-    key-store-type: PKCS12
-    key-store: ./dev-certificates/discount-watcher-server.p12
-    key-store-password: password
-    key-alias: DWS
-
 application:
   security:
     jwt:
