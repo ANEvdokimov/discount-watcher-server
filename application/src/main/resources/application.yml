@@ -2,3 +2,26 @@ server:
   port: 8081
   servlet:
     context-path: /server
+
+spring:
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      schema: discount_watcher_schema
+
+application:
+  security:
+    header:
+      authentication: Authorization
+  mq:
+    input-queue-name: "dw-parser-input"
+    output-queue-name: "dw-parser-output"
+    output-error-queue-name: "dw-parser-error"
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui

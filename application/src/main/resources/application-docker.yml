@@ -1,43 +1,17 @@
 spring:
-  jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
-    properties:
-      hibernate:
-        default_schema: discount_watcher_schema
   datasource:
-    driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/postgres
     username: discount_watcher_server
     password: secret-password
   rabbitmq:
     host: ${RABBIT_HOST}
 
-server:
-  ssl:
-    enabled: true
-    key-store-type: PKCS12
-    key-store: ${KEY_STORE_PATH}
-    key-store-password: ${KEY_STORE_PASSWORD}
-    key-alias: DWS
-
 application:
   security:
     jwt:
       secret: ldfbjafslnkasfnkasfmadaldfbjafslnkasfnkasfmadaldfbjafslnkasfnkasfmadaldfbjafslnkasfnkasfmadaldfbjafslnkasfnkasfmadaldfbjafslnkasfnkasfmadaldfbjafslnkasfnkasfmada
       expiration-time: 2592000
-    header:
-      authentication: Authorization
-  mq:
-    input-queue-name: "dw-parser-input"
-    output-queue-name: "dw-parser-output"
-    output-error-queue-name: "dw-parser-error"
 
 logging:
   level:
     root: INFO
-
-springdoc:
-  api-docs:
-    path: /api-docs
-  swagger-ui:
-    path: /swagger-ui
