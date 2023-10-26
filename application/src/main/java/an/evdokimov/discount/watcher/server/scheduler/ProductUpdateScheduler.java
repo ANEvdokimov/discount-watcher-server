@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 
@@ -18,6 +19,7 @@ public class ProductUpdateScheduler {
     private final ProductService productService;
 
     @Scheduled(cron = "0 0 0,12 * * *", zone = "UTC") // every day at 0:00 and 12:00
+    @Transactional
     public void updateProducts() {
         log.info("Start updating products");
 
