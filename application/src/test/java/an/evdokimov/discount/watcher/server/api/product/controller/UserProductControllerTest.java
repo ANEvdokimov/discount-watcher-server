@@ -4,7 +4,6 @@ import an.evdokimov.discount.watcher.server.api.TestConfig;
 import an.evdokimov.discount.watcher.server.api.error.ServerErrorCode;
 import an.evdokimov.discount.watcher.server.api.product.dto.request.UserProductRequest;
 import an.evdokimov.discount.watcher.server.api.product.dto.response.UserProductResponse;
-import an.evdokimov.discount.watcher.server.configuration.SecurityConfiguration;
 import an.evdokimov.discount.watcher.server.service.product.UserProductServiceImpl;
 import an.evdokimov.securitystarter.security.authentication.jwt.JwtUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;

@@ -4,7 +4,6 @@ import an.evdokimov.discount.watcher.server.api.TestConfig;
 import an.evdokimov.discount.watcher.server.api.city.dto.response.CityResponse;
 import an.evdokimov.discount.watcher.server.api.shop.dto.response.ShopChainResponse;
 import an.evdokimov.discount.watcher.server.api.shop.dto.response.ShopChainWithShopsResponse;
-import an.evdokimov.discount.watcher.server.configuration.SecurityConfiguration;
 import an.evdokimov.discount.watcher.server.database.city.model.City;
 import an.evdokimov.discount.watcher.server.database.shop.model.Shop;
 import an.evdokimov.discount.watcher.server.database.shop.model.ShopChain;

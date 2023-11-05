@@ -5,4 +5,4 @@
  */
 
 rootProject.name = 'discount-watcher-server'
-include 'application', 'security-spring-boot-starter'
+include 'application'

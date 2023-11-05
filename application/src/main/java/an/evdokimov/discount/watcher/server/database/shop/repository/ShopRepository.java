@@ -1,7 +1,7 @@
 package an.evdokimov.discount.watcher.server.database.shop.repository;
 
 import an.evdokimov.discount.watcher.server.database.shop.model.Shop;
-import an.evdokimov.discount.watcher.server.database.user.model.User;
+import an.evdokimov.discount.watcher.server.security.user.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

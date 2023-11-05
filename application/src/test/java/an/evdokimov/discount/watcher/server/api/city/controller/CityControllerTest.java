@@ -2,7 +2,6 @@ package an.evdokimov.discount.watcher.server.api.city.controller;
 
 import an.evdokimov.discount.watcher.server.api.TestConfig;
 import an.evdokimov.discount.watcher.server.api.city.dto.response.CityResponse;
-import an.evdokimov.discount.watcher.server.configuration.SecurityConfiguration;
 import an.evdokimov.discount.watcher.server.service.city.CityServiceImpl;
 import an.evdokimov.securitystarter.security.authentication.jwt.JwtUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,7 +23,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 

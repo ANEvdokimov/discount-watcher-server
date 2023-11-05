@@ -10,15 +10,9 @@ CREATE CAST (character varying as user_role) WITH INOUT AS IMPLICIT;
 CREATE CAST (character varying as parsing_status) WITH INOUT AS IMPLICIT;
 CREATE CAST (character varying as price_change) WITH INOUT AS IMPLICIT;
 
-CREATE SEQUENCE user_sequence;
-
 CREATE TABLE "user"
 (
-    id            BIGINT PRIMARY KEY,
     login         VARCHAR(256) NOT NULL UNIQUE,
-    password VARCHAR(256) NOT NULL,
-    name          VARCHAR(256) NOT NULL,
-    register_date TIMESTAMP    NOT NULL,
     role          USER_ROLE    NOT NULL DEFAULT 'ROLE_USER',
     enabled       BOOLEAN      NOT NULL DEFAULT TRUE,
     version  BIGINT       NOT NULL DEFAULT 1
@@ -106,15 +100,15 @@ CREATE SEQUENCE user_product_sequence;
 CREATE TABLE user_product
 (
     id                    BIGINT PRIMARY KEY,
-    user_id               BIGINT  NOT NULL REFERENCES "user" (id) ON UPDATE CASCADE ON DELETE CASCADE,
+    user_login VARCHAR(256) NOT NULL REFERENCES "user" (login) ON UPDATE CASCADE ON DELETE CASCADE,
     product_id            BIGINT  NOT NULL REFERENCES product (id) ON UPDATE CASCADE ON DELETE CASCADE,
     monitor_discount      BOOLEAN NOT NULL,
     monitor_availability  BOOLEAN NOT NULL,
     monitor_price_changes BOOLEAN NOT NULL,
     version BIGINT NOT NULL DEFAULT 1,
-    UNIQUE (user_id, product_id)
+    UNIQUE (user_login, product_id)
 );
-CREATE UNIQUE INDEX ON user_product (user_id, product_id);
+CREATE UNIQUE INDEX ON user_product (user_login, product_id);
 
 CREATE SEQUENCE parsing_error_sequence;
 CREATE TABLE parsing_error

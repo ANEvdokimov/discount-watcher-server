@@ -3,7 +3,7 @@ package an.evdokimov.discount.watcher.server.api.product.controller;
 import an.evdokimov.discount.watcher.server.api.error.ServerException;
 import an.evdokimov.discount.watcher.server.api.product.dto.request.UserProductRequest;
 import an.evdokimov.discount.watcher.server.api.product.dto.response.UserProductResponse;
-import an.evdokimov.discount.watcher.server.database.user.model.User;
+import an.evdokimov.discount.watcher.server.security.user.model.User;
 import an.evdokimov.discount.watcher.server.service.product.UserProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

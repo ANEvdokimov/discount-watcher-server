@@ -6,7 +6,7 @@ import an.evdokimov.discount.watcher.server.api.product.dto.request.NewProductRe
 import an.evdokimov.discount.watcher.server.api.product.dto.request.NewProductWithCookiesRequest;
 import an.evdokimov.discount.watcher.server.api.product.dto.response.ProductResponse;
 import an.evdokimov.discount.watcher.server.database.product.model.Product;
-import an.evdokimov.discount.watcher.server.database.user.model.User;
+import an.evdokimov.discount.watcher.server.security.user.model.User;
 import org.jetbrains.annotations.NotNull;
 
 public interface ProductService {

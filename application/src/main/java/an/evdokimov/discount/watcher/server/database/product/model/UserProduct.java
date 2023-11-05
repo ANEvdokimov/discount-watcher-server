@@ -1,9 +1,22 @@
 package an.evdokimov.discount.watcher.server.database.product.model;
 
-import an.evdokimov.discount.watcher.server.database.user.model.User;
-import jakarta.persistence.*;
+import an.evdokimov.discount.watcher.server.security.user.model.User;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -32,7 +45,7 @@ public class UserProduct {
     private Long id;
     @NotNull
     @ManyToOne(optional = false)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_login")
     @ToString.Exclude
     private User user;
     @NotNull
@@ -65,21 +78,21 @@ public class UserProduct {
                 && isMonitorAvailability() == that.isMonitorAvailability()
                 && isMonitorPriceChanges() == that.isMonitorPriceChanges()
                 && Objects.equals(getId(), that.getId())
-                && Objects.equals(getUser().getId(), that.getUser().getId())
+                && Objects.equals(getUser().getLogin(), that.getUser().getLogin())
                 && Objects.equals(getProduct().getId(), that.getProduct().getId())
                 && Objects.equals(getVersion(), that.getVersion());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getUser().getId(), getProduct().getId(), isMonitorDiscount(),
+        return Objects.hash(getId(), getUser().getLogin(), getProduct().getId(), isMonitorDiscount(),
                 isMonitorAvailability(), isMonitorPriceChanges(), getVersion());
     }
 
     // toString parameters for lombok
     @ToString.Include(name = "UserId")
-    private Long getUserId() {
-        return getUser().getId();
+    private String getUserLogin() {
+        return getUser().getLogin();
     }
 
     @ToString.Include(name = "ProductId")

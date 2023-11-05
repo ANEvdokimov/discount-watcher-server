@@ -5,7 +5,7 @@ import an.evdokimov.discount.watcher.server.api.product.dto.request.NewProductWi
 import an.evdokimov.discount.watcher.server.api.product.dto.response.UserProductResponse;
 import an.evdokimov.discount.watcher.server.database.product.model.Product;
 import an.evdokimov.discount.watcher.server.database.product.model.UserProduct;
-import an.evdokimov.discount.watcher.server.database.user.model.User;
+import an.evdokimov.discount.watcher.server.security.user.model.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.beans.factory.annotation.Autowired;

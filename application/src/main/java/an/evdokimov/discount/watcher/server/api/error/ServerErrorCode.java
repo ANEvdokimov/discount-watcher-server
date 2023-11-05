@@ -1,5 +1,7 @@
 package an.evdokimov.discount.watcher.server.api.error;
 
+import lombok.Getter;
+
 public enum ServerErrorCode {
     USER_ALREADY_EXISTS("A user with this login already exists."),
     WRONG_LOGIN_OR_PASSWORD("Wrong login or password."),
@@ -13,14 +15,11 @@ public enum ServerErrorCode {
     PRODUCT_INFORMATION_NOT_FOUND("Product information with this id not found"),
     PARSE_RESPONSE_ID_ERROR("ProductInformationId and ProductPriceId can not be null.");
 
+    @Getter
     private final String message;
 
     ServerErrorCode(String message) {
         this.message = message;
-    }
-
-    public String getMessage() {
-        return message;
     }
 
     public void throwException() throws ServerException {

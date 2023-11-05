@@ -4,7 +4,7 @@ import an.evdokimov.discount.watcher.server.api.error.ServerException;
 import an.evdokimov.discount.watcher.server.api.product.dto.request.NewProductRequest;
 import an.evdokimov.discount.watcher.server.api.product.dto.request.NewProductWithCookiesRequest;
 import an.evdokimov.discount.watcher.server.api.product.dto.response.ProductResponse;
-import an.evdokimov.discount.watcher.server.database.user.model.User;
+import an.evdokimov.discount.watcher.server.security.user.model.User;
 import an.evdokimov.discount.watcher.server.service.product.ProductService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
