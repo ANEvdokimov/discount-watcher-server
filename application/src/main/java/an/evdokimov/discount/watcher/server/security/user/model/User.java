@@ -56,7 +56,7 @@ public class User implements UserDetails {
 
     @Override
     public String getPassword() {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("User cannot have a password");
     }
 
     @Override
@@ -85,7 +85,6 @@ public class User implements UserDetails {
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
         User that = (User) o;
         return Objects.equals(getLogin(), that.getLogin())
-                && Objects.equals(getPassword(), that.getPassword())
                 && Objects.equals(getRole(), that.getRole())
                 && Objects.equals(isEnabled(), that.isEnabled())
                 && Objects.equals(getVersion(), that.getVersion());
@@ -93,6 +92,6 @@ public class User implements UserDetails {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getLogin(), getPassword(), getRole(), isEnabled(), getVersion());
+        return Objects.hash(getLogin(), getRole(), isEnabled(), getVersion());
     }
 }
