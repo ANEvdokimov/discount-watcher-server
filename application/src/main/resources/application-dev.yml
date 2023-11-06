@@ -6,8 +6,3 @@ spring:
   rabbitmq:
     host: localhost
 
-application:
-  security:
-    jwt:
-      secret: ldfbjafslnkasfnkasfmadaldfbjafslnkasfnkasfmadaldfbjafslnkasfnkasfmadaldfbjafslnkasfnkasfmadaldfbjafslnkasfnkasfmadaldfbjafslnkasfnkasfmadaldfbjafslnkasfnkasfmada
-      expiration-time: 2592000

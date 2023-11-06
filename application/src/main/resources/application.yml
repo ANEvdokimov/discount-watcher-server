@@ -12,9 +12,6 @@ spring:
       schema: discount_watcher_schema
 
 application:
-  security:
-    header:
-      authentication: Authorization
   mq:
     input-queue-name: "dw-parser-input"
     output-queue-name: "dw-parser-output"
