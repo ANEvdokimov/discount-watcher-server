@@ -11,8 +11,8 @@ import an.evdokimov.discount.watcher.server.database.product.model.UserProduct;
 import an.evdokimov.discount.watcher.server.database.product.repository.UserProductRepository;
 import an.evdokimov.discount.watcher.server.database.shop.model.Shop;
 import an.evdokimov.discount.watcher.server.database.shop.repository.ShopRepository;
-import an.evdokimov.discount.watcher.server.database.user.model.User;
 import an.evdokimov.discount.watcher.server.mapper.product.UserProductMapper;
+import an.evdokimov.discount.watcher.server.security.user.model.User;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,7 +86,7 @@ public class UserProductServiceTest {
                 .prices(List.of(price4))
                 .build();
 
-        User userWithProducts = User.builder().id(666L).build();
+        User userWithProducts = User.builder().login("login").build();
 
         UserProduct userProduct1 = UserProduct.builder()
                 .user(userWithProducts)
@@ -165,7 +165,7 @@ public class UserProductServiceTest {
                 .prices(List.of(price4))
                 .build();
 
-        User userWithProducts = User.builder().id(666L).build();
+        User userWithProducts = User.builder().login("login").build();
 
         UserProduct userProduct1 = UserProduct.builder()
                 .user(userWithProducts)
@@ -221,7 +221,7 @@ public class UserProductServiceTest {
         Product product3 = Product.builder().id(3L).build();
         Product product4 = Product.builder().id(4L).build();
 
-        User userWithProducts = User.builder().id(666L).build();
+        User userWithProducts = User.builder().login("login").build();
 
         UserProduct userProduct1 = UserProduct.builder()
                 .user(userWithProducts)
@@ -290,7 +290,7 @@ public class UserProductServiceTest {
         Product product3 = Product.builder().id(3L).build();
         Product product4 = Product.builder().id(4L).build();
 
-        User userWithProducts = User.builder().id(666L).build();
+        User userWithProducts = User.builder().login("login").build();
 
         UserProduct userProduct1 = UserProduct.builder()
                 .user(userWithProducts)
@@ -373,7 +373,7 @@ public class UserProductServiceTest {
     @SneakyThrows
     @Test
     void update_validUserProduct_updatedProduct() {
-        User user = User.builder().id(666L).build();
+        User user = User.builder().login("login").build();
         Product product = Product.builder().id(1L).build();
 
         UserProduct userProductFromDb = UserProduct.builder()
@@ -406,7 +406,7 @@ public class UserProductServiceTest {
     @SneakyThrows
     @Test
     void update_nonexistentUserProduct_ServerException() {
-        User user = User.builder().id(666L).build();
+        User user = User.builder().login("login").build();
         Product product = Product.builder().id(1L).build();
 
         UserProductRequest updatedUserProduct = UserProductRequest.builder()
@@ -426,7 +426,7 @@ public class UserProductServiceTest {
 
     @Test
     void delete_userProduct_deletedProduct() throws ServerException {
-        User user = User.builder().id(666L).build();
+        User user = User.builder().login("login").build();
         Product product = Product.builder().id(1L).build();
 
         UserProduct userProductFromDb = UserProduct.builder()
@@ -448,7 +448,7 @@ public class UserProductServiceTest {
 
     @Test
     void delete_nonexistentUserProduct_ServerException() {
-        User user = User.builder().id(666L).build();
+        User user = User.builder().login("login").build();
 
         when(userProductRepository.findByIdAndUser(666L, user))
                 .thenReturn(Optional.empty());

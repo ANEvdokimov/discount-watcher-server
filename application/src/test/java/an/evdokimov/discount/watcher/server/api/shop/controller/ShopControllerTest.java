@@ -4,13 +4,12 @@ import an.evdokimov.discount.watcher.server.api.TestConfig;
 import an.evdokimov.discount.watcher.server.api.error.ServerErrorCode;
 import an.evdokimov.discount.watcher.server.api.error.ServerException;
 import an.evdokimov.discount.watcher.server.api.shop.dto.response.ShopResponse;
+import an.evdokimov.discount.watcher.server.configuration.SecurityConfiguration;
 import an.evdokimov.discount.watcher.server.service.shop.ShopServiceImpl;
-import an.evdokimov.securitystarter.security.authentication.jwt.JwtUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
@@ -35,14 +34,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @WebMvcTest(ShopController.class)
 @Import({TestConfig.class, SecurityConfiguration.class})
 class ShopControllerTest {
-    @Value("${application.security.header.authentication}")
-    private String authHeaderName;
+    private static final String AUTH_HEADER_NAME = "Authenticated-User";
+    private static final String AUTH_USER = "test_user";
 
     @Autowired
     private TestConfig testConfig;
-
-    @Autowired
-    private JwtUtils jwtUtils;
 
     @Autowired
     private ObjectMapper mapper;
@@ -71,7 +67,7 @@ class ShopControllerTest {
         when(shopService.getAllUserShops(testConfig.getTestUser())).thenReturn(List.of(shop1, shop2));
 
         MvcResult result = mvc.perform(get("/api/shops")
-                        .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user")))
+                        .header(AUTH_HEADER_NAME, AUTH_USER))
                 .andReturn();
 
         ArrayList<ShopResponse> returnedShopResponses = mapper.readValue(
@@ -106,7 +102,7 @@ class ShopControllerTest {
         when(shopService.getAllUserShops(testConfig.getTestUser())).thenReturn(List.of(shop1, shop2));
 
         MvcResult result = mvc.perform(get("/api/shops")
-                        .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
+                        .header(AUTH_HEADER_NAME, AUTH_USER)
                         .header("only-my", "false"))
                 .andReturn();
 
@@ -142,7 +138,7 @@ class ShopControllerTest {
         when(shopService.getAllUserShops(testConfig.getTestUser())).thenReturn(List.of(shop1, shop2));
 
         MvcResult result = mvc.perform(get("/api/shops")
-                        .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
+                        .header(AUTH_HEADER_NAME, AUTH_USER)
                         .header("only-my", "true"))
                 .andReturn();
 
@@ -161,32 +157,6 @@ class ShopControllerTest {
     }
 
     @Test
-    void getAllShops_invalidJwt_http401() throws Exception {
-        ShopResponse shop1 = ShopResponse.builder()
-                .id(1L)
-                .name("shop1")
-                .build();
-        ShopResponse shop2 = ShopResponse.builder()
-                .id(2L)
-                .name("shop2")
-                .build();
-        ShopResponse shop3 = ShopResponse.builder()
-                .id(3L)
-                .name("shop3")
-                .build();
-        when(shopService.getAllShops()).thenReturn(List.of(shop1, shop2, shop3));
-
-        MvcResult result = mvc.perform(get("/api/shops")
-                        .header(authHeaderName, "invalid JWT"))
-                .andReturn();
-
-        assertAll(
-                () -> assertEquals(401, result.getResponse().getStatus()),
-                () -> verify(shopService, times(0)).getAllShops()
-        );
-    }
-
-    @Test
     void getShopById_validJwt_http200() throws Exception {
         ShopResponse shop1 = ShopResponse.builder()
                 .id(1L)
@@ -195,7 +165,7 @@ class ShopControllerTest {
         when(shopService.getShopById(1L)).thenReturn(shop1);
 
         MvcResult result = mvc.perform(get("/api/shop/" + shop1.getId())
-                        .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user")))
+                        .header(AUTH_HEADER_NAME, AUTH_USER))
                 .andReturn();
 
         ShopResponse returnedShopResponse = mapper.readValue(
@@ -206,24 +176,6 @@ class ShopControllerTest {
         assertAll(
                 () -> assertEquals(200, result.getResponse().getStatus()),
                 () -> assertEquals(shop1, returnedShopResponse)
-        );
-    }
-
-    @Test
-    void getShopById_invalidJwt_http401() throws Exception {
-        ShopResponse shop1 = ShopResponse.builder()
-                .id(1L)
-                .name("shop1")
-                .build();
-        when(shopService.getShopById(1L)).thenReturn(shop1);
-
-        MvcResult result = mvc.perform(get("/api/shop/" + shop1.getId())
-                        .header(authHeaderName, "invalid jwt"))
-                .andReturn();
-
-        assertAll(
-                () -> assertEquals(401, result.getResponse().getStatus()),
-                () -> verify(shopService, times(0)).getShopById(shop1.getId())
         );
     }
 
@@ -249,7 +201,7 @@ class ShopControllerTest {
         when(shopService.getShopById(anyLong())).thenThrow(new ServerException(ServerErrorCode.SHOP_NOT_FOUND));
 
         MvcResult result = mvc.perform(get("/api/shop/10")
-                        .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user")))
+                        .header(AUTH_HEADER_NAME, AUTH_USER))
                 .andReturn();
 
         assertAll(

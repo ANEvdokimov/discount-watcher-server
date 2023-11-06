@@ -11,9 +11,9 @@ import an.evdokimov.discount.watcher.server.database.shop.model.Shop;
 import an.evdokimov.discount.watcher.server.database.shop.model.ShopChain;
 import an.evdokimov.discount.watcher.server.database.shop.repository.ShopChainRepository;
 import an.evdokimov.discount.watcher.server.database.shop.repository.ShopRepository;
-import an.evdokimov.discount.watcher.server.database.user.model.User;
-import an.evdokimov.discount.watcher.server.database.user.model.UserRole;
-import an.evdokimov.discount.watcher.server.database.user.repository.UserRepository;
+import an.evdokimov.discount.watcher.server.security.user.model.User;
+import an.evdokimov.discount.watcher.server.security.user.model.UserRole;
+import an.evdokimov.discount.watcher.server.security.user.service.UserRepository;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -58,18 +58,12 @@ public class ShopRepositoryTest {
 
     @BeforeAll
     public void fillDb() throws MalformedURLException {
-        user1 = userRepository.save(User.builder().name("user1").login("login1").password("pass")
-                .role(UserRole.ROLE_USER).enabled(true).registerDate(LocalDateTime.now()).build());
-        user2 = userRepository.save(User.builder().name("user2").login("login2").password("pass")
-                .role(UserRole.ROLE_USER).enabled(true).registerDate(LocalDateTime.now()).build());
-        user3 = userRepository.save(User.builder().name("user3").login("login3").password("pass")
-                .role(UserRole.ROLE_USER).enabled(true).registerDate(LocalDateTime.now()).build());
-        user4 = userRepository.save(User.builder().name("user4").login("login4").password("pass")
-                .role(UserRole.ROLE_USER).enabled(true).registerDate(LocalDateTime.now()).build());
-        user5 = userRepository.save(User.builder().name("user5").login("login5").password("pass")
-                .role(UserRole.ROLE_USER).enabled(true).registerDate(LocalDateTime.now()).build());
-        user6 = userRepository.save(User.builder().name("user6").login("login6").password("pass")
-                .role(UserRole.ROLE_USER).enabled(true).registerDate(LocalDateTime.now()).build());
+        user1 = userRepository.save(User.builder().login("login1").role(UserRole.ROLE_USER).enabled(true).build());
+        user2 = userRepository.save(User.builder().login("login2").role(UserRole.ROLE_USER).enabled(true).build());
+        user3 = userRepository.save(User.builder().login("login3").role(UserRole.ROLE_USER).enabled(true).build());
+        user4 = userRepository.save(User.builder().login("login4").role(UserRole.ROLE_USER).enabled(true).build());
+        user5 = userRepository.save(User.builder().login("login5").role(UserRole.ROLE_USER).enabled(true).build());
+        user6 = userRepository.save(User.builder().login("login6").role(UserRole.ROLE_USER).enabled(true).build());
 
         City city17 = cityRepository.save(City.builder().name("city-17").cyrillicName("city-17").build());
 

@@ -5,13 +5,12 @@ import an.evdokimov.discount.watcher.server.api.product.dto.request.NewProductRe
 import an.evdokimov.discount.watcher.server.api.product.dto.request.NewProductWithCookiesRequest;
 import an.evdokimov.discount.watcher.server.api.product.dto.response.LentaProductPriceResponse;
 import an.evdokimov.discount.watcher.server.api.product.dto.response.ProductResponse;
+import an.evdokimov.discount.watcher.server.configuration.SecurityConfiguration;
 import an.evdokimov.discount.watcher.server.service.product.ProductServiceImpl;
-import an.evdokimov.securitystarter.security.authentication.jwt.JwtUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
@@ -38,14 +37,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @WebMvcTest(ProductController.class)
 @Import({TestConfig.class, SecurityConfiguration.class})
 class ProductControllerTest {
-    @Value("${application.security.header.authentication}")
-    private String authHeaderName;
+    private static final String AUTH_HEADER_NAME = "Authenticated-User";
+    private static final String AUTH_USER = "test_user";
 
     @Autowired
     private TestConfig testConfig;
-
-    @Autowired
-    private JwtUtils jwtUtils;
 
     @Autowired
     private ObjectMapper mapper;
@@ -73,7 +69,7 @@ class ProductControllerTest {
                 .build();
 
         MvcResult result = mvc.perform(put("/api/products/add_by_shop_id")
-                        .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
+                        .header(AUTH_HEADER_NAME, AUTH_USER)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(mapper.writeValueAsString(request)))
                 .andReturn();
@@ -93,7 +89,7 @@ class ProductControllerTest {
                 .build();
 
         MvcResult result = mvc.perform(put("/api/products/add_by_shop_id")
-                        .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
+                        .header(AUTH_HEADER_NAME, AUTH_USER)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(mapper.writeValueAsString(request)))
                 .andReturn();
@@ -113,33 +109,13 @@ class ProductControllerTest {
                 .build();
 
         MvcResult result = mvc.perform(put("/api/products/add_by_shop_id")
-                        .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
+                        .header(AUTH_HEADER_NAME, AUTH_USER)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(mapper.writeValueAsString(request)))
                 .andReturn();
 
         assertAll(
                 () -> assertEquals(400, result.getResponse().getStatus()),
-                () -> verify(productService, times(0))
-                        .addProduct(eq(testConfig.getTestUser()), eq(request))
-        );
-    }
-
-    @Test
-    void addProduct_invalidJwt_http401() throws Exception {
-        NewProductRequest request = NewProductRequest.builder()
-                .shopId(1L)
-                .url(new URL("https://test_url.com"))
-                .build();
-
-        MvcResult result = mvc.perform(put("/api/products/add_by_shop_id")
-                        .header(authHeaderName, "Bearer wrong_token")
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(mapper.writeValueAsString(request)))
-                .andReturn();
-
-        assertAll(
-                () -> assertEquals(401, result.getResponse().getStatus()),
                 () -> verify(productService, times(0))
                         .addProduct(eq(testConfig.getTestUser()), eq(request))
         );
@@ -162,7 +138,7 @@ class ProductControllerTest {
                 .build();
 
         MvcResult result = mvc.perform(put("/api/products/add_by_cookies")
-                        .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
+                        .header(AUTH_HEADER_NAME, AUTH_USER)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(mapper.writeValueAsString(request)))
                 .andReturn();
@@ -182,7 +158,7 @@ class ProductControllerTest {
                 .build();
 
         MvcResult result = mvc.perform(put("/api/products/add_by_cookies")
-                        .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
+                        .header(AUTH_HEADER_NAME, AUTH_USER)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(mapper.writeValueAsString(request)))
                 .andReturn();
@@ -202,7 +178,7 @@ class ProductControllerTest {
                 .build();
 
         MvcResult result = mvc.perform(put("/api/products/add_by_cookies")
-                        .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
+                        .header(AUTH_HEADER_NAME, AUTH_USER)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(mapper.writeValueAsString(request)))
                 .andReturn();
@@ -215,32 +191,12 @@ class ProductControllerTest {
     }
 
     @Test
-    void addProductByCookie_invalidJwt_http401() throws Exception {
-        NewProductWithCookiesRequest request = NewProductWithCookiesRequest.builder()
-                .cookies("COOKIES!!!")
-                .url(new URL("https://test_url.com"))
-                .build();
-
-        MvcResult result = mvc.perform(put("/api/products/add_by_cookies")
-                        .header(authHeaderName, "Bearer wrong_token")
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(mapper.writeValueAsString(request)))
-                .andReturn();
-
-        assertAll(
-                () -> assertEquals(401, result.getResponse().getStatus()),
-                () -> verify(productService, times(0))
-                        .addProduct(eq(testConfig.getTestUser()), eq(request))
-        );
-    }
-
-    @Test
     void getProduct_validJwt_http200() throws Exception {
         ProductResponse expectedProductResponse = ProductResponse.builder().id(1L).build();
         when(productService.getProduct(anyLong())).thenReturn(expectedProductResponse);
 
         MvcResult result = mvc.perform(get("/api/product/" + expectedProductResponse.getId())
-                .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
+                .header(AUTH_HEADER_NAME, AUTH_USER)
         ).andReturn();
 
         ProductResponse returnedProductResponse =
@@ -251,21 +207,6 @@ class ProductControllerTest {
                 () -> assertEquals(expectedProductResponse, returnedProductResponse),
                 () -> verify(productService, times(1))
                         .getProduct(expectedProductResponse.getId())
-        );
-    }
-
-    @Test
-    void getProduct_invalidJwt_http401() throws Exception {
-        ProductResponse expectedProductResponse = ProductResponse.builder().id(1L).build();
-        when(productService.getProduct(anyLong())).thenReturn(expectedProductResponse);
-
-        MvcResult result = mvc.perform(get("/api/product/" + expectedProductResponse.getId())
-                .header(authHeaderName, "invalid jwt")
-        ).andReturn();
-
-        assertAll(
-                () -> assertEquals(401, result.getResponse().getStatus()),
-                () -> verify(productService, times(0)).getProduct(anyLong())
         );
     }
 }

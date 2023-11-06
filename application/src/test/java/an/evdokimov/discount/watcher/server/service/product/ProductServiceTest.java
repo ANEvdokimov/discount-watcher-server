@@ -21,11 +21,11 @@ import an.evdokimov.discount.watcher.server.database.product.repository.ProductR
 import an.evdokimov.discount.watcher.server.database.product.repository.UserProductRepository;
 import an.evdokimov.discount.watcher.server.database.shop.model.Shop;
 import an.evdokimov.discount.watcher.server.database.shop.repository.ShopRepository;
-import an.evdokimov.discount.watcher.server.database.user.model.User;
 import an.evdokimov.discount.watcher.server.mapper.product.ParsedProductPriceMapper;
 import an.evdokimov.discount.watcher.server.mapper.product.ProductMapper;
 import an.evdokimov.discount.watcher.server.mapper.product.ProductPriceMapper;
 import an.evdokimov.discount.watcher.server.mapper.product.UserProductMapper;
+import an.evdokimov.discount.watcher.server.security.user.model.User;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -100,7 +100,7 @@ class ProductServiceTest {
                 false
         );
 
-        User mockedUser = User.builder().id(66L).build();
+        User mockedUser = User.builder().login("login").build();
         Shop mockedShop = Shop.builder().id(666L).build();
         ProductInformation mockedInformation = ProductInformation.builder()
                 .id(11L)

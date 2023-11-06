@@ -4,18 +4,17 @@ import an.evdokimov.discount.watcher.server.api.TestConfig;
 import an.evdokimov.discount.watcher.server.api.city.dto.response.CityResponse;
 import an.evdokimov.discount.watcher.server.api.shop.dto.response.ShopChainResponse;
 import an.evdokimov.discount.watcher.server.api.shop.dto.response.ShopChainWithShopsResponse;
+import an.evdokimov.discount.watcher.server.configuration.SecurityConfiguration;
 import an.evdokimov.discount.watcher.server.database.city.model.City;
 import an.evdokimov.discount.watcher.server.database.shop.model.Shop;
 import an.evdokimov.discount.watcher.server.database.shop.model.ShopChain;
 import an.evdokimov.discount.watcher.server.service.shop.ShopChainServiceImpl;
-import an.evdokimov.securitystarter.security.authentication.jwt.JwtUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
@@ -30,23 +29,19 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(ShopChainController.class)
 @Import({TestConfig.class, SecurityConfiguration.class})
 class ShopChainControllerTest {
-    @Value("${application.security.header.authentication}")
-    private String authHeaderName;
+    private static final String AUTH_HEADER_NAME = "Authenticated-User";
+    private static final String AUTH_USER = "test_user";
 
     @Autowired
     private MockMvc mvc;
 
     @Autowired
     private ObjectMapper objectMapper;
-
-    @Autowired
-    private JwtUtils jwtUtils;
 
     @MockBean
     private ShopChainServiceImpl service;
@@ -116,7 +111,7 @@ class ShopChainControllerTest {
     @Test
     void getAllShopChains_NoCityId_http200() throws Exception {
         MvcResult result = mvc.perform(get("/api/shop_chains")
-                        .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user")))
+                        .header(AUTH_HEADER_NAME, AUTH_USER))
                 .andReturn();
 
         Object resultContent = objectMapper.readValue(
@@ -133,7 +128,7 @@ class ShopChainControllerTest {
     @Test
     void getAllShopChains_withShopsNoCityId_http200() throws Exception {
         MvcResult result = mvc.perform(get("/api/shop_chains")
-                        .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
+                        .header(AUTH_HEADER_NAME, AUTH_USER)
                         .header("With-Shops", "true"))
                 .andReturn();
 
@@ -152,7 +147,7 @@ class ShopChainControllerTest {
     @Test
     void getAllShopChains_withShopsCityId17_http200() throws Exception {
         MvcResult result = mvc.perform(get("/api/shop_chains")
-                        .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
+                        .header(AUTH_HEADER_NAME, AUTH_USER)
                         .header("With-Shops", "true")
                         .header("City-Id", 17))
                 .andReturn();
@@ -167,14 +162,5 @@ class ShopChainControllerTest {
                 () -> assertEquals(200, result.getResponse().getStatus()),
                 () -> assertEquals(scWithShopsResponsesInCity17, resultContent)
         );
-    }
-
-    @Test
-    void getAllShopChains_wrongToken_http401() throws Exception {
-        mvc.perform(get("/api/shop_chains")
-                        .header(authHeaderName, "Bearer wrong token")
-                        .header("With-Shops", "true")
-                        .header("City-Id", 17))
-                .andExpect(status().isUnauthorized());
     }
 }

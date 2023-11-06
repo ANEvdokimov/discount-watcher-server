@@ -2,13 +2,12 @@ package an.evdokimov.discount.watcher.server.api.city.controller;
 
 import an.evdokimov.discount.watcher.server.api.TestConfig;
 import an.evdokimov.discount.watcher.server.api.city.dto.response.CityResponse;
+import an.evdokimov.discount.watcher.server.configuration.SecurityConfiguration;
 import an.evdokimov.discount.watcher.server.service.city.CityServiceImpl;
-import an.evdokimov.securitystarter.security.authentication.jwt.JwtUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
@@ -33,17 +32,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(CityController.class)
 @Import({TestConfig.class, SecurityConfiguration.class})
 class CityControllerTest {
-    @Value("${application.security.header.authentication}")
-    private String authHeaderName;
+    private static final String AUTH_HEADER_NAME = "Authenticated-User";
+    private static final String AUTH_USER = "test_user";
 
     @Autowired
     private MockMvc mvc;
 
     @Autowired
     private ObjectMapper objectMapper;
-
-    @Autowired
-    private JwtUtils jwtUtils;
 
     @MockBean
     private CityServiceImpl cityService;
@@ -57,7 +53,7 @@ class CityControllerTest {
         when(cityService.getAll()).thenReturn(cities);
 
         MvcResult result = mvc.perform(get("/api/cities")
-                        .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user")))
+                        .header(AUTH_HEADER_NAME, AUTH_USER))
                 .andReturn();
 
         assertAll(
@@ -73,9 +69,8 @@ class CityControllerTest {
     }
 
     @Test
-    void getAllCities_invalidJwt_http200() throws Exception {
-        mvc.perform(get("/api/cities")
-                        .header(authHeaderName, "Bearer wrong_token"))
+    void getAllCities_invalidJwt_http401() throws Exception {
+        mvc.perform(get("/api/cities"))
                 .andExpect(status().isUnauthorized());
     }
 }

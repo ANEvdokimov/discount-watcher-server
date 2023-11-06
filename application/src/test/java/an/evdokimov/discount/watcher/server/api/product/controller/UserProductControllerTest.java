@@ -4,13 +4,12 @@ import an.evdokimov.discount.watcher.server.api.TestConfig;
 import an.evdokimov.discount.watcher.server.api.error.ServerErrorCode;
 import an.evdokimov.discount.watcher.server.api.product.dto.request.UserProductRequest;
 import an.evdokimov.discount.watcher.server.api.product.dto.response.UserProductResponse;
+import an.evdokimov.discount.watcher.server.configuration.SecurityConfiguration;
 import an.evdokimov.discount.watcher.server.service.product.UserProductServiceImpl;
-import an.evdokimov.securitystarter.security.authentication.jwt.JwtUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
@@ -44,14 +43,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @WebMvcTest(UserProductController.class)
 @Import({TestConfig.class, SecurityConfiguration.class})
 public class UserProductControllerTest {
-    @Value("${application.security.header.authentication}")
-    private String authHeaderName;
+    private static final String AUTH_HEADER_NAME = "Authenticated-User";
+    private static final String AUTH_USER = "test_user";
 
     @Autowired
     private TestConfig testConfig;
-
-    @Autowired
-    private JwtUtils jwtUtils;
 
     @Autowired
     private ObjectMapper mapper;
@@ -78,7 +74,7 @@ public class UserProductControllerTest {
         ).thenReturn(products);
 
         MvcResult result = mvc.perform(get("/api/products/by_user")
-                .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
+                .header(AUTH_HEADER_NAME, AUTH_USER)
                 .header("only-active", true)
                 .header("monitor-availability", true)
         ).andReturn();
@@ -136,7 +132,7 @@ public class UserProductControllerTest {
         ).thenReturn(products);
 
         MvcResult result = mvc.perform(get("/api/products/by_user")
-                .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
+                .header(AUTH_HEADER_NAME, AUTH_USER)
                 .header("only-active", true)
                 .header("monitor-availability", false)
                 .header("monitor-discount", true)
@@ -187,7 +183,7 @@ public class UserProductControllerTest {
         ).thenReturn(products);
 
         MvcResult result = mvc.perform(get("/api/products/by_user")
-                .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
+                .header(AUTH_HEADER_NAME, AUTH_USER)
                 .header("only-active", true)
                 .header("monitor-price-changes", true)
         ).andReturn();
@@ -245,7 +241,7 @@ public class UserProductControllerTest {
         ).thenReturn(products);
 
         MvcResult result = mvc.perform(get("/api/products/by_user")
-                .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
+                .header(AUTH_HEADER_NAME, AUTH_USER)
                 .header("only-active", true)
                 .header("monitor-availability", true)
                 .header("monitor-discount", true)
@@ -305,7 +301,7 @@ public class UserProductControllerTest {
         ).thenReturn(products);
 
         MvcResult result = mvc.perform(get("/api/products/by_user")
-                .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
+                .header(AUTH_HEADER_NAME, AUTH_USER)
                 .header("only-active", true)
                 .header("monitor-availability", true)
                 .header("shop-id", 1)
@@ -348,7 +344,7 @@ public class UserProductControllerTest {
         ).thenReturn(products);
 
         MvcResult result = mvc.perform(get("/api/products/by_user")
-                .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
+                .header(AUTH_HEADER_NAME, AUTH_USER)
                 .header("only-active", true)
                 .header("monitor-discount", true)
                 .header("shop-id", 1)
@@ -391,7 +387,7 @@ public class UserProductControllerTest {
         ).thenReturn(products);
 
         MvcResult result = mvc.perform(get("/api/products/by_user")
-                .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
+                .header(AUTH_HEADER_NAME, AUTH_USER)
                 .header("only-active", true)
                 .header("monitor-price-changes", true)
                 .header("shop-id", 1)
@@ -434,7 +430,7 @@ public class UserProductControllerTest {
         ).thenReturn(products);
 
         MvcResult result = mvc.perform(get("/api/products/by_user")
-                .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
+                .header(AUTH_HEADER_NAME, AUTH_USER)
                 .header("only-active", true)
                 .header("monitor-discount", true)
                 .header("monitor-price-changes", true)
@@ -462,38 +458,6 @@ public class UserProductControllerTest {
     }
 
     @Test
-    void getUserProducts_invalidJwt_http401() throws Exception {
-        List<UserProductResponse> products = List.of(
-                UserProductResponse.builder().id(0L).build(),
-                UserProductResponse.builder().id(1L).build(),
-                UserProductResponse.builder().id(2L).build()
-        );
-
-        when(service.getUserProducts(
-                any(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean())
-        ).thenReturn(Collections.emptyList());
-        when(service.getUserProducts(
-                eq(testConfig.getTestUser()), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean())
-        ).thenReturn(products);
-
-        MvcResult result = mvc.perform(get("/api/products/by_user")
-                .header(authHeaderName, "wrong jwt")
-        ).andReturn();
-
-        assertAll(
-                () -> assertEquals(401, result.getResponse().getStatus()),
-                () -> verify(service, times(0))
-                        .getUserProducts(
-                                eq(testConfig.getTestUser()),
-                                anyBoolean(),
-                                anyBoolean(),
-                                anyBoolean(),
-                                anyBoolean()
-                        )
-        );
-    }
-
-    @Test
     void getUserProducts_withoutPriceHistoryHeader_400() throws Exception {
         List<UserProductResponse> products = List.of(
                 UserProductResponse.builder().id(0L).build(),
@@ -502,7 +466,7 @@ public class UserProductControllerTest {
         );
 
         MvcResult result = mvc.perform(get("/api/products/by_user")
-                .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
+                .header(AUTH_HEADER_NAME, AUTH_USER)
         ).andReturn();
 
         assertAll(
@@ -538,7 +502,7 @@ public class UserProductControllerTest {
                 .build();
 
         MvcResult result = mvc.perform(post("/api/products/by_user")
-                        .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
+                        .header(AUTH_HEADER_NAME, AUTH_USER)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(mapper.writeValueAsString(userProduct)))
                 .andReturn();
@@ -556,7 +520,7 @@ public class UserProductControllerTest {
                 .build();
 
         MvcResult result = mvc.perform(post("/api/products/by_user")
-                        .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
+                        .header(AUTH_HEADER_NAME, AUTH_USER)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(mapper.writeValueAsString(userProduct)))
                 .andReturn();
@@ -578,7 +542,7 @@ public class UserProductControllerTest {
                 .when(service).update(any(), eq(userProduct));
 
         MvcResult result = mvc.perform(post("/api/products/by_user")
-                        .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user"))
+                        .header(AUTH_HEADER_NAME, AUTH_USER)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(mapper.writeValueAsString(userProduct)))
                 .andReturn();
@@ -589,7 +553,7 @@ public class UserProductControllerTest {
     @Test
     void delete_userProduct_http200() throws Exception {
         MvcResult result = mvc.perform(delete("/api/products/by_user/666")
-                        .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user")))
+                        .header(AUTH_HEADER_NAME, AUTH_USER))
                 .andReturn();
 
         assertEquals(200, result.getResponse().getStatus());
@@ -598,7 +562,7 @@ public class UserProductControllerTest {
     @Test
     void delete_noId_http404() throws Exception {
         MvcResult result = mvc.perform(delete("/api/products/by_user/")
-                        .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user")))
+                        .header(AUTH_HEADER_NAME, AUTH_USER))
                 .andReturn();
 
         assertEquals(404, result.getResponse().getStatus());
@@ -610,7 +574,7 @@ public class UserProductControllerTest {
                 .when(service).delete(any(), eq(666L));
 
         MvcResult result = mvc.perform(delete("/api/products/by_user/666")
-                        .header(authHeaderName, "Bearer " + jwtUtils.generateToken("test_user")))
+                        .header(AUTH_HEADER_NAME, AUTH_USER))
                 .andReturn();
 
         assertEquals(400, result.getResponse().getStatus());
