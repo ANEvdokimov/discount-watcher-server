@@ -17,5 +17,5 @@ jobs:
           architecture: x64
       - run: gradle bootJar
       - run: docker login --username ${{secrets.DOCKER_USER}} --password ${{secrets.DOCKER_PASSWORD}} ${{secrets.REGISTRY_URL}}
-      - run: docker build -t "${{secrets.REGISTRY_URL}}/ANEvdokimov/discount-watcher-server:test" .
-      - run: docker push "${{secrets.REGISTRY_URL}}/ANEvdokimov/discount-watcher-server:test"
+      - run: docker build -t "${{secrets.REGISTRY_URL}}/anevdokimov/discount-watcher-server:test" .
+      - run: docker push "${{secrets.REGISTRY_URL}}/anevdokimov/discount-watcher-server:test"
