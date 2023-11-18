@@ -23,7 +23,7 @@ public class SecurityConfiguration {
                 new UserLoginExtractorAuthenticationProcessingFilter(userService);
 
         return httpSecurity
-                .securityMatcher("/**")
+                .securityMatcher("/api/**")
                 .authorizeHttpRequests(configurer -> configurer.anyRequest().authenticated())
                 .addFilterAt(filter, UsernamePasswordAuthenticationFilter.class)
                 .csrf(AbstractHttpConfigurer::disable)
