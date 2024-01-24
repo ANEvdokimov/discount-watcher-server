@@ -8,16 +8,16 @@ import org.hibernate.Hibernate;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-import org.mapstruct.NullValuePropertyMappingStrategy;
 
 import java.util.Map;
 import java.util.function.BiConsumer;
 
 import static org.mapstruct.MappingConstants.ComponentModel.SPRING;
+import static org.mapstruct.NullValuePropertyMappingStrategy.IGNORE;
 
 @Mapper(
         componentModel = SPRING,
-        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE
+        nullValuePropertyMappingStrategy = IGNORE
 )
 public abstract class ParsedProductPriceMapper {
     private final Map<Class<? extends ProductPrice>, BiConsumer<ParsedProductPrice, ProductPrice>> mappers =
@@ -35,6 +35,10 @@ public abstract class ParsedProductPriceMapper {
     }
 
     @Mapping(target = "output.parsingStatus", constant = "COMPLETE")
+    @Mapping(target = "output.product", ignore = true)
+    @Mapping(target = "output.creationDate", ignore = true)
+    @Mapping(target = "output.priceChange", ignore = true)
+    @Mapping(target = "output.version", ignore = true)
     public abstract void updateNotNullFieldsToProductPrice(ParsedProductPrice input,
                                                            @MappingTarget ProductPrice output);
 
@@ -47,6 +51,10 @@ public abstract class ParsedProductPriceMapper {
     }
 
     @Mapping(target = "output.parsingStatus", constant = "COMPLETE")
+    @Mapping(target = "output.product", ignore = true)
+    @Mapping(target = "output.creationDate", ignore = true)
+    @Mapping(target = "output.priceChange", ignore = true)
+    @Mapping(target = "output.version", ignore = true)
     public abstract void updateNotNullFieldsToLentaProductPrice(ParsedLentaProductPrice input,
                                                                 @MappingTarget LentaProductPrice output);
 }
