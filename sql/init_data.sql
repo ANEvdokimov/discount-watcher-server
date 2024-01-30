@@ -14,4 +14,4 @@ VALUES (nextval('shop_sequence'),
         'Магнит Семейный на Перелета',
         (SELECT id FROM city WHERE name = 'Omsk'),
         'ул. Перелета 32/1',
-        'shopCode=992301; shopId=4268;');
+        'shopCode=995506; shopId=52011');
