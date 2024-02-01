@@ -3,9 +3,6 @@ package an.evdokimov.discount.watcher.server.database.product.repository;
 import an.evdokimov.discount.watcher.server.database.product.model.ParsingStatus;
 import an.evdokimov.discount.watcher.server.database.product.model.ProductInformation;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.net.URL;
@@ -26,8 +23,4 @@ public interface ProductInformationRepository extends JpaRepository<ProductInfor
             return informationFromDb.get();
         }
     }
-
-    @Modifying
-    @Query("update ProductInformation pi set pi.name = :name, pi.parsingStatus = 'COMPLETE' where pi.id = :id")
-    int updateNameById(@Param("id") Long id, @Param("name") String name);
 }

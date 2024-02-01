@@ -9,6 +9,7 @@ import an.evdokimov.discount.watcher.server.api.error.ServerException;
 import an.evdokimov.discount.watcher.server.api.product.dto.request.NewProductRequest;
 import an.evdokimov.discount.watcher.server.api.product.dto.request.NewProductWithCookiesRequest;
 import an.evdokimov.discount.watcher.server.api.product.dto.response.ProductResponse;
+import an.evdokimov.discount.watcher.server.database.product.model.ParsingStatus;
 import an.evdokimov.discount.watcher.server.database.product.model.PriceChange;
 import an.evdokimov.discount.watcher.server.database.product.model.Product;
 import an.evdokimov.discount.watcher.server.database.product.model.ProductInformation;
@@ -197,8 +198,12 @@ public class ProductServiceImpl implements ProductService {
         productPriceRepository.save(priceInDb);
 
         if (StringUtils.isNotBlank(parsedProduct.getName())) {
-            if (productInformationRepository.updateNameById(parsedProduct.getId(), parsedProduct.getName()) != 1) {
-                ServerErrorCode.PRODUCT_INFORMATION_NOT_FOUND.throwException(parsedProduct.toString());
+            ProductInformation information = productInformationRepository.findById(parsedProduct.getId())
+                    .orElseThrow(() -> ServerErrorCode.PRODUCT_INFORMATION_NOT_FOUND.getException(parsedProduct.toString()));
+            if (!parsedProduct.getName().equals(information.getName())
+                    || !information.getParsingStatus().equals(ParsingStatus.COMPLETE)) {
+                information.setName(parsedProduct.getName());
+                information.setParsingStatus(ParsingStatus.COMPLETE);
             }
         }
     }

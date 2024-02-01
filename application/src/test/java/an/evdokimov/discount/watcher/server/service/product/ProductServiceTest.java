@@ -244,17 +244,16 @@ class ProductServiceTest {
                 .parsingStatus(ParsingStatus.PROCESSING)
                 .product(productFromDb)
                 .build();
+        ProductInformation mockedInfo = ProductInformation.builder()
+                .id(1L)
+                .name("wrong_name")
+                .url(new URL("http://shop.com"))
+                .parsingStatus(ParsingStatus.PROCESSING)
+                .build();
 
         when(productPriceRepository.findById(testedParsedPrice.getId())).thenReturn(Optional.of(mockedPriceFromDb));
         when(productPriceRepository.findLastCompletedPriceByProduct(productFromDb)).thenReturn(Optional.empty());
-        when(productInformationRepository.updateNameById(
-                testedParsedInformation.getId(),
-                testedParsedInformation.getName())
-        ).thenReturn(1);
-        when(productInformationRepository.updateNameById(
-                testedParsedInformation.getId(),
-                testedParsedInformation.getName())
-        ).thenReturn(1);
+        when(productInformationRepository.findById(mockedInfo.getId())).thenReturn(Optional.of(mockedInfo));
         doAnswer(invocation -> {
             ParsedProductPrice parsedProductPrice = invocation.getArgument(0, ParsedProductPrice.class);
             ProductPrice productPrice = invocation.getArgument(1, ProductPrice.class);
@@ -273,8 +272,8 @@ class ProductServiceTest {
 
         assertEquals(PriceChange.FIRST_PRICE, mockedPriceFromDb.getPriceChange());
         verify(productPriceRepository).save(mockedPriceFromDb);
-        verify(productInformationRepository)
-                .updateNameById(testedParsedInformation.getId(), testedParsedInformation.getName());
+        assertEquals(testedParsedInformation.getName(), mockedInfo.getName());
+        assertEquals(ParsingStatus.COMPLETE, mockedInfo.getParsingStatus());
     }
 
     @SneakyThrows
@@ -303,20 +302,23 @@ class ProductServiceTest {
                 .parsingStatus(ParsingStatus.PROCESSING)
                 .product(productFromDb)
                 .build();
+        ProductInformation mockedInfo = ProductInformation.builder()
+                .id(1L)
+                .name("wrong_name")
+                .url(new URL("http://shop.com"))
+                .parsingStatus(ParsingStatus.PROCESSING)
+                .build();
 
         when(productPriceRepository.findById(testedParsedPrice.getId())).thenReturn(Optional.of(mockedPriceFromDb));
         when(productPriceRepository.findLastCompletedPriceByProduct(productFromDb)).thenReturn(Optional.empty());
-        when(productInformationRepository.updateNameById(
-                testedParsedInformation.getId(),
-                testedParsedInformation.getName())
-        ).thenReturn(1);
+        when(productInformationRepository.findById(mockedInfo.getId())).thenReturn(Optional.of(mockedInfo));
 
         testedProductService.saveParsedProduct(testedParsedInformation);
 
         assertEquals(PriceChange.UNDEFINED, mockedPriceFromDb.getPriceChange());
         verify(productPriceRepository).save(mockedPriceFromDb);
-        verify(productInformationRepository)
-                .updateNameById(testedParsedInformation.getId(), testedParsedInformation.getName());
+        assertEquals(testedParsedInformation.getName(), mockedInfo.getName());
+        assertEquals(ParsingStatus.COMPLETE, mockedInfo.getParsingStatus());
     }
 
     @SneakyThrows
@@ -355,20 +357,23 @@ class ProductServiceTest {
                 .parsingStatus(ParsingStatus.COMPLETE)
                 .priceChange(PriceChange.FIRST_PRICE)
                 .build();
+        ProductInformation mockedInfo = ProductInformation.builder()
+                .id(1L)
+                .name("wrong_name")
+                .url(new URL("http://shop.com"))
+                .parsingStatus(ParsingStatus.PROCESSING)
+                .build();
 
         when(productPriceRepository.findById(testedParsedPrice.getId())).thenReturn(Optional.of(mockedPriceFromDb));
         when(productPriceRepository.findLastCompletedPriceByProduct(productFromDb)).thenReturn(Optional.of(previousPriceFromDb));
-        when(productInformationRepository.updateNameById(
-                testedParsedInformation.getId(),
-                testedParsedInformation.getName())
-        ).thenReturn(1);
+        when(productInformationRepository.findById(mockedInfo.getId())).thenReturn(Optional.of(mockedInfo));
 
         testedProductService.saveParsedProduct(testedParsedInformation);
 
         assertEquals(PriceChange.UNDEFINED, mockedPriceFromDb.getPriceChange());
         verify(productPriceRepository).save(mockedPriceFromDb);
-        verify(productInformationRepository)
-                .updateNameById(testedParsedInformation.getId(), testedParsedInformation.getName());
+        assertEquals(testedParsedInformation.getName(), mockedInfo.getName());
+        assertEquals(ParsingStatus.COMPLETE, mockedInfo.getParsingStatus());
     }
 
     @SneakyThrows
@@ -397,6 +402,12 @@ class ProductServiceTest {
                 .parsingStatus(ParsingStatus.PROCESSING)
                 .product(productFromDb)
                 .build();
+        ProductInformation mockedInfo = ProductInformation.builder()
+                .id(1L)
+                .name("wrong_name")
+                .url(new URL("http://shop.com"))
+                .parsingStatus(ParsingStatus.PROCESSING)
+                .build();
 
         ProductPrice previousPriceFromDb = ProductPrice.builder()
                 .id(665L)
@@ -410,10 +421,7 @@ class ProductServiceTest {
 
         when(productPriceRepository.findById(testedParsedPrice.getId())).thenReturn(Optional.of(mockedPriceFromDb));
         when(productPriceRepository.findLastCompletedPriceByProduct(productFromDb)).thenReturn(Optional.of(previousPriceFromDb));
-        when(productInformationRepository.updateNameById(
-                testedParsedInformation.getId(),
-                testedParsedInformation.getName())
-        ).thenReturn(1);
+        when(productInformationRepository.findById(mockedInfo.getId())).thenReturn(Optional.of(mockedInfo));
         doAnswer(invocation -> {
             ParsedProductPrice parsedProductPrice = invocation.getArgument(0, ParsedProductPrice.class);
             ProductPrice productPrice = invocation.getArgument(1, ProductPrice.class);
@@ -432,8 +440,8 @@ class ProductServiceTest {
 
         assertEquals(PriceChange.EQUAL, mockedPriceFromDb.getPriceChange());
         verify(productPriceRepository).save(mockedPriceFromDb);
-        verify(productInformationRepository)
-                .updateNameById(testedParsedInformation.getId(), testedParsedInformation.getName());
+        assertEquals(testedParsedInformation.getName(), mockedInfo.getName());
+        assertEquals(ParsingStatus.COMPLETE, mockedInfo.getParsingStatus());
     }
 
     @SneakyThrows
@@ -462,6 +470,12 @@ class ProductServiceTest {
                 .parsingStatus(ParsingStatus.PROCESSING)
                 .product(productFromDb)
                 .build();
+        ProductInformation mockedInfo = ProductInformation.builder()
+                .id(1L)
+                .name("wrong_name")
+                .url(new URL("http://shop.com"))
+                .parsingStatus(ParsingStatus.PROCESSING)
+                .build();
 
         ProductPrice previousPriceFromDb = ProductPrice.builder()
                 .id(665L)
@@ -475,10 +489,7 @@ class ProductServiceTest {
 
         when(productPriceRepository.findById(testedParsedPrice.getId())).thenReturn(Optional.of(mockedPriceFromDb));
         when(productPriceRepository.findLastCompletedPriceByProduct(productFromDb)).thenReturn(Optional.of(previousPriceFromDb));
-        when(productInformationRepository.updateNameById(
-                testedParsedInformation.getId(),
-                testedParsedInformation.getName())
-        ).thenReturn(1);
+        when(productInformationRepository.findById(mockedInfo.getId())).thenReturn(Optional.of(mockedInfo));
         doAnswer(invocation -> {
             ParsedProductPrice parsedProductPrice = invocation.getArgument(0, ParsedProductPrice.class);
             ProductPrice productPrice = invocation.getArgument(1, ProductPrice.class);
@@ -497,8 +508,8 @@ class ProductServiceTest {
 
         assertEquals(PriceChange.UP, mockedPriceFromDb.getPriceChange());
         verify(productPriceRepository).save(mockedPriceFromDb);
-        verify(productInformationRepository)
-                .updateNameById(testedParsedInformation.getId(), testedParsedInformation.getName());
+        assertEquals(testedParsedInformation.getName(), mockedInfo.getName());
+        assertEquals(ParsingStatus.COMPLETE, mockedInfo.getParsingStatus());
     }
 
     @SneakyThrows
@@ -527,6 +538,12 @@ class ProductServiceTest {
                 .parsingStatus(ParsingStatus.PROCESSING)
                 .product(productFromDb)
                 .build();
+        ProductInformation mockedInfo = ProductInformation.builder()
+                .id(1L)
+                .name("wrong_name")
+                .url(new URL("http://shop.com"))
+                .parsingStatus(ParsingStatus.PROCESSING)
+                .build();
 
         ProductPrice previousPriceFromDb = ProductPrice.builder()
                 .id(665L)
@@ -540,10 +557,7 @@ class ProductServiceTest {
 
         when(productPriceRepository.findById(testedParsedPrice.getId())).thenReturn(Optional.of(mockedPriceFromDb));
         when(productPriceRepository.findLastCompletedPriceByProduct(productFromDb)).thenReturn(Optional.of(previousPriceFromDb));
-        when(productInformationRepository.updateNameById(
-                testedParsedInformation.getId(),
-                testedParsedInformation.getName())
-        ).thenReturn(1);
+        when(productInformationRepository.findById(mockedInfo.getId())).thenReturn(Optional.of(mockedInfo));
         doAnswer(invocation -> {
             ParsedProductPrice parsedProductPrice = invocation.getArgument(0, ParsedProductPrice.class);
             ProductPrice productPrice = invocation.getArgument(1, ProductPrice.class);
@@ -562,8 +576,8 @@ class ProductServiceTest {
 
         assertEquals(PriceChange.DOWN, mockedPriceFromDb.getPriceChange());
         verify(productPriceRepository).save(mockedPriceFromDb);
-        verify(productInformationRepository)
-                .updateNameById(testedParsedInformation.getId(), testedParsedInformation.getName());
+        assertEquals(testedParsedInformation.getName(), mockedInfo.getName());
+        assertEquals(ParsingStatus.COMPLETE, mockedInfo.getParsingStatus());
     }
 
     @SneakyThrows
