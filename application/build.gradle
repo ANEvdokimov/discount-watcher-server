@@ -53,6 +53,7 @@ dependencies {
 
 //  Database
     implementation 'org.postgresql:postgresql'
+    implementation 'org.flywaydb:flyway-core'
 
 //  Lombok
     compileOnly 'org.projectlombok:lombok'

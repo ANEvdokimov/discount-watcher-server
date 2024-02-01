@@ -1,4 +1,7 @@
 spring:
+  flyway:
+    user: postgres
+    password: mysecretpassword
   datasource:
     url: jdbc:postgresql://localhost:5432/postgres
     username: discount_watcher_server
