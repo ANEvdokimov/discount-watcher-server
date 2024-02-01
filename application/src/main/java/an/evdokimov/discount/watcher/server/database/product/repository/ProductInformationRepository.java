@@ -28,6 +28,6 @@ public interface ProductInformationRepository extends JpaRepository<ProductInfor
     }
 
     @Modifying
-    @Query("update ProductInformation pi set pi.name = :name where pi.id = :id")
+    @Query("update ProductInformation pi set pi.name = :name, pi.parsingStatus = 'COMPLETE' where pi.id = :id")
     int updateNameById(@Param("id") Long id, @Param("name") String name);
 }
