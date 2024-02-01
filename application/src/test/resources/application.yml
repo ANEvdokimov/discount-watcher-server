@@ -21,6 +21,9 @@ spring:
       schema: discount_watcher_schema_test
 
 application:
+  scheduler:
+    product:
+      update: "0 0 0,12 * * *" # every day at 0:00 and 12:00
   mq:
     input-queue-name: "dw-parser-input"
     output-queue-name: "dw-parser-output"

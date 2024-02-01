@@ -18,7 +18,7 @@ public class ProductUpdateScheduler {
     private final ProductRepository productRepository;
     private final ProductService productService;
 
-    @Scheduled(cron = "0 0 0,12 * * *", zone = "UTC") // every day at 0:00 and 12:00
+    @Scheduled(cron = "#{productSchedulerProperties.update}", zone = "UTC")
     @Transactional
     public void updateProducts() {
         log.info("Start updating products");
