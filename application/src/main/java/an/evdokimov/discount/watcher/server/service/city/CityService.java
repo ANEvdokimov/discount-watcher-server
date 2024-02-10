@@ -1,9 +1,11 @@
 package an.evdokimov.discount.watcher.server.service.city;
 
-import an.evdokimov.discount.watcher.server.api.city.dto.response.CityResponse;
+import an.evdokimov.discount.watcher.server.database.city.model.City;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 
 public interface CityService {
-    Collection<CityResponse> getAll();
+    @NotNull
+    Collection<City> getAll();
 }

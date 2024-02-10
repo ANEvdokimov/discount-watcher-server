@@ -2,8 +2,8 @@ package an.evdokimov.discount.watcher.server.api.city.controller;
 
 import an.evdokimov.discount.watcher.server.api.TestConfig;
 import an.evdokimov.discount.watcher.server.api.city.dto.response.CityResponse;
+import an.evdokimov.discount.watcher.server.api.city.maintenance.CityMaintenance;
 import an.evdokimov.discount.watcher.server.configuration.SecurityConfiguration;
-import an.evdokimov.discount.watcher.server.service.city.CityServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -42,7 +42,7 @@ class CityControllerTest {
     private ObjectMapper objectMapper;
 
     @MockBean
-    private CityServiceImpl cityService;
+    private CityMaintenance cityMaintenance;
 
     @Test
     void getAllCities_validJwt_http200() throws Exception {
@@ -50,7 +50,7 @@ class CityControllerTest {
                 CityResponse.builder().name("city 1").build(),
                 CityResponse.builder().name("city 2").build(),
                 CityResponse.builder().name("city 17").build());
-        when(cityService.getAll()).thenReturn(cities);
+        when(cityMaintenance.getAll()).thenReturn(cities);
 
         MvcResult result = mvc.perform(get("/api/cities")
                         .header(AUTH_HEADER_NAME, AUTH_USER))
@@ -58,7 +58,7 @@ class CityControllerTest {
 
         assertAll(
                 () -> assertEquals(200, result.getResponse().getStatus()),
-                () -> verify(cityService, times(1)).getAll(),
+                () -> verify(cityMaintenance, times(1)).getAll(),
                 () -> assertThat(
                         objectMapper.readValue(
                                 result.getResponse().getContentAsString(),

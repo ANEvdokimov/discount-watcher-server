@@ -1,7 +1,8 @@
 package an.evdokimov.discount.watcher.server.api.city.controller;
 
 import an.evdokimov.discount.watcher.server.api.city.dto.response.CityResponse;
-import an.evdokimov.discount.watcher.server.service.city.CityService;
+import an.evdokimov.discount.watcher.server.api.city.maintenance.CityMaintenance;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,12 +14,9 @@ import java.util.Collection;
 @RestController
 @RequestMapping("/api/cities")
 @Slf4j
+@RequiredArgsConstructor
 public class CityController {
-    private final CityService cityService;
-
-    public CityController(CityService cityService) {
-        this.cityService = cityService;
-    }
+    private final CityMaintenance cityMaintenance;
 
     /**
      * Getting supported cities.
@@ -29,6 +27,6 @@ public class CityController {
     public Collection<CityResponse> getAllCities() {
         log.debug("getting all cities");
 
-        return cityService.getAll();
+        return cityMaintenance.getAll();
     }
 }
