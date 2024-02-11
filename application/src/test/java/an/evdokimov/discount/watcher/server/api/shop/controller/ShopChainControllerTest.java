@@ -4,11 +4,11 @@ import an.evdokimov.discount.watcher.server.api.TestConfig;
 import an.evdokimov.discount.watcher.server.api.city.dto.response.CityResponse;
 import an.evdokimov.discount.watcher.server.api.shop.dto.response.ShopChainResponse;
 import an.evdokimov.discount.watcher.server.api.shop.dto.response.ShopChainWithShopsResponse;
+import an.evdokimov.discount.watcher.server.api.shop.maintenance.ShopChainMaintenance;
 import an.evdokimov.discount.watcher.server.configuration.SecurityConfiguration;
 import an.evdokimov.discount.watcher.server.database.city.model.City;
 import an.evdokimov.discount.watcher.server.database.shop.model.Shop;
 import an.evdokimov.discount.watcher.server.database.shop.model.ShopChain;
-import an.evdokimov.discount.watcher.server.service.shop.ShopChainServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,7 +44,7 @@ class ShopChainControllerTest {
     private ObjectMapper objectMapper;
 
     @MockBean
-    private ShopChainServiceImpl service;
+    private ShopChainMaintenance maintenance;
 
     private static List<ShopChainResponse> scResponsesInAllCity;
     private static List<ShopChainResponse> scResponsesInCity1;
@@ -100,12 +100,12 @@ class ShopChainControllerTest {
 
     @BeforeEach
     public void mockRepository() {
-        when(service.getShopChains(false, null)).thenReturn(scResponsesInAllCity);
-        when(service.getShopChains(false, 1L)).thenReturn(scResponsesInCity1);
-        when(service.getShopChains(false, 17L)).thenReturn(scResponsesInCity17);
-        when(service.getShopChains(true, null)).thenReturn(scWithShopsResponsesInAllCity);
-        when(service.getShopChains(true, 1L)).thenReturn(scWithShopsResponsesInCity1);
-        when(service.getShopChains(true, 17L)).thenReturn(scWithShopsResponsesInCity17);
+        when(maintenance.getShopChains(false, null)).thenReturn(scResponsesInAllCity);
+        when(maintenance.getShopChains(false, 1L)).thenReturn(scResponsesInCity1);
+        when(maintenance.getShopChains(false, 17L)).thenReturn(scResponsesInCity17);
+        when(maintenance.getShopChains(true, null)).thenReturn(scWithShopsResponsesInAllCity);
+        when(maintenance.getShopChains(true, 1L)).thenReturn(scWithShopsResponsesInCity1);
+        when(maintenance.getShopChains(true, 17L)).thenReturn(scWithShopsResponsesInCity17);
     }
 
     @Test

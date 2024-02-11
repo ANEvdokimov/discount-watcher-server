@@ -1,7 +1,8 @@
 package an.evdokimov.discount.watcher.server.api.shop.controller;
 
 import an.evdokimov.discount.watcher.server.api.shop.dto.response.ShopChainResponse;
-import an.evdokimov.discount.watcher.server.service.shop.ShopChainService;
+import an.evdokimov.discount.watcher.server.api.shop.maintenance.ShopChainMaintenance;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.lang.Nullable;
@@ -15,12 +16,9 @@ import java.util.Collection;
 @RestController
 @RequestMapping("/api/shop_chains")
 @Slf4j
+@RequiredArgsConstructor
 public class ShopChainController {
-    private final ShopChainService shopChainService;
-
-    public ShopChainController(ShopChainService shopChainService) {
-        this.shopChainService = shopChainService;
-    }
+    private final ShopChainMaintenance shopChainMaintenance;
 
     /**
      * Getting all supported shop chains.
@@ -35,6 +33,6 @@ public class ShopChainController {
             @Nullable @RequestHeader("City-Id") Long cityId) {
         log.debug("Getting all commercial networks. withShops: {}, cityId: {}", withShops, cityId);
 
-        return shopChainService.getShopChains(withShops, cityId);
+        return shopChainMaintenance.getShopChains(withShops, cityId);
     }
 }

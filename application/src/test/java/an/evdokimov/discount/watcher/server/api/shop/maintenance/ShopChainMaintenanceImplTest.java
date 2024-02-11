@@ -1,4 +1,4 @@
-package an.evdokimov.discount.watcher.server.service.shop;
+package an.evdokimov.discount.watcher.server.api.shop.maintenance;
 
 import an.evdokimov.discount.watcher.server.api.city.dto.response.CityResponse;
 import an.evdokimov.discount.watcher.server.api.shop.dto.response.ShopChainResponse;
@@ -6,9 +6,11 @@ import an.evdokimov.discount.watcher.server.api.shop.dto.response.ShopChainWithS
 import an.evdokimov.discount.watcher.server.database.city.model.City;
 import an.evdokimov.discount.watcher.server.database.shop.model.Shop;
 import an.evdokimov.discount.watcher.server.database.shop.model.ShopChain;
-import an.evdokimov.discount.watcher.server.database.shop.repository.ShopChainRepository;
+import an.evdokimov.discount.watcher.server.mapper.shop.ShopChainMapper;
+import an.evdokimov.discount.watcher.server.service.shop.ShopChainService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,14 +23,16 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest(classes = ShopChainServiceImpl.class)
+@SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class ShopChainServiceTest {
+class ShopChainMaintenanceImplTest {
     @MockBean
-    private ShopChainRepository repository;
+    private ShopChainService shopChainService;
+    @MockBean
+    private ShopChainMapper mapper;
 
     @Autowired
-    private ShopChainServiceImpl testedService;
+    private ShopChainMaintenanceImpl testedMaintenance;
 
     private ShopChain scInCity1;
     private ShopChain scInCities1And17;
@@ -79,37 +83,48 @@ class ShopChainServiceTest {
     }
 
     @BeforeEach
-    public void mockRepository() {
-        when(repository.findAll()).thenReturn(List.of(scInCity1, scInCities1And17, scInCity17));
-        when(repository.findByCityId(1L)).thenReturn(List.of(scInCity1, scInCities1And17));
-        when(repository.findByCityId(17L)).thenReturn(List.of(scInCities1And17, scInCity17));
+    public void mockServiceAndMapper() {
+        when(shopChainService.getShopChains(null)).thenReturn(List.of(scInCity1, scInCities1And17, scInCity17));
+        when(shopChainService.getShopChains(1L)).thenReturn(List.of(scInCity1, scInCities1And17));
+        when(shopChainService.getShopChains(17L)).thenReturn(List.of(scInCities1And17, scInCity17));
+
+        when(mapper.toDto(scInCity1)).thenReturn(scrInCity1);
+        when(mapper.toDto(scInCities1And17)).thenReturn(scrInCities1And17);
+        when(mapper.toDto(scInCity17)).thenReturn(scrInCity17);
+        when(mapper.toDtoWithShops(scInCity1)).thenReturn(scrwsInCity1);
+        when(mapper.toDtoWithShops(scInCities1And17)).thenReturn(scrwsInCities1And17);
+        when(mapper.toDtoWithShops(scInCity17)).thenReturn(scrwsInCity17);
     }
 
     @Test
-    void getAllShopChains_viewShopsFalseCityNull_listOfSc() {
-        Collection<ShopChain> result = testedService.getShopChains(null);
+    @DisplayName("get all shop chains")
+    void getAllShopChains_withShopsFalseCityNull_listOfSc() {
+        Collection<ShopChainResponse> result = testedMaintenance.getShopChains(false, null);
 
-        assertEquals(List.of(scInCity1, scInCities1And17, scInCity17), result);
+        assertEquals(List.of(scrInCity1, scrInCities1And17, scrInCity17), result);
     }
 
     @Test
-    void getAllShopChains_viewShopsTrueCityNull_listOfSc() {
-        Collection<ShopChain> result = testedService.getShopChains(null);
+    @DisplayName("get all shop chains with shops")
+    void getAllShopChains_withShopsTrueCityNull_listOfSc() {
+        Collection<ShopChainResponse> result = testedMaintenance.getShopChains(true, null);
 
-        assertEquals(List.of(scInCity1, scInCities1And17, scInCity17), result);
+        assertEquals(List.of(scrwsInCity1, scrwsInCities1And17, scrwsInCity17), result);
     }
 
     @Test
-    void getAllShopChains_viewShopsFalseCity1_listOfSc() {
-        Collection<ShopChain> result = testedService.getShopChains(1L);
+    @DisplayName("get all shop chains in city")
+    void getAllShopChains_withShopsFalseCity1_listOfSc() {
+        Collection<ShopChainResponse> result = testedMaintenance.getShopChains(false, 1L);
 
-        assertEquals(List.of(scInCity1, scInCities1And17), result);
+        assertEquals(List.of(scrInCity1, scrInCities1And17), result);
     }
 
     @Test
-    void getAllShopChains_viewShopsTrueCity17_listOfSc() {
-        Collection<ShopChain> result = testedService.getShopChains(17L);
+    @DisplayName("get all shop chain with shops in city")
+    void getAllShopChains_withShopsTrueCity17_listOfSc() {
+        Collection<ShopChainResponse> result = testedMaintenance.getShopChains(true, 17L);
 
-        assertEquals(List.of(scInCities1And17, scInCity17), result);
+        assertEquals(List.of(scrwsInCities1And17, scrwsInCity17), result);
     }
 }
