@@ -2,8 +2,8 @@ package an.evdokimov.discount.watcher.server.api.shop.controller;
 
 import an.evdokimov.discount.watcher.server.api.error.ServerException;
 import an.evdokimov.discount.watcher.server.api.shop.dto.response.ShopResponse;
+import an.evdokimov.discount.watcher.server.api.shop.maintenance.ShopMaintenance;
 import an.evdokimov.discount.watcher.server.security.user.model.User;
-import an.evdokimov.discount.watcher.server.service.shop.ShopService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -22,7 +22,7 @@ import java.util.Collection;
 @Slf4j
 @RequiredArgsConstructor
 public class ShopController {
-    private final ShopService service;
+    private final ShopMaintenance maintenance;
 
     /**
      * Getting all supported shops.
@@ -35,11 +35,11 @@ public class ShopController {
                                                 @Nullable @RequestHeader("only-my") Boolean onlyCurrentUser) {
         if (onlyCurrentUser == null || !onlyCurrentUser) {
             log.info("getting all shops.");
-            return service.getAllShops();
+            return maintenance.getAllShops();
         } else {
             User currentUser = (User) authentication.getPrincipal();
             log.info("getting shop by user={}", currentUser.getLogin());
-            return service.getAllUserShops(currentUser);
+            return maintenance.getAllUserShops(currentUser);
         }
     }
 
@@ -49,6 +49,6 @@ public class ShopController {
     @GetMapping(value = "shop/{shopId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ShopResponse getShopById(@PathVariable("shopId") Long shopId) throws ServerException {
         log.info("getting shop by id={}", shopId);
-        return service.getShopById(shopId);
+        return maintenance.getShopById(shopId);
     }
 }

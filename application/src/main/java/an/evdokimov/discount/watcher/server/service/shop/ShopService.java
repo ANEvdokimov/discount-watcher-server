@@ -1,15 +1,19 @@
 package an.evdokimov.discount.watcher.server.service.shop;
 
 import an.evdokimov.discount.watcher.server.api.error.ServerException;
-import an.evdokimov.discount.watcher.server.api.shop.dto.response.ShopResponse;
+import an.evdokimov.discount.watcher.server.database.shop.model.Shop;
 import an.evdokimov.discount.watcher.server.security.user.model.User;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 
 public interface ShopService {
-    ShopResponse getShopById(Long id) throws ServerException;
+    @NotNull
+    Shop getShopById(@NotNull Long id) throws ServerException;
 
-    Collection<ShopResponse> getAllShops();
+    @NotNull
+    Collection<Shop> getAllShops();
 
-    Collection<ShopResponse> getAllUserShops(User user);
+    @NotNull
+    Collection<Shop> getAllUserShops(@NotNull User user);
 }

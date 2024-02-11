@@ -4,8 +4,8 @@ import an.evdokimov.discount.watcher.server.api.TestConfig;
 import an.evdokimov.discount.watcher.server.api.error.ServerErrorCode;
 import an.evdokimov.discount.watcher.server.api.error.ServerException;
 import an.evdokimov.discount.watcher.server.api.shop.dto.response.ShopResponse;
+import an.evdokimov.discount.watcher.server.api.shop.maintenance.ShopMaintenance;
 import an.evdokimov.discount.watcher.server.configuration.SecurityConfiguration;
-import an.evdokimov.discount.watcher.server.service.shop.ShopServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -44,7 +44,7 @@ class ShopControllerTest {
     private ObjectMapper mapper;
 
     @MockBean
-    private ShopServiceImpl shopService;
+    private ShopMaintenance shopMaintenance;
 
     @Autowired
     private MockMvc mvc;
@@ -63,8 +63,8 @@ class ShopControllerTest {
                 .id(3L)
                 .name("shop3")
                 .build();
-        when(shopService.getAllShops()).thenReturn(List.of(shop1, shop2, shop3));
-        when(shopService.getAllUserShops(testConfig.getTestUser())).thenReturn(List.of(shop1, shop2));
+        when(shopMaintenance.getAllShops()).thenReturn(List.of(shop1, shop2, shop3));
+        when(shopMaintenance.getAllUserShops(testConfig.getTestUser())).thenReturn(List.of(shop1, shop2));
 
         MvcResult result = mvc.perform(get("/api/shops")
                         .header(AUTH_HEADER_NAME, AUTH_USER))
@@ -98,8 +98,8 @@ class ShopControllerTest {
                 .id(3L)
                 .name("shop3")
                 .build();
-        when(shopService.getAllShops()).thenReturn(List.of(shop1, shop2, shop3));
-        when(shopService.getAllUserShops(testConfig.getTestUser())).thenReturn(List.of(shop1, shop2));
+        when(shopMaintenance.getAllShops()).thenReturn(List.of(shop1, shop2, shop3));
+        when(shopMaintenance.getAllUserShops(testConfig.getTestUser())).thenReturn(List.of(shop1, shop2));
 
         MvcResult result = mvc.perform(get("/api/shops")
                         .header(AUTH_HEADER_NAME, AUTH_USER)
@@ -134,8 +134,8 @@ class ShopControllerTest {
                 .id(3L)
                 .name("shop3")
                 .build();
-        when(shopService.getAllShops()).thenReturn(List.of(shop1, shop2, shop3));
-        when(shopService.getAllUserShops(testConfig.getTestUser())).thenReturn(List.of(shop1, shop2));
+        when(shopMaintenance.getAllShops()).thenReturn(List.of(shop1, shop2, shop3));
+        when(shopMaintenance.getAllUserShops(testConfig.getTestUser())).thenReturn(List.of(shop1, shop2));
 
         MvcResult result = mvc.perform(get("/api/shops")
                         .header(AUTH_HEADER_NAME, AUTH_USER)
@@ -162,7 +162,7 @@ class ShopControllerTest {
                 .id(1L)
                 .name("shop1")
                 .build();
-        when(shopService.getShopById(1L)).thenReturn(shop1);
+        when(shopMaintenance.getShopById(1L)).thenReturn(shop1);
 
         MvcResult result = mvc.perform(get("/api/shop/" + shop1.getId())
                         .header(AUTH_HEADER_NAME, AUTH_USER))
@@ -185,20 +185,20 @@ class ShopControllerTest {
                 .id(1L)
                 .name("shop1")
                 .build();
-        when(shopService.getShopById(1L)).thenReturn(shop1);
+        when(shopMaintenance.getShopById(1L)).thenReturn(shop1);
 
         MvcResult result = mvc.perform(get("/api/shop/" + shop1.getId()))
                 .andReturn();
 
         assertAll(
                 () -> assertEquals(401, result.getResponse().getStatus()),
-                () -> verify(shopService, times(0)).getShopById(shop1.getId())
+                () -> verify(shopMaintenance, times(0)).getShopById(shop1.getId())
         );
     }
 
     @Test
     void getShopById_nonexistentShop_http400() throws Exception {
-        when(shopService.getShopById(anyLong())).thenThrow(new ServerException(ServerErrorCode.SHOP_NOT_FOUND));
+        when(shopMaintenance.getShopById(anyLong())).thenThrow(new ServerException(ServerErrorCode.SHOP_NOT_FOUND));
 
         MvcResult result = mvc.perform(get("/api/shop/10")
                         .header(AUTH_HEADER_NAME, AUTH_USER))
@@ -206,7 +206,7 @@ class ShopControllerTest {
 
         assertAll(
                 () -> assertEquals(400, result.getResponse().getStatus()),
-                () -> verify(shopService, times(1)).getShopById(anyLong())
+                () -> verify(shopMaintenance, times(1)).getShopById(anyLong())
         );
     }
 }
