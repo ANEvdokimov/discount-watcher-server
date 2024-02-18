@@ -59,7 +59,7 @@ public class Product {
     @ToString.Exclude
     private Shop shop;
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinFormula("(select pp.id from product_price pp where pp.product_id = id order by pp.parsing_date desc limit 1)")
+    @JoinFormula("(select pp.id from product_price pp where pp.product_id = id order by coalesce(pp.parsing_date, pp.creation_date) desc limit 1)")
     @ToString.Exclude
     private ProductPrice lastPrice;
     @OneToMany(mappedBy = "product")
