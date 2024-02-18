@@ -5,8 +5,8 @@ import an.evdokimov.discount.watcher.server.api.product.dto.request.NewProductRe
 import an.evdokimov.discount.watcher.server.api.product.dto.request.NewProductWithCookiesRequest;
 import an.evdokimov.discount.watcher.server.api.product.dto.response.LentaProductPriceResponse;
 import an.evdokimov.discount.watcher.server.api.product.dto.response.ProductResponse;
+import an.evdokimov.discount.watcher.server.api.product.maintenance.ProductMaintenance;
 import an.evdokimov.discount.watcher.server.configuration.SecurityConfiguration;
-import an.evdokimov.discount.watcher.server.service.product.ProductServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -47,7 +47,7 @@ class ProductControllerTest {
     private ObjectMapper mapper;
 
     @MockBean
-    private ProductServiceImpl productService;
+    private ProductMaintenance productMaintenance;
 
     @Autowired
     private MockMvc mvc;
@@ -76,7 +76,7 @@ class ProductControllerTest {
 
         assertAll(
                 () -> assertEquals(200, result.getResponse().getStatus()),
-                () -> verify(productService, times(1))
+                () -> verify(productMaintenance, times(1))
                         .addProduct(eq(testConfig.getTestUser()), eq(request))
         );
     }
@@ -96,7 +96,7 @@ class ProductControllerTest {
 
         assertAll(
                 () -> assertEquals(400, result.getResponse().getStatus()),
-                () -> verify(productService, times(0))
+                () -> verify(productMaintenance, times(0))
                         .addProduct(eq(testConfig.getTestUser()), eq(request))
         );
     }
@@ -116,7 +116,7 @@ class ProductControllerTest {
 
         assertAll(
                 () -> assertEquals(400, result.getResponse().getStatus()),
-                () -> verify(productService, times(0))
+                () -> verify(productMaintenance, times(0))
                         .addProduct(eq(testConfig.getTestUser()), eq(request))
         );
     }
@@ -145,7 +145,7 @@ class ProductControllerTest {
 
         assertAll(
                 () -> assertEquals(200, result.getResponse().getStatus()),
-                () -> verify(productService, times(1))
+                () -> verify(productMaintenance, times(1))
                         .addProduct(eq(testConfig.getTestUser()), eq(request))
         );
     }
@@ -165,7 +165,7 @@ class ProductControllerTest {
 
         assertAll(
                 () -> assertEquals(400, result.getResponse().getStatus()),
-                () -> verify(productService, times(0))
+                () -> verify(productMaintenance, times(0))
                         .addProduct(eq(testConfig.getTestUser()), eq(request))
         );
     }
@@ -185,7 +185,7 @@ class ProductControllerTest {
 
         assertAll(
                 () -> assertEquals(400, result.getResponse().getStatus()),
-                () -> verify(productService, times(0))
+                () -> verify(productMaintenance, times(0))
                         .addProduct(eq(testConfig.getTestUser()), eq(request))
         );
     }
@@ -193,7 +193,7 @@ class ProductControllerTest {
     @Test
     void getProduct_validJwt_http200() throws Exception {
         ProductResponse expectedProductResponse = ProductResponse.builder().id(1L).build();
-        when(productService.getProduct(anyLong())).thenReturn(expectedProductResponse);
+        when(productMaintenance.getProduct(anyLong())).thenReturn(expectedProductResponse);
 
         MvcResult result = mvc.perform(get("/api/product/" + expectedProductResponse.getId())
                 .header(AUTH_HEADER_NAME, AUTH_USER)
@@ -205,7 +205,7 @@ class ProductControllerTest {
         assertAll(
                 () -> assertEquals(200, result.getResponse().getStatus()),
                 () -> assertEquals(expectedProductResponse, returnedProductResponse),
-                () -> verify(productService, times(1))
+                () -> verify(productMaintenance, times(1))
                         .getProduct(expectedProductResponse.getId())
         );
     }

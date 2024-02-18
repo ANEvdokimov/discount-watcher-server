@@ -14,6 +14,7 @@ import an.evdokimov.discount.watcher.server.database.shop.repository.ShopReposit
 import an.evdokimov.discount.watcher.server.mapper.product.UserProductMapper;
 import an.evdokimov.discount.watcher.server.security.user.model.User;
 import lombok.SneakyThrows;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -34,6 +35,7 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.refEq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -456,5 +458,61 @@ public class UserProductServiceTest {
         assertThrows(ServerException.class,
                 () -> testedService.delete(user, 666L));
         verify(userProductRepository, times(0)).delete(any());
+    }
+
+    @Test
+    @DisplayName("update user products by user and products")
+    void addOrUpdate_existentUserProducts_success() {
+        User user = User.builder().login("login").build();
+        Product product = Product.builder().id(1L).build();
+
+
+        UserProduct userProductFromDb = UserProduct.builder()
+                .id(666L)
+                .user(user)
+                .product(product)
+                .monitorDiscount(false)
+                .monitorAvailability(false)
+                .monitorPriceChanges(false)
+                .build();
+        UserProduct testedProduct = UserProduct.builder()
+                .id(666L)
+                .user(user)
+                .product(product)
+                .monitorDiscount(true)
+                .monitorAvailability(true)
+                .monitorPriceChanges(true)
+                .build();
+
+        when(userProductRepository.findByUserAndProduct(user, product)).thenReturn(Optional.ofNullable(testedProduct));
+
+        testedService.addOrUpdate(testedProduct);
+
+        verify(userProductRepository).save(testedProduct);
+        verify(userProductRepository, never()).save(userProductFromDb);
+    }
+
+    @Test
+    @DisplayName("create user products by user and products")
+    void addOrUpdate_nonexistentUserProducts_success() {
+        User user = User.builder().login("login").build();
+        Product product = Product.builder().id(1L).build();
+
+
+        UserProduct testedProduct = UserProduct.builder()
+                .id(666L)
+                .user(user)
+                .product(product)
+                .monitorDiscount(true)
+                .monitorAvailability(true)
+                .monitorPriceChanges(true)
+                .build();
+
+        when(userProductRepository.findByUserAndProduct(user, product)).thenReturn(Optional.ofNullable(testedProduct));
+
+        testedService.addOrUpdate(testedProduct);
+
+        verify(userProductRepository).save(testedProduct);
+        verify(userProductRepository).save(any());
     }
 }

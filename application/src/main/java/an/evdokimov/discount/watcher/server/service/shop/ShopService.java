@@ -12,6 +12,9 @@ public interface ShopService {
     Shop getShopById(@NotNull Long id) throws ServerException;
 
     @NotNull
+    Shop getShopByCookie(@NotNull String cookie) throws ServerException;
+
+    @NotNull
     Collection<Shop> getAllShops();
 
     @NotNull

@@ -1,11 +1,11 @@
 package an.evdokimov.discount.watcher.server.scheduler;
 
+import an.evdokimov.discount.watcher.server.api.product.maintenance.ProductMaintenance;
 import an.evdokimov.discount.watcher.server.database.product.model.Product;
 import an.evdokimov.discount.watcher.server.database.product.model.ProductInformation;
 import an.evdokimov.discount.watcher.server.database.product.model.ProductPrice;
 import an.evdokimov.discount.watcher.server.database.product.repository.ProductRepository;
 import an.evdokimov.discount.watcher.server.database.shop.model.Shop;
-import an.evdokimov.discount.watcher.server.service.product.ProductServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,13 +14,14 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import java.math.BigDecimal;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest(classes = ProductUpdateScheduler.class)
 class ProductUpdateSchedulerTest {
     @MockBean
-    private ProductServiceImpl productService;
+    private ProductMaintenance productMaintenance;
     @MockBean
     private ProductRepository productRepository;
 
@@ -51,10 +52,7 @@ class ProductUpdateSchedulerTest {
         when(productRepository.findAllTrackedProducts()).thenReturn(List.of(product1, product2, product3));
 
         testedProductUpdateScheduler.updateProducts();
-        assertAll(
-                () -> verify(productService, times(1)).updateProduct(product1),
-                () -> verify(productService, times(1)).updateProduct(product2),
-                () -> verify(productService, times(1)).updateProduct(product3)
-        );
+
+        verify(productMaintenance, times(1)).updateTrackedProducts();
     }
 }

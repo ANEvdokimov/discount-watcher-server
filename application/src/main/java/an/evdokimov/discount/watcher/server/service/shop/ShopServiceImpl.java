@@ -21,10 +21,19 @@ public class ShopServiceImpl implements ShopService {
     @Override
     @NotNull
     public Shop getShopById(@NotNull Long id) throws ServerException {
-        log.trace("getting shop by id={}", id);
+        log.trace("getting shop by id [{}]", id);
 
         return repository.findById(id)
                 .orElseThrow(() -> ServerErrorCode.SHOP_NOT_FOUND.getException("id=%s".formatted(id)));
+    }
+
+    @Override
+    @NotNull
+    public Shop getShopByCookie(@NotNull String cookie) throws ServerException {
+        log.trace("getting shop by cookie [{}]", cookie);
+
+        return repository.findByCookie(cookie)
+                .orElseThrow(() -> new ServerException(ServerErrorCode.SHOP_NOT_FOUND));
     }
 
     @Override
@@ -38,7 +47,7 @@ public class ShopServiceImpl implements ShopService {
     @Override
     @NotNull
     public Collection<Shop> getAllUserShops(@NotNull User user) {
-        log.trace("getting all shops by user: {}", user.getLogin());
+        log.trace("getting all shops by user [{}]", user.getLogin());
 
         return repository.findAllUserShops(user);
     }

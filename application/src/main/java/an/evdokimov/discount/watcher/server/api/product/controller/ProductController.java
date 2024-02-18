@@ -4,9 +4,10 @@ import an.evdokimov.discount.watcher.server.api.error.ServerException;
 import an.evdokimov.discount.watcher.server.api.product.dto.request.NewProductRequest;
 import an.evdokimov.discount.watcher.server.api.product.dto.request.NewProductWithCookiesRequest;
 import an.evdokimov.discount.watcher.server.api.product.dto.response.ProductResponse;
+import an.evdokimov.discount.watcher.server.api.product.maintenance.ProductMaintenance;
 import an.evdokimov.discount.watcher.server.security.user.model.User;
-import an.evdokimov.discount.watcher.server.service.product.ProductService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
@@ -21,25 +22,26 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api")
 @Slf4j
+@RequiredArgsConstructor
 public class ProductController {
-    private final ProductService productService;
-
-    public ProductController(ProductService productService) {
-        this.productService = productService;
-    }
+    private final ProductMaintenance productMaintenance;
 
     /**
      * Addition a new product to the current user. The product will be parsed from a shop cite.
+     * <p/>
+     * Deprecated.
+     * Use "/products/add_by_cookies" ({@link #addProductByCookies(Authentication, NewProductWithCookiesRequest)}).
      *
      * @param newProduct information about the added product.
      * @throws ServerException any errors during adding the product.
      */
     @PutMapping(value = "/products/add_by_shop_id", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Deprecated
     public void addProductByShopId(Authentication authentication,
                                    @Valid @RequestBody NewProductRequest newProduct) throws ServerException {
         log.info("Adding new product {} to user {}", newProduct.toString(),
                 ((User) authentication.getPrincipal()).getLogin());
-        productService.addProduct((User) authentication.getPrincipal(), newProduct);
+        productMaintenance.addProduct((User) authentication.getPrincipal(), newProduct);
     }
 
     /**
@@ -53,7 +55,7 @@ public class ProductController {
                                     @Valid @RequestBody NewProductWithCookiesRequest newProduct) throws ServerException {
         log.info("Adding new product {} to user {}", newProduct.toString(),
                 ((User) authentication.getPrincipal()).getLogin());
-        productService.addProduct((User) authentication.getPrincipal(), newProduct);
+        productMaintenance.addProduct((User) authentication.getPrincipal(), newProduct);
     }
 
     /**
@@ -67,7 +69,7 @@ public class ProductController {
     public ProductResponse getProduct(@PathVariable Long id)
             throws ServerException {
         log.info("Getting product by id={}", id);
-        return productService.getProduct(id);
+        return productMaintenance.getProduct(id);
     }
 
     /**
@@ -78,6 +80,6 @@ public class ProductController {
     @PostMapping("/product/update/{id}")
     public void updateProduct(@PathVariable Long id) throws ServerException {
         log.info("Update product by id={}", id);
-        productService.updateProduct(id);
+        productMaintenance.updateProduct(id);
     }
 }

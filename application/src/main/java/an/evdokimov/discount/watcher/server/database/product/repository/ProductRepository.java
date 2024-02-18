@@ -12,18 +12,6 @@ import java.util.Optional;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
-    default Product findOrCreateByProductInformationAndShop(ProductInformation productInformation, Shop shop) {
-        Optional<Product> productFromDb =
-                findByProductInformationAndShop(productInformation, shop);
-        if (productFromDb.isEmpty()) {
-            Product product = Product.builder().productInformation(productInformation).shop(shop).build();
-            save(product);
-            return product;
-        } else {
-            return productFromDb.get();
-        }
-    }
-
     Optional<Product> findByProductInformationAndShop(ProductInformation productInformation, Shop shop);
 
     @Query("""

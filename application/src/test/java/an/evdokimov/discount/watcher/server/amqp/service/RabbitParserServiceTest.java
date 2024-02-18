@@ -6,6 +6,7 @@ import an.evdokimov.discount.watcher.server.amqp.dto.ParsingErrorMessage;
 import an.evdokimov.discount.watcher.server.amqp.dto.ProductForParsing;
 import an.evdokimov.discount.watcher.server.api.error.ServerErrorCode;
 import an.evdokimov.discount.watcher.server.api.error.ServerException;
+import an.evdokimov.discount.watcher.server.api.product.maintenance.ProductMaintenance;
 import an.evdokimov.discount.watcher.server.configuration.property.RabbitProperties;
 import an.evdokimov.discount.watcher.server.database.product.model.ParsingError;
 import an.evdokimov.discount.watcher.server.database.product.model.ProductInformation;
@@ -14,7 +15,6 @@ import an.evdokimov.discount.watcher.server.database.product.repository.ParsingE
 import an.evdokimov.discount.watcher.server.database.product.repository.ProductInformationRepository;
 import an.evdokimov.discount.watcher.server.database.product.repository.ProductPriceRepository;
 import an.evdokimov.discount.watcher.server.mapper.product.ParsingErrorMapper;
-import an.evdokimov.discount.watcher.server.service.product.ProductService;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -45,7 +45,7 @@ class RabbitParserServiceTest {
     @MockBean
     private ParsingErrorMapper parsingErrorMapper;
     @MockBean
-    private ProductService productService;
+    private ProductMaintenance productMaintenance;
 
     @Autowired
     private RabbitParserService testedRabbitParserService;
@@ -80,7 +80,7 @@ class RabbitParserServiceTest {
 
         testedRabbitParserService.handleParsedProductPrice(mockedParsedInformation);
 
-        verify(productService).saveParsedProduct(mockedParsedInformation);
+        verify(productMaintenance).saveParsedProduct(mockedParsedInformation);
     }
 
     @SneakyThrows
@@ -105,7 +105,7 @@ class RabbitParserServiceTest {
                 ServerException.class,
                 () -> testedRabbitParserService.handleParsedProductPrice(mockedParsedInformation)
         );
-        verify(productService, never()).saveParsedProduct(mockedParsedInformation);
+        verify(productMaintenance, never()).saveParsedProduct(mockedParsedInformation);
     }
 
     @SneakyThrows
@@ -130,7 +130,7 @@ class RabbitParserServiceTest {
                 ServerException.class,
                 () -> testedRabbitParserService.handleParsedProductPrice(mockedParsedInformation)
         );
-        verify(productService, never()).saveParsedProduct(mockedParsedInformation);
+        verify(productMaintenance, never()).saveParsedProduct(mockedParsedInformation);
     }
 
     @SneakyThrows
@@ -155,7 +155,7 @@ class RabbitParserServiceTest {
                 ServerException.class,
                 () -> testedRabbitParserService.handleParsedProductPrice(mockedParsedInformation)
         );
-        verify(productService, never()).saveParsedProduct(mockedParsedInformation);
+        verify(productMaintenance, never()).saveParsedProduct(mockedParsedInformation);
     }
 
     @SneakyThrows
@@ -177,7 +177,7 @@ class RabbitParserServiceTest {
         );
 
         doThrow(new ServerException(ServerErrorCode.PRODUCT_NOT_FOUND))
-                .when(productService).saveParsedProduct(mockedParsedInformation);
+                .when(productMaintenance).saveParsedProduct(mockedParsedInformation);
 
         assertThrows(
                 ServerException.class,
@@ -204,7 +204,7 @@ class RabbitParserServiceTest {
         );
 
         doThrow(new ServerException(ServerErrorCode.PRODUCT_INFORMATION_NOT_FOUND))
-                .when(productService).saveParsedProduct(mockedParsedInformation);
+                .when(productMaintenance).saveParsedProduct(mockedParsedInformation);
 
         assertThrows(
                 ServerException.class,

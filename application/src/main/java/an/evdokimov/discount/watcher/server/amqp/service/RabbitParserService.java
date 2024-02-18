@@ -5,6 +5,7 @@ import an.evdokimov.discount.watcher.server.amqp.dto.ParsingErrorMessage;
 import an.evdokimov.discount.watcher.server.amqp.dto.ProductForParsing;
 import an.evdokimov.discount.watcher.server.api.error.ServerErrorCode;
 import an.evdokimov.discount.watcher.server.api.error.ServerException;
+import an.evdokimov.discount.watcher.server.api.product.maintenance.ProductMaintenance;
 import an.evdokimov.discount.watcher.server.configuration.property.RabbitProperties;
 import an.evdokimov.discount.watcher.server.database.product.model.ParsingStatus;
 import an.evdokimov.discount.watcher.server.database.product.model.ProductInformation;
@@ -13,7 +14,6 @@ import an.evdokimov.discount.watcher.server.database.product.repository.ParsingE
 import an.evdokimov.discount.watcher.server.database.product.repository.ProductInformationRepository;
 import an.evdokimov.discount.watcher.server.database.product.repository.ProductPriceRepository;
 import an.evdokimov.discount.watcher.server.mapper.product.ParsingErrorMapper;
-import an.evdokimov.discount.watcher.server.service.product.ProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
@@ -35,7 +35,7 @@ public class RabbitParserService implements ParserService {
     private final ProductInformationRepository informationRepository;
     private final ParsingErrorRepository parsingErrorRepository;
     private final ParsingErrorMapper errorMapper;
-    private final ProductService productService;
+    private final ProductMaintenance productMaintenance;
 
     public RabbitParserService(RabbitTemplate rabbitTemplate,
                                RabbitProperties rabbitProperties,
@@ -43,14 +43,14 @@ public class RabbitParserService implements ParserService {
                                ProductInformationRepository informationRepository,
                                ParsingErrorRepository parsingErrorRepository,
                                ParsingErrorMapper errorMapper,
-                               @Lazy ProductService productService) {
+                               @Lazy ProductMaintenance productService) {
         this.rabbitTemplate = rabbitTemplate;
         this.rabbitProperties = rabbitProperties;
         this.priceRepository = priceRepository;
         this.informationRepository = informationRepository;
         this.parsingErrorRepository = parsingErrorRepository;
         this.errorMapper = errorMapper;
-        this.productService = productService;
+        this.productMaintenance = productService;
     }
 
     @Override
@@ -68,7 +68,7 @@ public class RabbitParserService implements ParserService {
         if (parsedProduct.getId() == null || parsedProduct.getProductPrice().getId() == null) {
             ServerErrorCode.PARSE_RESPONSE_ID_ERROR.throwException(parsedProduct.toString());
         } else {
-            productService.saveParsedProduct(parsedProduct);
+            productMaintenance.saveParsedProduct(parsedProduct);
         }
     }
 

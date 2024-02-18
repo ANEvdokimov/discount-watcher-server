@@ -9,18 +9,22 @@ import an.evdokimov.discount.watcher.server.database.product.repository.ProductP
 import an.evdokimov.discount.watcher.server.database.product.repository.ProductRepository;
 import an.evdokimov.discount.watcher.server.mapper.product.ProductPriceMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Stack;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class ProductPriceServiceImpl implements ProductPriceService {
     private final ProductRepository productRepository;
@@ -28,8 +32,25 @@ public class ProductPriceServiceImpl implements ProductPriceService {
     private final ProductPriceMapper mapper;
 
     @Override
+    @NotNull
+    public Optional<ProductPrice> findLastCompletedPriceByProduct(Product product) {
+        log.trace("search last completed ProductPrice for product [productId={}]", product.getId());
+        return priceRepository.findLastCompletedPriceByProduct(product);
+    }
+
+    @Override
+    @NotNull
+    public ProductPrice getById(@NotNull Long id) throws ServerException {
+        return priceRepository.findById(id)
+                .orElseThrow(() -> ServerErrorCode.PRODUCT_PRICE_NOT_FOUND.getException("id=" + id));
+    }
+
+    @Override
+    @NotNull
     public List<ProductPriceResponse> getPrices(@NotNull Long productId, boolean group, @Nullable LocalDate startDate)
             throws ServerException {
+        log.trace("getting prices [productId={}, group={}, startDate={}]", productId, group, startDate);
+
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> ServerErrorCode.PRODUCT_NOT_FOUND.getException("id=" + productId));
 
@@ -48,6 +69,14 @@ public class ProductPriceServiceImpl implements ProductPriceService {
         return prices.stream()
                 .map(mapper::map)
                 .toList();
+    }
+
+    @Override
+    @Transactional
+    public void addPrice(@NotNull ProductPrice price) {
+        log.trace("saving price [{}]", price);
+
+        priceRepository.save(price);
     }
 
     private List<ProductPrice> groupByDateAndPrice(@NotNull List<ProductPrice> prices) {

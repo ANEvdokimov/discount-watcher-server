@@ -110,15 +110,4 @@ public interface UserProductRepository extends JpaRepository<UserProduct, Long> 
     List<UserProduct> findAllUserProductsInShop(@Param("user") User user, @Param("shop") Shop shop);
 
     Optional<UserProduct> findByUserAndProduct(User user, Product product);
-
-    default void saveOrUpdate(UserProduct userProduct) {
-        Optional<UserProduct> userProductFromDb =
-                findByUserAndProduct(userProduct.getUser(), userProduct.getProduct());
-        if (userProductFromDb.isEmpty()) {
-            save(userProduct);
-        } else {
-            userProduct.setId(userProductFromDb.get().getId());
-            save(userProduct);
-        }
-    }
 }
