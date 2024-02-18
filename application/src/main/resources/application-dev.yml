@@ -3,7 +3,7 @@ spring:
     user: postgres
     password: mysecretpassword
   datasource:
-    url: jdbc:postgresql://localhost:5432/postgres
+    url: jdbc:postgresql://localhost:5432/dw_server
     username: discount_watcher_server
     password: secret-password
   rabbitmq:
