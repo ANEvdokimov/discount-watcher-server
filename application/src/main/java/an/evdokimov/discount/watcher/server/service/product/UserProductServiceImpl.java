@@ -2,15 +2,12 @@ package an.evdokimov.discount.watcher.server.service.product;
 
 import an.evdokimov.discount.watcher.server.api.error.ServerErrorCode;
 import an.evdokimov.discount.watcher.server.api.error.ServerException;
-import an.evdokimov.discount.watcher.server.api.product.dto.request.UserProductRequest;
-import an.evdokimov.discount.watcher.server.api.product.dto.response.UserProductResponse;
 import an.evdokimov.discount.watcher.server.database.product.model.UserProduct;
 import an.evdokimov.discount.watcher.server.database.product.repository.UserProductRepository;
 import an.evdokimov.discount.watcher.server.database.shop.model.Shop;
-import an.evdokimov.discount.watcher.server.database.shop.repository.ShopRepository;
-import an.evdokimov.discount.watcher.server.mapper.product.UserProductMapper;
 import an.evdokimov.discount.watcher.server.security.user.model.User;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
@@ -18,31 +15,32 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class UserProductServiceImpl implements UserProductService {
     private final UserProductRepository repository;
-    private final ShopRepository shopRepository;//todo replace to service
-    private final UserProductMapper mapper;
 
     @Override
     @NotNull
-    public UserProductResponse getById(@NotNull User user, @NotNull Long id) throws ServerException {
-        UserProduct userProduct = repository.findByIdAndUser(id, user).orElseThrow(() ->
+    public UserProduct getById(@NotNull User user, @NotNull Long id) throws ServerException {
+        log.trace("getting user products by id={} for user={}", id, user);
+
+        return repository.findByIdAndUser(id, user).orElseThrow(() ->
                 ServerErrorCode.USER_PRODUCT_NOT_FOUND.getException("user=%s, user_product=%s"
                         .formatted(user.getLogin(), id)));
-        return mapper.map(userProduct);
     }
 
     @Override
     @NotNull
-    public List<UserProductResponse> getAll(@NotNull User user,
-                                            boolean onlyActive,
-                                            @Nullable Boolean monitorAvailability,
-                                            @Nullable Boolean monitorDiscount,
-                                            @Nullable Boolean monitorPriceChanges) {
+    public List<UserProduct> getAll(@NotNull User user,
+                                    boolean onlyActive,
+                                    @Nullable Boolean monitorAvailability,
+                                    @Nullable Boolean monitorDiscount,
+                                    @Nullable Boolean monitorPriceChanges) {
+        log.trace("get all products for user={}", user.getLogin());
+
         List<UserProduct> userProducts;
         if (onlyActive) {
             userProducts = repository.findActiveUserProducts(user, monitorAvailability, monitorDiscount,
@@ -52,22 +50,18 @@ public class UserProductServiceImpl implements UserProductService {
                     monitorPriceChanges);
         }
 
-        return userProducts.stream()
-                .map(mapper::map)
-                .collect(Collectors.toList());
+        return userProducts;
     }
 
     @Override
     @NotNull
-    public List<UserProductResponse> getByShop(@NotNull User user,
-                                               @NotNull Long shopId,
-                                               boolean onlyActive,
-                                               @Nullable Boolean monitorAvailability,
-                                               @Nullable Boolean monitorDiscount,
-                                               @Nullable Boolean monitorPriceChanges)
-            throws ServerException {
-        Shop shop = shopRepository
-                .findById(shopId).orElseThrow(() -> new ServerException(ServerErrorCode.SHOP_NOT_FOUND));
+    public List<UserProduct> getAll(@NotNull User user,
+                                    boolean onlyActive,
+                                    @Nullable Boolean monitorAvailability,
+                                    @Nullable Boolean monitorDiscount,
+                                    @Nullable Boolean monitorPriceChanges,
+                                    @NotNull Shop shop) {
+        log.trace("getting products for user={} in shop={}", user.getLogin(), shop.getId());
 
         List<UserProduct> userProducts;
         if (onlyActive) {
@@ -78,14 +72,14 @@ public class UserProductServiceImpl implements UserProductService {
                     monitorDiscount, monitorPriceChanges);
         }
 
-        return userProducts.stream()
-                .map(mapper::map)
-                .toList();
+        return userProducts;
     }
 
     @Override
     @Transactional
-    public void update(@NotNull User user, @NotNull UserProductRequest updatedUserProduct) throws ServerException {
+    public void update(@NotNull User user, @NotNull UserProduct updatedUserProduct) throws ServerException {
+        log.trace("updating UserProducts for user={}", user.getLogin());
+
         UserProduct userProduct = repository.findByIdAndUser(updatedUserProduct.getId(), user).orElseThrow(() ->
                 ServerErrorCode.USER_PRODUCT_NOT_FOUND.getException("user_product_id=%s, user_login=%s"
                         .formatted(updatedUserProduct.getId(), user.getLogin())));
@@ -98,6 +92,8 @@ public class UserProductServiceImpl implements UserProductService {
     @Override
     @Transactional
     public void delete(@NotNull User user, @NotNull Long userProductId) throws ServerException {
+        log.trace("updating UserProduct id={} for user={}", userProductId, user.getLogin());
+
         UserProduct userProduct = repository.findByIdAndUser(userProductId, user).orElseThrow(() ->
                 ServerErrorCode.USER_PRODUCT_NOT_FOUND.getException("user_product_id=%s, user_login=%s"
                         .formatted(userProductId, user.getLogin())));

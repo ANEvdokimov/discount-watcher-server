@@ -4,8 +4,8 @@ import an.evdokimov.discount.watcher.server.api.TestConfig;
 import an.evdokimov.discount.watcher.server.api.error.ServerErrorCode;
 import an.evdokimov.discount.watcher.server.api.product.dto.request.UserProductRequest;
 import an.evdokimov.discount.watcher.server.api.product.dto.response.UserProductResponse;
+import an.evdokimov.discount.watcher.server.api.product.maintenance.UserProductMaintenance;
 import an.evdokimov.discount.watcher.server.configuration.SecurityConfiguration;
-import an.evdokimov.discount.watcher.server.service.product.UserProductServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -53,7 +53,7 @@ public class UserProductControllerTest {
     private ObjectMapper mapper;
 
     @MockBean
-    private UserProductServiceImpl service;
+    private UserProductMaintenance service;
 
     @Autowired
     private MockMvc mvc;
@@ -96,22 +96,22 @@ public class UserProductControllerTest {
                                 isNull()
                         ),
                 () -> verify(service, times(0))
-                        .getByShop(
+                        .getAll(
                                 eq(testConfig.getTestUser()),
-                                anyLong(),
                                 anyBoolean(),
                                 anyBoolean(),
                                 anyBoolean(),
-                                anyBoolean()
+                                anyBoolean(),
+                                anyLong()
                         ),
                 () -> verify(service, times(0))
-                        .getByShop(
+                        .getAll(
                                 eq(testConfig.getTestUser()),
-                                anyLong(),
                                 anyBoolean(),
                                 anyBoolean(),
                                 isNull(),
-                                isNull()
+                                isNull(),
+                                anyLong()
                         )
         );
     }
@@ -156,13 +156,13 @@ public class UserProductControllerTest {
                                 anyBoolean()
                         ),
                 () -> verify(service, times(0))
-                        .getByShop(
+                        .getAll(
                                 eq(testConfig.getTestUser()),
-                                anyLong(),
                                 anyBoolean(),
                                 anyBoolean(),
                                 anyBoolean(),
-                                anyBoolean()
+                                anyBoolean(),
+                                anyLong()
                         )
         );
     }
@@ -205,22 +205,22 @@ public class UserProductControllerTest {
                                 anyBoolean()
                         ),
                 () -> verify(service, times(0))
-                        .getByShop(
+                        .getAll(
                                 eq(testConfig.getTestUser()),
-                                anyLong(),
                                 anyBoolean(),
                                 anyBoolean(),
                                 anyBoolean(),
-                                anyBoolean()
+                                anyBoolean(),
+                                anyLong()
                         ),
                 () -> verify(service, times(0))
-                        .getByShop(
+                        .getAll(
                                 eq(testConfig.getTestUser()),
-                                anyLong(),
                                 anyBoolean(),
                                 isNull(),
                                 isNull(),
-                                anyBoolean()
+                                anyBoolean(),
+                                anyLong()
                         )
         );
     }
@@ -264,22 +264,22 @@ public class UserProductControllerTest {
                                 isNull()
                         ),
                 () -> verify(service, times(0))
-                        .getByShop(
+                        .getAll(
                                 eq(testConfig.getTestUser()),
-                                anyLong(),
                                 anyBoolean(),
                                 anyBoolean(),
                                 anyBoolean(),
-                                anyBoolean()
+                                anyBoolean(),
+                                anyLong()
                         ),
                 () -> verify(service, times(0))
-                        .getByShop(
+                        .getAll(
                                 eq(testConfig.getTestUser()),
-                                anyLong(),
                                 anyBoolean(),
                                 anyBoolean(),
                                 anyBoolean(),
-                                isNull()
+                                isNull(),
+                                anyLong()
                         )
         );
     }
@@ -292,12 +292,12 @@ public class UserProductControllerTest {
                 UserProductResponse.builder().id(2L).build()
         );
 
-        when(service.getByShop(
-                any(), anyLong(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean())
+        when(service.getAll(
+                any(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean(), anyLong())
         ).thenReturn(Collections.emptyList());
-        when(service.getByShop(
-                eq(testConfig.getTestUser()), eq(1L), anyBoolean(),
-                eq(true), isNull(), isNull())
+        when(service.getAll(
+                eq(testConfig.getTestUser()), anyBoolean(),
+                eq(true), isNull(), isNull(), eq(1L))
         ).thenReturn(products);
 
         MvcResult result = mvc.perform(get("/api/products/by_user")
@@ -316,13 +316,13 @@ public class UserProductControllerTest {
                 () -> assertEquals(200, result.getResponse().getStatus()),
                 () -> assertThat(resultProducts, containsInAnyOrder(products.toArray())),
                 () -> verify(service, times(1))
-                        .getByShop(
+                        .getAll(
                                 eq(testConfig.getTestUser()),
-                                anyLong(),
                                 anyBoolean(),
                                 anyBoolean(),
                                 isNull(),
-                                isNull()
+                                isNull(),
+                                anyLong()
                         )
         );
     }
@@ -335,12 +335,12 @@ public class UserProductControllerTest {
                 UserProductResponse.builder().id(2L).build()
         );
 
-        when(service.getByShop(
-                any(), anyLong(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean())
+        when(service.getAll(
+                any(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean(), anyLong())
         ).thenReturn(Collections.emptyList());
-        when(service.getByShop(
-                eq(testConfig.getTestUser()), eq(1L), anyBoolean(),
-                isNull(), eq(true), isNull())
+        when(service.getAll(
+                eq(testConfig.getTestUser()), anyBoolean(),
+                isNull(), eq(true), isNull(), eq(1L))
         ).thenReturn(products);
 
         MvcResult result = mvc.perform(get("/api/products/by_user")
@@ -359,13 +359,13 @@ public class UserProductControllerTest {
                 () -> assertEquals(200, result.getResponse().getStatus()),
                 () -> assertThat(resultProducts, containsInAnyOrder(products.toArray())),
                 () -> verify(service, times(1))
-                        .getByShop(
+                        .getAll(
                                 eq(testConfig.getTestUser()),
-                                anyLong(),
                                 anyBoolean(),
                                 isNull(),
                                 anyBoolean(),
-                                isNull()
+                                isNull(),
+                                anyLong()
                         )
         );
     }
@@ -378,12 +378,12 @@ public class UserProductControllerTest {
                 UserProductResponse.builder().id(2L).build()
         );
 
-        when(service.getByShop(
-                any(), anyLong(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean())
+        when(service.getAll(
+                any(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean(), anyLong())
         ).thenReturn(Collections.emptyList());
-        when(service.getByShop(
-                eq(testConfig.getTestUser()), eq(1L), anyBoolean(),
-                isNull(), isNull(), eq(true))
+        when(service.getAll(
+                eq(testConfig.getTestUser()), anyBoolean(),
+                isNull(), isNull(), eq(true), eq(1L))
         ).thenReturn(products);
 
         MvcResult result = mvc.perform(get("/api/products/by_user")
@@ -402,13 +402,13 @@ public class UserProductControllerTest {
                 () -> assertEquals(200, result.getResponse().getStatus()),
                 () -> assertThat(resultProducts, containsInAnyOrder(products.toArray())),
                 () -> verify(service, times(1))
-                        .getByShop(
+                        .getAll(
                                 eq(testConfig.getTestUser()),
-                                anyLong(),
                                 anyBoolean(),
                                 isNull(),
                                 isNull(),
-                                anyBoolean()
+                                anyBoolean(),
+                                anyLong()
                         )
         );
     }
@@ -421,12 +421,12 @@ public class UserProductControllerTest {
                 UserProductResponse.builder().id(2L).build()
         );
 
-        when(service.getByShop(
-                any(), anyLong(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean())
+        when(service.getAll(
+                any(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean(), anyLong())
         ).thenReturn(Collections.emptyList());
-        when(service.getByShop(
-                eq(testConfig.getTestUser()), eq(1L), anyBoolean(),
-                isNull(), eq(true), eq(true))
+        when(service.getAll(
+                eq(testConfig.getTestUser()), anyBoolean(),
+                isNull(), eq(true), eq(true), eq(1L))
         ).thenReturn(products);
 
         MvcResult result = mvc.perform(get("/api/products/by_user")
@@ -446,13 +446,13 @@ public class UserProductControllerTest {
                 () -> assertEquals(200, result.getResponse().getStatus()),
                 () -> assertThat(resultProducts, containsInAnyOrder(products.toArray())),
                 () -> verify(service, times(1))
-                        .getByShop(
+                        .getAll(
                                 eq(testConfig.getTestUser()),
-                                anyLong(),
                                 anyBoolean(),
                                 isNull(),
                                 anyBoolean(),
-                                anyBoolean()
+                                anyBoolean(),
+                                anyLong()
                         )
         );
     }
@@ -480,13 +480,13 @@ public class UserProductControllerTest {
                                 anyBoolean()
                         ),
                 () -> verify(service, times(0))
-                        .getByShop(
+                        .getAll(
                                 eq(testConfig.getTestUser()),
-                                anyLong(),
                                 anyBoolean(),
                                 anyBoolean(),
                                 anyBoolean(),
-                                anyBoolean()
+                                anyBoolean(),
+                                anyLong()
                         )
         );
     }

@@ -3,8 +3,8 @@ package an.evdokimov.discount.watcher.server.api.product.controller;
 import an.evdokimov.discount.watcher.server.api.error.ServerException;
 import an.evdokimov.discount.watcher.server.api.product.dto.request.UserProductRequest;
 import an.evdokimov.discount.watcher.server.api.product.dto.response.UserProductResponse;
+import an.evdokimov.discount.watcher.server.api.product.maintenance.UserProductMaintenance;
 import an.evdokimov.discount.watcher.server.security.user.model.User;
-import an.evdokimov.discount.watcher.server.service.product.UserProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +27,7 @@ import java.util.Collection;
 @RequiredArgsConstructor
 @Slf4j
 public class UserProductController {
-    private final UserProductService service;
+    private final UserProductMaintenance maintenance;
 
     /**
      * Getting current user's UserProduct by id.
@@ -42,7 +42,7 @@ public class UserProductController {
                                        @PathVariable Long userProductId) throws ServerException {
         User currentUser = (User) authentication.getPrincipal();
         log.info("Getting user product by id={} for user={}", userProductId, currentUser.getLogin());
-        return service.getById(currentUser, userProductId);
+        return maintenance.getById(currentUser, userProductId);
     }
 
     /**
@@ -71,10 +71,10 @@ public class UserProductController {
                 monitorAvailability, monitorDiscount, monitorPriceChanges);
 
         if (shopId != null) {
-            return service.getByShop(currentUser, shopId, onlyActive,
-                    monitorAvailability, monitorDiscount, monitorPriceChanges);
+            return maintenance.getAll(currentUser, onlyActive,
+                    monitorAvailability, monitorDiscount, monitorPriceChanges, shopId);
         } else {
-            return service.getAll(currentUser, onlyActive, monitorAvailability,
+            return maintenance.getAll(currentUser, onlyActive, monitorAvailability,
                     monitorDiscount, monitorPriceChanges);
         }
     }
@@ -90,7 +90,7 @@ public class UserProductController {
                        @Valid @RequestBody UserProductRequest userProduct) throws ServerException {
         User currentUser = (User) authentication.getPrincipal();
         log.info("Updating UserProduct [{}] for user [{}]", userProduct, currentUser.getLogin());
-        service.update(currentUser, userProduct);
+        maintenance.update(currentUser, userProduct);
     }
 
     /**
@@ -104,6 +104,6 @@ public class UserProductController {
                        @PathVariable Long userProductId) throws ServerException {
         User currentUser = (User) authentication.getPrincipal();
         log.info("Deletion UserProduct [id={}] for user [{}]", userProductId, currentUser.getLogin());
-        service.delete(currentUser, userProductId);
+        maintenance.delete(currentUser, userProductId);
     }
 }
