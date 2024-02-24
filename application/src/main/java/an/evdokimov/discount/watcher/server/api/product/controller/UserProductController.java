@@ -71,10 +71,10 @@ public class UserProductController {
                 monitorAvailability, monitorDiscount, monitorPriceChanges);
 
         if (shopId != null) {
-            return service.getUserProductsInShop(currentUser, shopId, onlyActive,
+            return service.getByShop(currentUser, shopId, onlyActive,
                     monitorAvailability, monitorDiscount, monitorPriceChanges);
         } else {
-            return service.getUserProducts(currentUser, onlyActive, monitorAvailability,
+            return service.getAll(currentUser, onlyActive, monitorAvailability,
                     monitorDiscount, monitorPriceChanges);
         }
     }

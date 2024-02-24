@@ -18,7 +18,7 @@ public class ShopChainServiceImpl implements ShopChainService {
 
     @Override
     @NotNull
-    public Collection<ShopChain> getShopChains(@Nullable Long cityId) {
+    public Collection<ShopChain> getAll(@Nullable Long cityId) {
         log.trace("Getting all shop chains in city [cityId={}]", cityId);
 
         if (cityId != null) {

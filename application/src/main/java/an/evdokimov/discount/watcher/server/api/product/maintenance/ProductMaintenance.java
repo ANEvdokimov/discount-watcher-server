@@ -10,16 +10,16 @@ import org.jetbrains.annotations.NotNull;
 
 public interface ProductMaintenance {
     @NotNull
-    ProductResponse getProduct(@NotNull Long id) throws ServerException;
+    ProductResponse getById(@NotNull Long id) throws ServerException;
 
     @Deprecated
-    void addProduct(@NotNull User user, @NotNull NewProductRequest newProduct) throws ServerException;
+    void saveProduct(@NotNull User user, @NotNull NewProductRequest newProduct) throws ServerException;
 
-    void addProduct(@NotNull User user, @NotNull NewProductWithCookiesRequest newProduct) throws ServerException;
+    void saveProduct(@NotNull User user, @NotNull NewProductWithCookiesRequest newProduct) throws ServerException;
 
     void saveParsedProduct(@NotNull ParsedProductInformation parsedProduct) throws ServerException;
 
-    void updateProduct(@NotNull Long id) throws ServerException;
+    void update(@NotNull Long id) throws ServerException;
 
     void updateTrackedProducts();
 }

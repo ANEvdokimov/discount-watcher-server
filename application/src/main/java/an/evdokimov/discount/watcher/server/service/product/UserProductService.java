@@ -15,24 +15,24 @@ public interface UserProductService {
     UserProductResponse getById(@NotNull User user, @NotNull Long id) throws ServerException;
 
     @NotNull
-    List<UserProductResponse> getUserProducts(@NotNull User user,
-                                              boolean onlyActive,
-                                              @Nullable Boolean monitorAvailability,
-                                              @Nullable Boolean monitorDiscount,
-                                              @Nullable Boolean monitorPriceChanges);
+    List<UserProductResponse> getAll(@NotNull User user,
+                                     boolean onlyActive,
+                                     @Nullable Boolean monitorAvailability,
+                                     @Nullable Boolean monitorDiscount,
+                                     @Nullable Boolean monitorPriceChanges);
 
     @NotNull
-    List<UserProductResponse> getUserProductsInShop(@NotNull User user,
-                                                    @NotNull Long shopId,
-                                                    boolean onlyActive,
-                                                    @Nullable Boolean monitorAvailability,
-                                                    @Nullable Boolean monitorDiscount,
-                                                    @Nullable Boolean monitorPriceChanges)
+    List<UserProductResponse> getByShop(@NotNull User user,
+                                        @NotNull Long shopId,
+                                        boolean onlyActive,
+                                        @Nullable Boolean monitorAvailability,
+                                        @Nullable Boolean monitorDiscount,
+                                        @Nullable Boolean monitorPriceChanges)
             throws ServerException;
 
     void update(@NotNull User user, @NotNull UserProductRequest userProduct) throws ServerException;
 
     void delete(@NotNull User user, @NotNull Long userProductId) throws ServerException;
 
-    void addOrUpdate(@NotNull UserProduct userProduct);
+    void saveOrUpdate(@NotNull UserProduct userProduct);
 }

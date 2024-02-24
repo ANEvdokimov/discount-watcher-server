@@ -33,6 +33,6 @@ public class ShopChainController {
             @Nullable @RequestHeader("City-Id") Long cityId) {
         log.debug("Getting all commercial networks. withShops: {}, cityId: {}", withShops, cityId);
 
-        return shopChainMaintenance.getShopChains(withShops, cityId);
+        return shopChainMaintenance.getAll(withShops, cityId);
     }
 }

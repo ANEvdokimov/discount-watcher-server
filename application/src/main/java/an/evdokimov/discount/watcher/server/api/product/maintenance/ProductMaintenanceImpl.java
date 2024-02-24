@@ -81,24 +81,24 @@ public class ProductMaintenanceImpl implements ProductMaintenance {
 
     @Override
     @NotNull
-    public ProductResponse getProduct(@NotNull Long id) throws ServerException {
+    public ProductResponse getById(@NotNull Long id) throws ServerException {
         log.trace("getting product by id={}", id);
-        return productMapper.map(productService.getProduct(id));
+        return productMapper.map(productService.getById(id));
     }
 
     @Override
     @Transactional
-    public void addProduct(@NotNull User user, @NotNull NewProductRequest newProduct) throws ServerException {
-        Shop shop = shopService.getShopById(newProduct.getShopId());
+    public void saveProduct(@NotNull User user, @NotNull NewProductRequest newProduct) throws ServerException {
+        Shop shop = shopService.getById(newProduct.getShopId());
 
         ProductInformation information = informationService.getOrCreateByUrl(newProduct.getUrl());
         Product product = productService.getOrCreateByProductInformationAndShop(information, shop);
         ProductPrice price = priceMapper.mapNewPrice(product, LocalDateTime.now(clock));
 
-        priceService.addPrice(price);
+        priceService.savePrice(price);
         product.addPrice(price);
 
-        userProductService.addOrUpdate(userProductMapper.map(newProduct, user, product));
+        userProductService.saveOrUpdate(userProductMapper.map(newProduct, user, product));
 
         parserService.parseProduct(
                 new ProductForParsing(
@@ -112,17 +112,17 @@ public class ProductMaintenanceImpl implements ProductMaintenance {
 
     @Override
     @Transactional
-    public void addProduct(@NotNull User user, @NotNull NewProductWithCookiesRequest newProduct) throws ServerException {
-        Shop shop = shopService.getShopByCookie(newProduct.getCookies());
+    public void saveProduct(@NotNull User user, @NotNull NewProductWithCookiesRequest newProduct) throws ServerException {
+        Shop shop = shopService.getByCookie(newProduct.getCookies());
 
         ProductInformation information = informationService.getOrCreateByUrl(newProduct.getUrl());
         Product product = productService.getOrCreateByProductInformationAndShop(information, shop);
         ProductPrice price = priceMapper.mapNewPrice(product, LocalDateTime.now(clock));
 
-        priceService.addPrice(price);
+        priceService.savePrice(price);
         product.addPrice(price);
 
-        userProductService.addOrUpdate(userProductMapper.map(newProduct, user, product));
+        userProductService.saveOrUpdate(userProductMapper.map(newProduct, user, product));
 
         parserService.parseProduct(
                 new ProductForParsing(
@@ -174,8 +174,8 @@ public class ProductMaintenanceImpl implements ProductMaintenance {
 
     @Override
     @Transactional
-    public void updateProduct(@NotNull Long id) throws ServerException {
-        self.updateProduct(productService.getProduct(id));
+    public void update(@NotNull Long id) throws ServerException {
+        self.updateProduct(productService.getById(id));
     }
 
     @Override
@@ -188,7 +188,7 @@ public class ProductMaintenanceImpl implements ProductMaintenance {
     public void updateProduct(Product product) {
         ProductPrice productPrice = priceMapper.mapNewPrice(product, LocalDateTime.now(clock));
 
-        priceService.addPrice(productPrice);
+        priceService.savePrice(productPrice);
         product.addPrice(productPrice);
 
         parserService.parseProduct(

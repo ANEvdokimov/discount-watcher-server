@@ -73,7 +73,7 @@ public class ProductPriceServiceImpl implements ProductPriceService {
 
     @Override
     @Transactional
-    public void addPrice(@NotNull ProductPrice price) {
+    public void savePrice(@NotNull ProductPrice price) {
         log.trace("saving price [{}]", price);
 
         priceRepository.save(price);

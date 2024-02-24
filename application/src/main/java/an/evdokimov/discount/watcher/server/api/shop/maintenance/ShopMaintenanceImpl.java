@@ -22,28 +22,28 @@ public class ShopMaintenanceImpl implements ShopMaintenance {
 
     @Override
     @NotNull
-    public ShopResponse getShopById(@NotNull Long id) throws ServerException {
+    public ShopResponse getById(@NotNull Long id) throws ServerException {
         log.trace("getting shop by id={}", id);
 
-        return shopMapper.map(shopService.getShopById(id));
+        return shopMapper.map(shopService.getById(id));
     }
 
     @Override
     @NotNull
-    public Collection<ShopResponse> getAllShops() {
+    public Collection<ShopResponse> getAll() {
         log.trace("getting all shops");
 
-        return shopService.getAllShops().stream()
+        return shopService.getAll().stream()
                 .map(shopMapper::map)
                 .collect(Collectors.toList());
     }
 
     @Override
     @NotNull
-    public Collection<ShopResponse> getAllUserShops(@NotNull User user) {
+    public Collection<ShopResponse> getAllByUser(@NotNull User user) {
         log.trace("getting all user's shop: [user={}]", user.getLogin());
 
-        return shopService.getAllUserShops(user).stream()
+        return shopService.getByUser(user).stream()
                 .map(shopMapper::map)
                 .collect(Collectors.toList());
     }

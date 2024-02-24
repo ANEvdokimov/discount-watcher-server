@@ -63,8 +63,8 @@ class ShopControllerTest {
                 .id(3L)
                 .name("shop3")
                 .build();
-        when(shopMaintenance.getAllShops()).thenReturn(List.of(shop1, shop2, shop3));
-        when(shopMaintenance.getAllUserShops(testConfig.getTestUser())).thenReturn(List.of(shop1, shop2));
+        when(shopMaintenance.getAll()).thenReturn(List.of(shop1, shop2, shop3));
+        when(shopMaintenance.getAllByUser(testConfig.getTestUser())).thenReturn(List.of(shop1, shop2));
 
         MvcResult result = mvc.perform(get("/api/shops")
                         .header(AUTH_HEADER_NAME, AUTH_USER))
@@ -98,8 +98,8 @@ class ShopControllerTest {
                 .id(3L)
                 .name("shop3")
                 .build();
-        when(shopMaintenance.getAllShops()).thenReturn(List.of(shop1, shop2, shop3));
-        when(shopMaintenance.getAllUserShops(testConfig.getTestUser())).thenReturn(List.of(shop1, shop2));
+        when(shopMaintenance.getAll()).thenReturn(List.of(shop1, shop2, shop3));
+        when(shopMaintenance.getAllByUser(testConfig.getTestUser())).thenReturn(List.of(shop1, shop2));
 
         MvcResult result = mvc.perform(get("/api/shops")
                         .header(AUTH_HEADER_NAME, AUTH_USER)
@@ -134,8 +134,8 @@ class ShopControllerTest {
                 .id(3L)
                 .name("shop3")
                 .build();
-        when(shopMaintenance.getAllShops()).thenReturn(List.of(shop1, shop2, shop3));
-        when(shopMaintenance.getAllUserShops(testConfig.getTestUser())).thenReturn(List.of(shop1, shop2));
+        when(shopMaintenance.getAll()).thenReturn(List.of(shop1, shop2, shop3));
+        when(shopMaintenance.getAllByUser(testConfig.getTestUser())).thenReturn(List.of(shop1, shop2));
 
         MvcResult result = mvc.perform(get("/api/shops")
                         .header(AUTH_HEADER_NAME, AUTH_USER)
@@ -162,7 +162,7 @@ class ShopControllerTest {
                 .id(1L)
                 .name("shop1")
                 .build();
-        when(shopMaintenance.getShopById(1L)).thenReturn(shop1);
+        when(shopMaintenance.getById(1L)).thenReturn(shop1);
 
         MvcResult result = mvc.perform(get("/api/shop/" + shop1.getId())
                         .header(AUTH_HEADER_NAME, AUTH_USER))
@@ -185,20 +185,20 @@ class ShopControllerTest {
                 .id(1L)
                 .name("shop1")
                 .build();
-        when(shopMaintenance.getShopById(1L)).thenReturn(shop1);
+        when(shopMaintenance.getById(1L)).thenReturn(shop1);
 
         MvcResult result = mvc.perform(get("/api/shop/" + shop1.getId()))
                 .andReturn();
 
         assertAll(
                 () -> assertEquals(401, result.getResponse().getStatus()),
-                () -> verify(shopMaintenance, times(0)).getShopById(shop1.getId())
+                () -> verify(shopMaintenance, times(0)).getById(shop1.getId())
         );
     }
 
     @Test
     void getShopById_nonexistentShop_http400() throws Exception {
-        when(shopMaintenance.getShopById(anyLong())).thenThrow(new ServerException(ServerErrorCode.SHOP_NOT_FOUND));
+        when(shopMaintenance.getById(anyLong())).thenThrow(new ServerException(ServerErrorCode.SHOP_NOT_FOUND));
 
         MvcResult result = mvc.perform(get("/api/shop/10")
                         .header(AUTH_HEADER_NAME, AUTH_USER))
@@ -206,7 +206,7 @@ class ShopControllerTest {
 
         assertAll(
                 () -> assertEquals(400, result.getResponse().getStatus()),
-                () -> verify(shopMaintenance, times(1)).getShopById(anyLong())
+                () -> verify(shopMaintenance, times(1)).getById(anyLong())
         );
     }
 }

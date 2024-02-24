@@ -37,7 +37,7 @@ class ShopServiceTest {
 
         when(shopRepository.findById(shopInDb.getId())).thenReturn(Optional.of(shopInDb));
 
-        Shop returnedShop = testedShopService.getShopById(1L);
+        Shop returnedShop = testedShopService.getById(1L);
 
         assertEquals(shopInDb, returnedShop);
     }
@@ -48,7 +48,7 @@ class ShopServiceTest {
 
         assertThrows(
                 ServerException.class,
-                () -> testedShopService.getShopById(1111L)
+                () -> testedShopService.getById(1111L)
         );
     }
 
@@ -69,7 +69,7 @@ class ShopServiceTest {
 
         when(shopRepository.findAll()).thenReturn(List.of(shopInDb1, shopInDb2, shopInDb3));
 
-        Collection<Shop> returnedShops = testedShopService.getAllShops();
+        Collection<Shop> returnedShops = testedShopService.getAll();
         assertThat(
                 returnedShops,
                 containsInAnyOrder(shopInDb1, shopInDb2, shopInDb3)
@@ -80,7 +80,7 @@ class ShopServiceTest {
     void getAllShops_nonexistentShops_emptyList() {
         when(shopRepository.findAll()).thenReturn(List.of());
 
-        Collection<Shop> returnedShops = testedShopService.getAllShops();
+        Collection<Shop> returnedShops = testedShopService.getAll();
         assertTrue(returnedShops.isEmpty());
     }
 }

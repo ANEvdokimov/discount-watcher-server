@@ -18,7 +18,7 @@ public interface ProductPriceService {
     ProductPrice getById(@NotNull Long id) throws ServerException;
 
     @NotNull
-    List<ProductPriceResponse> getPrices(@NotNull Long productId, boolean group, LocalDate startDate) throws ServerException;
+    List<ProductPriceResponse> getPrices(@NotNull Long productId, boolean group, LocalDate startDate) throws ServerException;//todo move to maintenance
 
-    void addPrice(@NotNull ProductPrice price);
+    void savePrice(@NotNull ProductPrice price);
 }

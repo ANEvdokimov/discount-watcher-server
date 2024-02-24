@@ -41,7 +41,7 @@ public class ProductController {
                                    @Valid @RequestBody NewProductRequest newProduct) throws ServerException {
         log.info("Adding new product {} to user {}", newProduct.toString(),
                 ((User) authentication.getPrincipal()).getLogin());
-        productMaintenance.addProduct((User) authentication.getPrincipal(), newProduct);
+        productMaintenance.saveProduct((User) authentication.getPrincipal(), newProduct);
     }
 
     /**
@@ -55,7 +55,7 @@ public class ProductController {
                                     @Valid @RequestBody NewProductWithCookiesRequest newProduct) throws ServerException {
         log.info("Adding new product {} to user {}", newProduct.toString(),
                 ((User) authentication.getPrincipal()).getLogin());
-        productMaintenance.addProduct((User) authentication.getPrincipal(), newProduct);
+        productMaintenance.saveProduct((User) authentication.getPrincipal(), newProduct);
     }
 
     /**
@@ -69,7 +69,7 @@ public class ProductController {
     public ProductResponse getProduct(@PathVariable Long id)
             throws ServerException {
         log.info("Getting product by id={}", id);
-        return productMaintenance.getProduct(id);
+        return productMaintenance.getById(id);
     }
 
     /**
@@ -80,6 +80,6 @@ public class ProductController {
     @PostMapping("/product/update/{id}")
     public void updateProduct(@PathVariable Long id) throws ServerException {
         log.info("Update product by id={}", id);
-        productMaintenance.updateProduct(id);
+        productMaintenance.update(id);
     }
 }

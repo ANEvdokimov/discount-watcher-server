@@ -35,11 +35,11 @@ public class ShopController {
                                                 @Nullable @RequestHeader("only-my") Boolean onlyCurrentUser) {
         if (onlyCurrentUser == null || !onlyCurrentUser) {
             log.info("getting all shops.");
-            return maintenance.getAllShops();
+            return maintenance.getAll();
         } else {
             User currentUser = (User) authentication.getPrincipal();
             log.info("getting shop by user={}", currentUser.getLogin());
-            return maintenance.getAllUserShops(currentUser);
+            return maintenance.getAllByUser(currentUser);
         }
     }
 
@@ -49,6 +49,6 @@ public class ShopController {
     @GetMapping(value = "shop/{shopId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ShopResponse getShopById(@PathVariable("shopId") Long shopId) throws ServerException {
         log.info("getting shop by id={}", shopId);
-        return maintenance.getShopById(shopId);
+        return maintenance.getById(shopId);
     }
 }

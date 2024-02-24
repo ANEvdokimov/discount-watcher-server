@@ -22,7 +22,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @NotNull
-    public Product getProduct(@NotNull Long id) throws ServerException {
+    public Product getById(@NotNull Long id) throws ServerException {
         return productRepository.findById(id)
                 .orElseThrow(() -> ServerErrorCode.PRODUCT_NOT_FOUND.getException("id=" + id));
     }
@@ -50,7 +50,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    public void addProduct(@NotNull Product product) {
+    public void saveProduct(@NotNull Product product) {
         productRepository.save(product);
     }
 }

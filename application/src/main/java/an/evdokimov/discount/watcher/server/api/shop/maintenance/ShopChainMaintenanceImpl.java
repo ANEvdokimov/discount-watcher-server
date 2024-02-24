@@ -21,10 +21,10 @@ public class ShopChainMaintenanceImpl implements ShopChainMaintenance {
 
     @Override
     @NotNull
-    public Collection<ShopChainResponse> getShopChains(boolean withShops, Long cityId) {
+    public Collection<ShopChainResponse> getAll(boolean withShops, Long cityId) {
         log.trace("getting all shop chains with parameters: [withShops={}; cityId={}]", withShops, cityId);
 
-        Collection<ShopChain> shopChains = shopChainService.getShopChains(cityId);
+        Collection<ShopChain> shopChains = shopChainService.getAll(cityId);
 
         if (withShops) {
             return shopChains.stream()

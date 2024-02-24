@@ -66,10 +66,10 @@ public class UserProductControllerTest {
                 UserProductResponse.builder().id(2L).build()
         );
 
-        when(service.getUserProducts(
+        when(service.getAll(
                 any(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean())
         ).thenReturn(Collections.emptyList());
-        when(service.getUserProducts(
+        when(service.getAll(
                 eq(testConfig.getTestUser()), anyBoolean(), eq(true), isNull(), isNull())
         ).thenReturn(products);
 
@@ -88,7 +88,7 @@ public class UserProductControllerTest {
                 () -> assertEquals(200, result.getResponse().getStatus()),
                 () -> assertThat(resultProducts, containsInAnyOrder(products.toArray())),
                 () -> verify(service, times(1))
-                        .getUserProducts(
+                        .getAll(
                                 eq(testConfig.getTestUser()),
                                 anyBoolean(),
                                 anyBoolean(),
@@ -96,7 +96,7 @@ public class UserProductControllerTest {
                                 isNull()
                         ),
                 () -> verify(service, times(0))
-                        .getUserProductsInShop(
+                        .getByShop(
                                 eq(testConfig.getTestUser()),
                                 anyLong(),
                                 anyBoolean(),
@@ -105,7 +105,7 @@ public class UserProductControllerTest {
                                 anyBoolean()
                         ),
                 () -> verify(service, times(0))
-                        .getUserProductsInShop(
+                        .getByShop(
                                 eq(testConfig.getTestUser()),
                                 anyLong(),
                                 anyBoolean(),
@@ -124,10 +124,10 @@ public class UserProductControllerTest {
                 UserProductResponse.builder().id(2L).build()
         );
 
-        when(service.getUserProducts(
+        when(service.getAll(
                 any(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean())
         ).thenReturn(Collections.emptyList());
-        when(service.getUserProducts(
+        when(service.getAll(
                 eq(testConfig.getTestUser()), anyBoolean(), eq(false), eq(true), eq(false))
         ).thenReturn(products);
 
@@ -148,7 +148,7 @@ public class UserProductControllerTest {
                 () -> assertEquals(200, result.getResponse().getStatus()),
                 () -> assertThat(resultProducts, containsInAnyOrder(products.toArray())),
                 () -> verify(service, times(1))
-                        .getUserProducts(
+                        .getAll(
                                 eq(testConfig.getTestUser()),
                                 anyBoolean(),
                                 anyBoolean(),
@@ -156,7 +156,7 @@ public class UserProductControllerTest {
                                 anyBoolean()
                         ),
                 () -> verify(service, times(0))
-                        .getUserProductsInShop(
+                        .getByShop(
                                 eq(testConfig.getTestUser()),
                                 anyLong(),
                                 anyBoolean(),
@@ -175,10 +175,10 @@ public class UserProductControllerTest {
                 UserProductResponse.builder().id(2L).build()
         );
 
-        when(service.getUserProducts(
+        when(service.getAll(
                 any(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean())
         ).thenReturn(Collections.emptyList());
-        when(service.getUserProducts(
+        when(service.getAll(
                 eq(testConfig.getTestUser()), anyBoolean(), isNull(), isNull(), eq(true))
         ).thenReturn(products);
 
@@ -197,7 +197,7 @@ public class UserProductControllerTest {
                 () -> assertEquals(200, result.getResponse().getStatus()),
                 () -> assertThat(resultProducts, containsInAnyOrder(products.toArray())),
                 () -> verify(service, times(1))
-                        .getUserProducts(
+                        .getAll(
                                 eq(testConfig.getTestUser()),
                                 anyBoolean(),
                                 isNull(),
@@ -205,7 +205,7 @@ public class UserProductControllerTest {
                                 anyBoolean()
                         ),
                 () -> verify(service, times(0))
-                        .getUserProductsInShop(
+                        .getByShop(
                                 eq(testConfig.getTestUser()),
                                 anyLong(),
                                 anyBoolean(),
@@ -214,7 +214,7 @@ public class UserProductControllerTest {
                                 anyBoolean()
                         ),
                 () -> verify(service, times(0))
-                        .getUserProductsInShop(
+                        .getByShop(
                                 eq(testConfig.getTestUser()),
                                 anyLong(),
                                 anyBoolean(),
@@ -233,10 +233,10 @@ public class UserProductControllerTest {
                 UserProductResponse.builder().id(2L).build()
         );
 
-        when(service.getUserProducts(
+        when(service.getAll(
                 any(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean())
         ).thenReturn(Collections.emptyList());
-        when(service.getUserProducts(
+        when(service.getAll(
                 eq(testConfig.getTestUser()), anyBoolean(), eq(true), eq(true), isNull())
         ).thenReturn(products);
 
@@ -256,7 +256,7 @@ public class UserProductControllerTest {
                 () -> assertEquals(200, result.getResponse().getStatus()),
                 () -> assertThat(resultProducts, containsInAnyOrder(products.toArray())),
                 () -> verify(service, times(1))
-                        .getUserProducts(
+                        .getAll(
                                 eq(testConfig.getTestUser()),
                                 anyBoolean(),
                                 anyBoolean(),
@@ -264,7 +264,7 @@ public class UserProductControllerTest {
                                 isNull()
                         ),
                 () -> verify(service, times(0))
-                        .getUserProductsInShop(
+                        .getByShop(
                                 eq(testConfig.getTestUser()),
                                 anyLong(),
                                 anyBoolean(),
@@ -273,7 +273,7 @@ public class UserProductControllerTest {
                                 anyBoolean()
                         ),
                 () -> verify(service, times(0))
-                        .getUserProductsInShop(
+                        .getByShop(
                                 eq(testConfig.getTestUser()),
                                 anyLong(),
                                 anyBoolean(),
@@ -292,10 +292,10 @@ public class UserProductControllerTest {
                 UserProductResponse.builder().id(2L).build()
         );
 
-        when(service.getUserProductsInShop(
+        when(service.getByShop(
                 any(), anyLong(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean())
         ).thenReturn(Collections.emptyList());
-        when(service.getUserProductsInShop(
+        when(service.getByShop(
                 eq(testConfig.getTestUser()), eq(1L), anyBoolean(),
                 eq(true), isNull(), isNull())
         ).thenReturn(products);
@@ -316,7 +316,7 @@ public class UserProductControllerTest {
                 () -> assertEquals(200, result.getResponse().getStatus()),
                 () -> assertThat(resultProducts, containsInAnyOrder(products.toArray())),
                 () -> verify(service, times(1))
-                        .getUserProductsInShop(
+                        .getByShop(
                                 eq(testConfig.getTestUser()),
                                 anyLong(),
                                 anyBoolean(),
@@ -335,10 +335,10 @@ public class UserProductControllerTest {
                 UserProductResponse.builder().id(2L).build()
         );
 
-        when(service.getUserProductsInShop(
+        when(service.getByShop(
                 any(), anyLong(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean())
         ).thenReturn(Collections.emptyList());
-        when(service.getUserProductsInShop(
+        when(service.getByShop(
                 eq(testConfig.getTestUser()), eq(1L), anyBoolean(),
                 isNull(), eq(true), isNull())
         ).thenReturn(products);
@@ -359,7 +359,7 @@ public class UserProductControllerTest {
                 () -> assertEquals(200, result.getResponse().getStatus()),
                 () -> assertThat(resultProducts, containsInAnyOrder(products.toArray())),
                 () -> verify(service, times(1))
-                        .getUserProductsInShop(
+                        .getByShop(
                                 eq(testConfig.getTestUser()),
                                 anyLong(),
                                 anyBoolean(),
@@ -378,10 +378,10 @@ public class UserProductControllerTest {
                 UserProductResponse.builder().id(2L).build()
         );
 
-        when(service.getUserProductsInShop(
+        when(service.getByShop(
                 any(), anyLong(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean())
         ).thenReturn(Collections.emptyList());
-        when(service.getUserProductsInShop(
+        when(service.getByShop(
                 eq(testConfig.getTestUser()), eq(1L), anyBoolean(),
                 isNull(), isNull(), eq(true))
         ).thenReturn(products);
@@ -402,7 +402,7 @@ public class UserProductControllerTest {
                 () -> assertEquals(200, result.getResponse().getStatus()),
                 () -> assertThat(resultProducts, containsInAnyOrder(products.toArray())),
                 () -> verify(service, times(1))
-                        .getUserProductsInShop(
+                        .getByShop(
                                 eq(testConfig.getTestUser()),
                                 anyLong(),
                                 anyBoolean(),
@@ -421,10 +421,10 @@ public class UserProductControllerTest {
                 UserProductResponse.builder().id(2L).build()
         );
 
-        when(service.getUserProductsInShop(
+        when(service.getByShop(
                 any(), anyLong(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean())
         ).thenReturn(Collections.emptyList());
-        when(service.getUserProductsInShop(
+        when(service.getByShop(
                 eq(testConfig.getTestUser()), eq(1L), anyBoolean(),
                 isNull(), eq(true), eq(true))
         ).thenReturn(products);
@@ -446,7 +446,7 @@ public class UserProductControllerTest {
                 () -> assertEquals(200, result.getResponse().getStatus()),
                 () -> assertThat(resultProducts, containsInAnyOrder(products.toArray())),
                 () -> verify(service, times(1))
-                        .getUserProductsInShop(
+                        .getByShop(
                                 eq(testConfig.getTestUser()),
                                 anyLong(),
                                 anyBoolean(),
@@ -472,7 +472,7 @@ public class UserProductControllerTest {
         assertAll(
                 () -> assertEquals(400, result.getResponse().getStatus()),
                 () -> verify(service, times(0))
-                        .getUserProducts(
+                        .getAll(
                                 eq(testConfig.getTestUser()),
                                 anyBoolean(),
                                 anyBoolean(),
@@ -480,7 +480,7 @@ public class UserProductControllerTest {
                                 anyBoolean()
                         ),
                 () -> verify(service, times(0))
-                        .getUserProductsInShop(
+                        .getByShop(
                                 eq(testConfig.getTestUser()),
                                 anyLong(),
                                 anyBoolean(),

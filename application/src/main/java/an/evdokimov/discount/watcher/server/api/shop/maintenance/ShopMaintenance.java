@@ -9,11 +9,11 @@ import java.util.Collection;
 
 public interface ShopMaintenance {
     @NotNull
-    ShopResponse getShopById(@NotNull Long id) throws ServerException;
+    ShopResponse getById(@NotNull Long id) throws ServerException;
 
     @NotNull
-    Collection<ShopResponse> getAllShops();
+    Collection<ShopResponse> getAll();
 
     @NotNull
-    Collection<ShopResponse> getAllUserShops(@NotNull User user);
+    Collection<ShopResponse> getAllByUser(@NotNull User user);
 }

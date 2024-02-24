@@ -9,14 +9,14 @@ import java.util.Collection;
 
 public interface ShopService {
     @NotNull
-    Shop getShopById(@NotNull Long id) throws ServerException;
+    Shop getById(@NotNull Long id) throws ServerException;
 
     @NotNull
-    Shop getShopByCookie(@NotNull String cookie) throws ServerException;
+    Shop getByCookie(@NotNull String cookie) throws ServerException;
 
     @NotNull
-    Collection<Shop> getAllShops();
+    Collection<Shop> getAll();
 
     @NotNull
-    Collection<Shop> getAllUserShops(@NotNull User user);
+    Collection<Shop> getByUser(@NotNull User user);
 }

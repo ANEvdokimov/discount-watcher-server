@@ -38,11 +38,11 @@ public class UserProductServiceImpl implements UserProductService {
 
     @Override
     @NotNull
-    public List<UserProductResponse> getUserProducts(@NotNull User user,
-                                                     boolean onlyActive,
-                                                     @Nullable Boolean monitorAvailability,
-                                                     @Nullable Boolean monitorDiscount,
-                                                     @Nullable Boolean monitorPriceChanges) {
+    public List<UserProductResponse> getAll(@NotNull User user,
+                                            boolean onlyActive,
+                                            @Nullable Boolean monitorAvailability,
+                                            @Nullable Boolean monitorDiscount,
+                                            @Nullable Boolean monitorPriceChanges) {
         List<UserProduct> userProducts;
         if (onlyActive) {
             userProducts = repository.findActiveUserProducts(user, monitorAvailability, monitorDiscount,
@@ -59,12 +59,12 @@ public class UserProductServiceImpl implements UserProductService {
 
     @Override
     @NotNull
-    public List<UserProductResponse> getUserProductsInShop(@NotNull User user,
-                                                           @NotNull Long shopId,
-                                                           boolean onlyActive,
-                                                           @Nullable Boolean monitorAvailability,
-                                                           @Nullable Boolean monitorDiscount,
-                                                           @Nullable Boolean monitorPriceChanges)
+    public List<UserProductResponse> getByShop(@NotNull User user,
+                                               @NotNull Long shopId,
+                                               boolean onlyActive,
+                                               @Nullable Boolean monitorAvailability,
+                                               @Nullable Boolean monitorDiscount,
+                                               @Nullable Boolean monitorPriceChanges)
             throws ServerException {
         Shop shop = shopRepository
                 .findById(shopId).orElseThrow(() -> new ServerException(ServerErrorCode.SHOP_NOT_FOUND));
@@ -107,7 +107,7 @@ public class UserProductServiceImpl implements UserProductService {
 
     @Override
     @Transactional
-    public void addOrUpdate(@NotNull UserProduct userProduct) {
+    public void saveOrUpdate(@NotNull UserProduct userProduct) {
         Optional<UserProduct> userProductFromDb =
                 repository.findByUserAndProduct(userProduct.getUser(), userProduct.getProduct());
         if (userProductFromDb.isEmpty()) {

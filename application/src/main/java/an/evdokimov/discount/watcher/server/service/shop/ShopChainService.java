@@ -8,5 +8,5 @@ import java.util.Collection;
 
 public interface ShopChainService {
     @NotNull
-    Collection<ShopChain> getShopChains(@Nullable Long cityId);
+    Collection<ShopChain> getAll(@Nullable Long cityId);
 }

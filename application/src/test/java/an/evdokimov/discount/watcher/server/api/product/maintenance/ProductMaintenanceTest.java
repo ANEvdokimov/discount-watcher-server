@@ -111,10 +111,10 @@ class ProductMaintenanceTest {
                 .lastPrice(priceResponse2)
                 .build();
 
-        when(productService.getProduct(666L)).thenReturn(testProduct);
+        when(productService.getById(666L)).thenReturn(testProduct);
         when(productMapper.map(refEq(testProduct))).thenReturn(response);
 
-        ProductResponse returnedProduct = testedProductMaintenance.getProduct(666L);
+        ProductResponse returnedProduct = testedProductMaintenance.getById(666L);
 
         assertEquals(response, returnedProduct);
     }
@@ -123,10 +123,10 @@ class ProductMaintenanceTest {
     @Test
     @DisplayName("Getting nonexistent product by id")
     void getProduct_nonexistentProduct_ServerException() {
-        when(productService.getProduct(666L)).thenThrow(ServerErrorCode.PRODUCT_NOT_FOUND.getException());
+        when(productService.getById(666L)).thenThrow(ServerErrorCode.PRODUCT_NOT_FOUND.getException());
 
-        assertThrows(ServerException.class, () -> testedProductMaintenance.getProduct(666L));
-        verify(productService).getProduct(666L);
+        assertThrows(ServerException.class, () -> testedProductMaintenance.getById(666L));
+        verify(productService).getById(666L);
     }
 
     @Test
@@ -165,7 +165,7 @@ class ProductMaintenanceTest {
                 .monitorPriceChanges(request.getMonitorPriceChanges())
                 .build();
 
-        when(shopService.getShopByCookie(mockedShop.getCookie())).thenReturn(mockedShop);
+        when(shopService.getByCookie(mockedShop.getCookie())).thenReturn(mockedShop);
         when(informationService.getOrCreateByUrl(request.getUrl())).thenReturn(mockedInformation);
         when(productService.getOrCreateByProductInformationAndShop(mockedInformation, mockedShop))
                 .thenReturn(mockedProduct);
@@ -180,10 +180,10 @@ class ProductMaintenanceTest {
                 .cookie(mockedShop.getCookie())
                 .build();
 
-        testedProductMaintenance.addProduct(mockedUser, request);
+        testedProductMaintenance.saveProduct(mockedUser, request);
 
-        verify(priceService).addPrice(mockedPrice);
-        verify(userProductService).addOrUpdate(mockedUserProduct);
+        verify(priceService).savePrice(mockedPrice);
+        verify(userProductService).saveOrUpdate(mockedUserProduct);
         verify(parserService).parseProduct(expectedResult);
     }
 
@@ -640,7 +640,7 @@ class ProductMaintenanceTest {
                 .build();
 
         when(priceMapper.mapNewPrice(eq(mockedProduct), any())).thenReturn(mockedPrice);
-        when(productService.getProduct(mockedProduct.getId())).thenReturn(mockedProduct);
+        when(productService.getById(mockedProduct.getId())).thenReturn(mockedProduct);
 
         ProductForParsing expectedResult = new ProductForParsing(
                 mockedProduct.getProductInformation().getId(),
@@ -649,9 +649,9 @@ class ProductMaintenanceTest {
                 mockedProduct.getShop().getCookie()
         );
 
-        testedProductMaintenance.updateProduct(mockedProduct.getId());
+        testedProductMaintenance.update(mockedProduct.getId());
 
-        verify(priceService).addPrice(mockedPrice);
+        verify(priceService).savePrice(mockedPrice);
         verify(parserService).parseProduct(expectedResult);
     }
 
@@ -684,7 +684,7 @@ class ProductMaintenanceTest {
 
         testedProductMaintenance.updateTrackedProducts();
 
-        verify(priceService).addPrice(mockedPrice);
+        verify(priceService).savePrice(mockedPrice);
         verify(parserService).parseProduct(expectedResult);
     }
 }

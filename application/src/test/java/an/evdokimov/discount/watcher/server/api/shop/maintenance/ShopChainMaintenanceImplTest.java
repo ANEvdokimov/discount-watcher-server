@@ -84,9 +84,9 @@ class ShopChainMaintenanceImplTest {
 
     @BeforeEach
     public void mockServiceAndMapper() {
-        when(shopChainService.getShopChains(null)).thenReturn(List.of(scInCity1, scInCities1And17, scInCity17));
-        when(shopChainService.getShopChains(1L)).thenReturn(List.of(scInCity1, scInCities1And17));
-        when(shopChainService.getShopChains(17L)).thenReturn(List.of(scInCities1And17, scInCity17));
+        when(shopChainService.getAll(null)).thenReturn(List.of(scInCity1, scInCities1And17, scInCity17));
+        when(shopChainService.getAll(1L)).thenReturn(List.of(scInCity1, scInCities1And17));
+        when(shopChainService.getAll(17L)).thenReturn(List.of(scInCities1And17, scInCity17));
 
         when(mapper.toDto(scInCity1)).thenReturn(scrInCity1);
         when(mapper.toDto(scInCities1And17)).thenReturn(scrInCities1And17);
@@ -99,7 +99,7 @@ class ShopChainMaintenanceImplTest {
     @Test
     @DisplayName("get all shop chains")
     void getAllShopChains_withShopsFalseCityNull_listOfSc() {
-        Collection<ShopChainResponse> result = testedMaintenance.getShopChains(false, null);
+        Collection<ShopChainResponse> result = testedMaintenance.getAll(false, null);
 
         assertEquals(List.of(scrInCity1, scrInCities1And17, scrInCity17), result);
     }
@@ -107,7 +107,7 @@ class ShopChainMaintenanceImplTest {
     @Test
     @DisplayName("get all shop chains with shops")
     void getAllShopChains_withShopsTrueCityNull_listOfSc() {
-        Collection<ShopChainResponse> result = testedMaintenance.getShopChains(true, null);
+        Collection<ShopChainResponse> result = testedMaintenance.getAll(true, null);
 
         assertEquals(List.of(scrwsInCity1, scrwsInCities1And17, scrwsInCity17), result);
     }
@@ -115,7 +115,7 @@ class ShopChainMaintenanceImplTest {
     @Test
     @DisplayName("get all shop chains in city")
     void getAllShopChains_withShopsFalseCity1_listOfSc() {
-        Collection<ShopChainResponse> result = testedMaintenance.getShopChains(false, 1L);
+        Collection<ShopChainResponse> result = testedMaintenance.getAll(false, 1L);
 
         assertEquals(List.of(scrInCity1, scrInCities1And17), result);
     }
@@ -123,7 +123,7 @@ class ShopChainMaintenanceImplTest {
     @Test
     @DisplayName("get all shop chain with shops in city")
     void getAllShopChains_withShopsTrueCity17_listOfSc() {
-        Collection<ShopChainResponse> result = testedMaintenance.getShopChains(true, 17L);
+        Collection<ShopChainResponse> result = testedMaintenance.getAll(true, 17L);
 
         assertEquals(List.of(scrwsInCities1And17, scrwsInCity17), result);
     }

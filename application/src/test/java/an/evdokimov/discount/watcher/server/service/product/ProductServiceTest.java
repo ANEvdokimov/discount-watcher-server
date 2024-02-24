@@ -44,7 +44,7 @@ class ProductServiceTest {
 
         when(productRepository.findById(666L)).thenReturn(Optional.of(testProduct));
 
-        Product actual = testedProductService.getProduct(testProduct.getId());
+        Product actual = testedProductService.getById(testProduct.getId());
 
         assertEquals(testProduct, actual);
     }
@@ -54,7 +54,7 @@ class ProductServiceTest {
     void getProduct_nonexistentProduct_ServerException() {
         when(productRepository.findById(666L)).thenReturn(Optional.empty());
 
-        assertThrows(ServerException.class, () -> testedProductService.getProduct(666L));
+        assertThrows(ServerException.class, () -> testedProductService.getById(666L));
         verify(productRepository).findById(666L);
     }
 
@@ -141,7 +141,7 @@ class ProductServiceTest {
                 .id(666L)
                 .build();
 
-        testedProductService.addProduct(testProduct);
+        testedProductService.saveProduct(testProduct);
 
         verify(productRepository).save(testProduct);
     }

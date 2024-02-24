@@ -20,7 +20,7 @@ public class ShopServiceImpl implements ShopService {
 
     @Override
     @NotNull
-    public Shop getShopById(@NotNull Long id) throws ServerException {
+    public Shop getById(@NotNull Long id) throws ServerException {
         log.trace("getting shop by id [{}]", id);
 
         return repository.findById(id)
@@ -29,7 +29,7 @@ public class ShopServiceImpl implements ShopService {
 
     @Override
     @NotNull
-    public Shop getShopByCookie(@NotNull String cookie) throws ServerException {
+    public Shop getByCookie(@NotNull String cookie) throws ServerException {
         log.trace("getting shop by cookie [{}]", cookie);
 
         return repository.findByCookie(cookie)
@@ -38,7 +38,7 @@ public class ShopServiceImpl implements ShopService {
 
     @Override
     @NotNull
-    public Collection<Shop> getAllShops() {
+    public Collection<Shop> getAll() {
         log.trace("getting all shops");
 
         return repository.findAll();
@@ -46,7 +46,7 @@ public class ShopServiceImpl implements ShopService {
 
     @Override
     @NotNull
-    public Collection<Shop> getAllUserShops(@NotNull User user) {
+    public Collection<Shop> getByUser(@NotNull User user) {
         log.trace("getting all shops by user [{}]", user.getLogin());
 
         return repository.findAllUserShops(user);

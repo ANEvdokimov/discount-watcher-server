@@ -86,29 +86,29 @@ class ShopChainServiceTest {
     }
 
     @Test
-    void getAllShopChains_viewShopsFalseCityNull_listOfSc() {
-        Collection<ShopChain> result = testedService.getShopChains(null);
+    void getAll_viewShopsFalseCityNull_listOfSc() {
+        Collection<ShopChain> result = testedService.getAll(null);
 
         assertEquals(List.of(scInCity1, scInCities1And17, scInCity17), result);
     }
 
     @Test
-    void getAllShopChains_viewShopsTrueCityNull_listOfSc() {
-        Collection<ShopChain> result = testedService.getShopChains(null);
+    void getAll_viewShopsTrueCityNull_listOfSc() {
+        Collection<ShopChain> result = testedService.getAll(null);
 
         assertEquals(List.of(scInCity1, scInCities1And17, scInCity17), result);
     }
 
     @Test
-    void getAllShopChains_viewShopsFalseCity1_listOfSc() {
-        Collection<ShopChain> result = testedService.getShopChains(1L);
+    void getAll_viewShopsFalseCity1_listOfSc() {
+        Collection<ShopChain> result = testedService.getAll(1L);
 
         assertEquals(List.of(scInCity1, scInCities1And17), result);
     }
 
     @Test
-    void getAllShopChains_viewShopsTrueCity17_listOfSc() {
-        Collection<ShopChain> result = testedService.getShopChains(17L);
+    void getAll_viewShopsTrueCity17_listOfSc() {
+        Collection<ShopChain> result = testedService.getAll(17L);
 
         assertEquals(List.of(scInCities1And17, scInCity17), result);
     }

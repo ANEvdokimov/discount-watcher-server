@@ -10,7 +10,7 @@ import java.util.Collection;
 
 public interface ProductService {
     @NotNull
-    Product getProduct(@NotNull Long id) throws ServerException;
+    Product getById(@NotNull Long id) throws ServerException;
 
     @NotNull
     Product getOrCreateByProductInformationAndShop(ProductInformation information, Shop shop);
@@ -18,5 +18,5 @@ public interface ProductService {
     @NotNull
     Collection<Product> getAllTrackedProducts();
 
-    void addProduct(@NotNull Product product);
+    void saveProduct(@NotNull Product product);
 }

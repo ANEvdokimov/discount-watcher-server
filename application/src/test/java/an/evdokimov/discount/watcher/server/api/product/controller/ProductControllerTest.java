@@ -77,7 +77,7 @@ class ProductControllerTest {
         assertAll(
                 () -> assertEquals(200, result.getResponse().getStatus()),
                 () -> verify(productMaintenance, times(1))
-                        .addProduct(eq(testConfig.getTestUser()), eq(request))
+                        .saveProduct(eq(testConfig.getTestUser()), eq(request))
         );
     }
 
@@ -97,7 +97,7 @@ class ProductControllerTest {
         assertAll(
                 () -> assertEquals(400, result.getResponse().getStatus()),
                 () -> verify(productMaintenance, times(0))
-                        .addProduct(eq(testConfig.getTestUser()), eq(request))
+                        .saveProduct(eq(testConfig.getTestUser()), eq(request))
         );
     }
 
@@ -117,7 +117,7 @@ class ProductControllerTest {
         assertAll(
                 () -> assertEquals(400, result.getResponse().getStatus()),
                 () -> verify(productMaintenance, times(0))
-                        .addProduct(eq(testConfig.getTestUser()), eq(request))
+                        .saveProduct(eq(testConfig.getTestUser()), eq(request))
         );
     }
 
@@ -146,7 +146,7 @@ class ProductControllerTest {
         assertAll(
                 () -> assertEquals(200, result.getResponse().getStatus()),
                 () -> verify(productMaintenance, times(1))
-                        .addProduct(eq(testConfig.getTestUser()), eq(request))
+                        .saveProduct(eq(testConfig.getTestUser()), eq(request))
         );
     }
 
@@ -166,7 +166,7 @@ class ProductControllerTest {
         assertAll(
                 () -> assertEquals(400, result.getResponse().getStatus()),
                 () -> verify(productMaintenance, times(0))
-                        .addProduct(eq(testConfig.getTestUser()), eq(request))
+                        .saveProduct(eq(testConfig.getTestUser()), eq(request))
         );
     }
 
@@ -186,14 +186,14 @@ class ProductControllerTest {
         assertAll(
                 () -> assertEquals(400, result.getResponse().getStatus()),
                 () -> verify(productMaintenance, times(0))
-                        .addProduct(eq(testConfig.getTestUser()), eq(request))
+                        .saveProduct(eq(testConfig.getTestUser()), eq(request))
         );
     }
 
     @Test
     void getProduct_validJwt_http200() throws Exception {
         ProductResponse expectedProductResponse = ProductResponse.builder().id(1L).build();
-        when(productMaintenance.getProduct(anyLong())).thenReturn(expectedProductResponse);
+        when(productMaintenance.getById(anyLong())).thenReturn(expectedProductResponse);
 
         MvcResult result = mvc.perform(get("/api/product/" + expectedProductResponse.getId())
                 .header(AUTH_HEADER_NAME, AUTH_USER)
@@ -206,7 +206,7 @@ class ProductControllerTest {
                 () -> assertEquals(200, result.getResponse().getStatus()),
                 () -> assertEquals(expectedProductResponse, returnedProductResponse),
                 () -> verify(productMaintenance, times(1))
-                        .getProduct(expectedProductResponse.getId())
+                        .getById(expectedProductResponse.getId())
         );
     }
 }

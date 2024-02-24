@@ -124,7 +124,7 @@ public class UserProductServiceTest {
         ));
 
         Collection<UserProductResponse> returnedProducts =
-                testedService.getUserProducts(userWithProducts, false, true, true, true);
+                testedService.getAll(userWithProducts, false, true, true, true);
         assertThat(
                 returnedProducts,
                 containsInAnyOrder(response1, response2)
@@ -202,7 +202,7 @@ public class UserProductServiceTest {
                 ));
 
         Collection<UserProductResponse> returnedProducts =
-                testedService.getUserProducts(
+                testedService.getAll(
                         userWithProducts,
                         true,
                         true,
@@ -273,7 +273,7 @@ public class UserProductServiceTest {
         when(userProductRepository.findActiveUserProductsInShop(any(), any(), anyBoolean(), anyBoolean(), anyBoolean()))
                 .thenReturn(List.of(userProduct3));
 
-        Collection<UserProductResponse> returnedProducts = testedService.getUserProductsInShop(
+        Collection<UserProductResponse> returnedProducts = testedService.getByShop(
                 new User(),
                 shop.getId(),
                 false,
@@ -343,7 +343,7 @@ public class UserProductServiceTest {
                 .thenReturn(List.of(userProduct3));
 
         Collection<UserProductResponse> returnedProducts =
-                testedService.getUserProductsInShop(
+                testedService.getByShop(
                         new User(),
                         shop.getId(),
                         true,
@@ -361,7 +361,7 @@ public class UserProductServiceTest {
 
         assertThrows(
                 ServerException.class,
-                () -> testedService.getUserProductsInShop(
+                () -> testedService.getByShop(
                         new User(),
                         666L,
                         true,
@@ -486,7 +486,7 @@ public class UserProductServiceTest {
 
         when(userProductRepository.findByUserAndProduct(user, product)).thenReturn(Optional.ofNullable(testedProduct));
 
-        testedService.addOrUpdate(testedProduct);
+        testedService.saveOrUpdate(testedProduct);
 
         verify(userProductRepository).save(testedProduct);
         verify(userProductRepository, never()).save(userProductFromDb);
@@ -510,7 +510,7 @@ public class UserProductServiceTest {
 
         when(userProductRepository.findByUserAndProduct(user, product)).thenReturn(Optional.ofNullable(testedProduct));
 
-        testedService.addOrUpdate(testedProduct);
+        testedService.saveOrUpdate(testedProduct);
 
         verify(userProductRepository).save(testedProduct);
         verify(userProductRepository).save(any());

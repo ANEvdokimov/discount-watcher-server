@@ -46,10 +46,10 @@ class ShopMaintenanceImplTest {
                 .name(shopInDb.getName())
                 .build();
 
-        when(shopService.getShopById(shopInDb.getId())).thenReturn(shopInDb);
+        when(shopService.getById(shopInDb.getId())).thenReturn(shopInDb);
         when(shopMapper.map(shopInDb)).thenReturn(shopResponse);
 
-        ShopResponse returnedShopResponse = testedShopMaintenance.getShopById(1L);
+        ShopResponse returnedShopResponse = testedShopMaintenance.getById(1L);
 
         assertEquals(shopResponse, returnedShopResponse);
     }
@@ -58,11 +58,11 @@ class ShopMaintenanceImplTest {
     @Test
     @DisplayName("get nonexistent shop by id")
     void getShopById_nonexistentShop_ShopResponse() {
-        when(shopService.getShopById(anyLong())).thenThrow(ServerErrorCode.SHOP_NOT_FOUND.getException());
+        when(shopService.getById(anyLong())).thenThrow(ServerErrorCode.SHOP_NOT_FOUND.getException());
 
         assertThrows(
                 ServerException.class,
-                () -> testedShopMaintenance.getShopById(1111L)
+                () -> testedShopMaintenance.getById(1111L)
         );
     }
 
@@ -95,12 +95,12 @@ class ShopMaintenanceImplTest {
                 .name(shopInDb3.getName())
                 .build();
 
-        when(shopService.getAllShops()).thenReturn(List.of(shopInDb1, shopInDb2, shopInDb3));
+        when(shopService.getAll()).thenReturn(List.of(shopInDb1, shopInDb2, shopInDb3));
         when(shopMapper.map(shopInDb1)).thenReturn(shopResponse1);
         when(shopMapper.map(shopInDb2)).thenReturn(shopResponse2);
         when(shopMapper.map(shopInDb3)).thenReturn(shopResponse3);
 
-        Collection<ShopResponse> returnedShops = testedShopMaintenance.getAllShops();
+        Collection<ShopResponse> returnedShops = testedShopMaintenance.getAll();
         assertThat(
                 returnedShops,
                 containsInAnyOrder(shopResponse1, shopResponse2, shopResponse3)
@@ -110,9 +110,9 @@ class ShopMaintenanceImplTest {
     @Test
     @DisplayName("get all nonexistent shops")
     void getAllShops_nonexistentShops_emptyList() {
-        when(shopService.getAllShops()).thenReturn(List.of());
+        when(shopService.getAll()).thenReturn(List.of());
 
-        Collection<ShopResponse> returnedShops = testedShopMaintenance.getAllShops();
+        Collection<ShopResponse> returnedShops = testedShopMaintenance.getAll();
         assertTrue(returnedShops.isEmpty());
     }
 }

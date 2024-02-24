@@ -100,12 +100,12 @@ class ShopChainControllerTest {
 
     @BeforeEach
     public void mockRepository() {
-        when(maintenance.getShopChains(false, null)).thenReturn(scResponsesInAllCity);
-        when(maintenance.getShopChains(false, 1L)).thenReturn(scResponsesInCity1);
-        when(maintenance.getShopChains(false, 17L)).thenReturn(scResponsesInCity17);
-        when(maintenance.getShopChains(true, null)).thenReturn(scWithShopsResponsesInAllCity);
-        when(maintenance.getShopChains(true, 1L)).thenReturn(scWithShopsResponsesInCity1);
-        when(maintenance.getShopChains(true, 17L)).thenReturn(scWithShopsResponsesInCity17);
+        when(maintenance.getAll(false, null)).thenReturn(scResponsesInAllCity);
+        when(maintenance.getAll(false, 1L)).thenReturn(scResponsesInCity1);
+        when(maintenance.getAll(false, 17L)).thenReturn(scResponsesInCity17);
+        when(maintenance.getAll(true, null)).thenReturn(scWithShopsResponsesInAllCity);
+        when(maintenance.getAll(true, 1L)).thenReturn(scWithShopsResponsesInCity1);
+        when(maintenance.getAll(true, 17L)).thenReturn(scWithShopsResponsesInCity17);
     }
 
     @Test
