@@ -2,7 +2,7 @@ package an.evdokimov.discount.watcher.server.api.product.controller;
 
 import an.evdokimov.discount.watcher.server.api.error.ServerException;
 import an.evdokimov.discount.watcher.server.api.product.dto.response.ProductPriceResponse;
-import an.evdokimov.discount.watcher.server.service.product.ProductPriceService;
+import an.evdokimov.discount.watcher.server.api.product.maintenance.ProductPriceMaintenance;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.Nullable;
@@ -20,7 +20,7 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 public class ProductPriceController {
-    private final ProductPriceService priceService;
+    private final ProductPriceMaintenance priceMaintenance;
 
     /**
      * Getting price history for product.
@@ -41,6 +41,6 @@ public class ProductPriceController {
             group = false;
         }
 
-        return priceService.getPrices(productId, group, startDate);
+        return priceMaintenance.getByProduct(productId, group, startDate);
     }
 }

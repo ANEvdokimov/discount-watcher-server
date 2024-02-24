@@ -1,6 +1,5 @@
 package an.evdokimov.discount.watcher.server.service.product;
 
-import an.evdokimov.discount.watcher.server.api.product.dto.response.ProductPriceResponse;
 import an.evdokimov.discount.watcher.server.database.city.model.City;
 import an.evdokimov.discount.watcher.server.database.product.model.ParsingStatus;
 import an.evdokimov.discount.watcher.server.database.product.model.PriceChange;
@@ -11,7 +10,6 @@ import an.evdokimov.discount.watcher.server.database.product.repository.ProductP
 import an.evdokimov.discount.watcher.server.database.product.repository.ProductRepository;
 import an.evdokimov.discount.watcher.server.database.shop.model.Shop;
 import an.evdokimov.discount.watcher.server.database.shop.model.ShopChain;
-import an.evdokimov.discount.watcher.server.mapper.product.ProductPriceMapperImpl;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -19,7 +17,6 @@ import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 
 import java.math.BigDecimal;
 import java.net.URL;
@@ -37,8 +34,6 @@ import static org.mockito.Mockito.when;
 class ProductPriceServiceImplTest {
     @Autowired
     private ProductPriceServiceImpl testedService;
-    @SpyBean
-    private ProductPriceMapperImpl productPriceMapper;
     @MockBean
     private ProductPriceRepository priceRepository;
     @MockBean
@@ -127,10 +122,10 @@ class ProductPriceServiceImplTest {
         when(priceRepository.findByProductOrderByParsingDateDesc(mockedProduct))
                 .thenReturn(List.of(price4, price3, price2, price1));
 
-        List<ProductPriceResponse> result = testedService.getPrices(mockedProduct.getId(), true, null);
+        List<ProductPrice> result = testedService.getByProduct(mockedProduct, true, null);
 
         assertThat(
-                result.stream().map(ProductPriceResponse::getId).toList(),
+                result.stream().map(ProductPrice::getId).toList(),
                 contains(price3.getId(), price1.getId())
         );
     }
@@ -188,10 +183,10 @@ class ProductPriceServiceImplTest {
         when(priceRepository.findByProductOrderByParsingDateDesc(mockedProduct))
                 .thenReturn(List.of(price4, price3, price2, price1));
 
-        List<ProductPriceResponse> result = testedService.getPrices(mockedProduct.getId(), false, null);
+        List<ProductPrice> result = testedService.getByProduct(mockedProduct, false, null);
 
         assertThat(
-                result.stream().map(ProductPriceResponse::getId).toList(),
+                result.stream().map(ProductPrice::getId).toList(),
                 contains(price4.getId(), price3.getId(), price2.getId(), price1.getId())
         );
     }
@@ -226,10 +221,10 @@ class ProductPriceServiceImplTest {
         when(priceRepository.findByProductOrderByParsingDateDesc(mockedProduct))
                 .thenReturn(List.of(price2, price1));
 
-        List<ProductPriceResponse> result = testedService.getPrices(mockedProduct.getId(), true, null);
+        List<ProductPrice> result = testedService.getByProduct(mockedProduct, true, null);
 
         assertThat(
-                result.stream().map(ProductPriceResponse::getId).toList(),
+                result.stream().map(ProductPrice::getId).toList(),
                 contains(price1.getId())
         );
     }
@@ -290,11 +285,10 @@ class ProductPriceServiceImplTest {
                 mockedProduct, LocalDate.of(2023, 10, 2).atStartOfDay()))
                 .thenReturn(List.of(price4, price3));
 
-        List<ProductPriceResponse> result = testedService.getPrices(
-                mockedProduct.getId(), false, LocalDate.of(2023, 10, 2));
+        List<ProductPrice> result = testedService.getByProduct(mockedProduct, false, LocalDate.of(2023, 10, 2));
 
         assertThat(
-                result.stream().map(ProductPriceResponse::getId).toList(),
+                result.stream().map(ProductPrice::getId).toList(),
                 contains(price4.getId(), price3.getId())
         );
     }
@@ -355,11 +349,10 @@ class ProductPriceServiceImplTest {
                 mockedProduct, LocalDate.of(2023, 10, 2).atStartOfDay()))
                 .thenReturn(List.of(price4, price3));
 
-        List<ProductPriceResponse> result = testedService.getPrices(
-                mockedProduct.getId(), true, LocalDate.of(2023, 10, 2));
+        List<ProductPrice> result = testedService.getByProduct(mockedProduct, true, LocalDate.of(2023, 10, 2));
 
         assertThat(
-                result.stream().map(ProductPriceResponse::getId).toList(),
+                result.stream().map(ProductPrice::getId).toList(),
                 contains(price3.getId())
         );
     }

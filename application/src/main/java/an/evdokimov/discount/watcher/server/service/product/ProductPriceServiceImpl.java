@@ -2,16 +2,12 @@ package an.evdokimov.discount.watcher.server.service.product;
 
 import an.evdokimov.discount.watcher.server.api.error.ServerErrorCode;
 import an.evdokimov.discount.watcher.server.api.error.ServerException;
-import an.evdokimov.discount.watcher.server.api.product.dto.response.ProductPriceResponse;
 import an.evdokimov.discount.watcher.server.database.product.model.Product;
 import an.evdokimov.discount.watcher.server.database.product.model.ProductPrice;
 import an.evdokimov.discount.watcher.server.database.product.repository.ProductPriceRepository;
-import an.evdokimov.discount.watcher.server.database.product.repository.ProductRepository;
-import an.evdokimov.discount.watcher.server.mapper.product.ProductPriceMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,9 +23,7 @@ import java.util.Stack;
 @Slf4j
 @RequiredArgsConstructor
 public class ProductPriceServiceImpl implements ProductPriceService {
-    private final ProductRepository productRepository;
     private final ProductPriceRepository priceRepository;
-    private final ProductPriceMapper mapper;
 
     @Override
     @NotNull
@@ -47,12 +41,8 @@ public class ProductPriceServiceImpl implements ProductPriceService {
 
     @Override
     @NotNull
-    public List<ProductPriceResponse> getPrices(@NotNull Long productId, boolean group, @Nullable LocalDate startDate)
-            throws ServerException {
-        log.trace("getting prices [productId={}, group={}, startDate={}]", productId, group, startDate);
-
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> ServerErrorCode.PRODUCT_NOT_FOUND.getException("id=" + productId));
+    public List<ProductPrice> getByProduct(@NotNull Product product, boolean group, LocalDate startDate) {
+        log.trace("getting prices [product={}, group={}, startDate={}]", product, group, startDate);
 
         List<ProductPrice> prices;
         if (startDate == null) {
@@ -66,9 +56,7 @@ public class ProductPriceServiceImpl implements ProductPriceService {
             prices = groupByDateAndPrice(prices);
         }
 
-        return prices.stream()
-                .map(mapper::map)
-                .toList();
+        return prices;
     }
 
     @Override

@@ -1,7 +1,6 @@
 package an.evdokimov.discount.watcher.server.service.product;
 
 import an.evdokimov.discount.watcher.server.api.error.ServerException;
-import an.evdokimov.discount.watcher.server.api.product.dto.response.ProductPriceResponse;
 import an.evdokimov.discount.watcher.server.database.product.model.Product;
 import an.evdokimov.discount.watcher.server.database.product.model.ProductPrice;
 import org.jetbrains.annotations.NotNull;
@@ -18,7 +17,7 @@ public interface ProductPriceService {
     ProductPrice getById(@NotNull Long id) throws ServerException;
 
     @NotNull
-    List<ProductPriceResponse> getPrices(@NotNull Long productId, boolean group, LocalDate startDate) throws ServerException;//todo move to maintenance
+    List<ProductPrice> getByProduct(@NotNull Product product, boolean group, LocalDate startDate);
 
     void savePrice(@NotNull ProductPrice price);
 }
